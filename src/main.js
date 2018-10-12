@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import iView from 'iview'
 import './my-theme/index.less'
+import './assets/css/index.css'
 // import locale from 'iview/dist/locale/en-US'
 // 引用axios
 import api from './api'

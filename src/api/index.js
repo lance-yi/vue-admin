@@ -1,10 +1,9 @@
+import axios from 'axios'
 // 配置API接口地址
 var root = 'http://192.168.8.185:8888/api'
 // var root = 'http://192.168.8.185:8888/api'
-// var wwwroot = 'http://ht.lingbu168.com'
 // 引用axios
-import axios from 'axios';
-axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true
 // 自定义判断元素类型JS
 function toType (obj) {
   return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
@@ -12,7 +11,7 @@ function toType (obj) {
 // 参数过滤函数
 function filterNull (o) {
   for (var key in o) {
-    if (o[key] === null) {delete o[key]}
+    if (o[key] === null) { delete o[key] }
     if (toType(o[key]) === 'string') {
       o[key] = o[key].trim()
     } else if (toType(o[key]) === 'object') {
@@ -30,21 +29,20 @@ function apiAxios (method, url, params, success, failure) {
   }
   axios({
     method: method,
+    headers: { 'Authorization': localStorage.token },
     url: url,
     data: method === 'POST' || method === 'PUT' ? params : null,
-    dataType: "json",
+    dataType: 'json',
     params: method === 'GET' || method === 'DELETE' ? params : null,
     baseURL: root,
     withCredentials: false
-  })
-  .then(function (res) {
-    if (res.data.status == true || res!=='') {
-      if (success) {success(res.data);}
+  }).then(function (res) {
+    if (res.data.status === true || res !== '') {
+      if (success) { success(res.data) }
     } else {
-      if (failure) {failure(res.data);} else {throw new Error(res);}
+      if (failure) { failure(res.data) } else { throw new Error(res) }
     }
-  })
-  .catch(function (err) {throw new Error(err);})
+  }).catch(function (err) { throw new Error(err) })
 }
 
 // 返回在vue模板中的调用接口

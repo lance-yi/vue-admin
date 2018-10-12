@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/views/Home.vue'
+import login from '@/views/login.vue'
+import personmanage from '@/views/personmanage.vue'
+import personmanagedetail from '@/subpage/personmanagedetail.vue'
 import iView from 'iview'
 
 Vue.use(iView)
@@ -16,24 +18,14 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "about" */ '@/views/login.vue'),
     },
     {
-      path: '/home',
-      name: 'home',
-      component: Home
+      path: '/personmanage',
+      name: 'personmanage',
+      component: personmanage
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ '@/views/About.vue'),
-      children: [  //这里就是二级路由的配置
-        {
-          path: 'admin',
-          name: 'admin',
-          component: () => import(/* webpackChunkName: "about" */ '@/subpage/admin.vue'),
-        },
-      ]
+      path: '/personmanagedetail',
+      name: 'personmanagedetail',
+      component: personmanagedetail
     }
   ]
 })

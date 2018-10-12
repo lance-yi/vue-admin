@@ -16,7 +16,7 @@
                   <Input type="password" v-model="formValidate.password" placeholder="Password" />
               </FormItem>
               <FormItem>
-                  <Button type="primary" @click="handleSubmit('formValidate')">登 陆</Button>
+                  <Button type="primary" @click="handleSubmit('formValidate')" @on-enter.stop="handleSubmit('formValidate')">登 陆</Button>
               </FormItem>
           </Form>
       </div>
@@ -56,7 +56,7 @@ export default {
           this.$Message.success('Success!');
           this.$http.post("auth/jwt/token",{"username":this.formValidate.name,"password":this.formValidate.password},res=>{
             localStorage.setItem('token',res.token)
-            this.$router.push({path: '/home'});
+            this.$router.push({path: '/personmanage'});
           },err=>{
           })
         } else {
@@ -69,6 +69,14 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+    .ivu-btn-primary{
+        width: 150px;
+        height: 48px;
+        border-radius: 30px;
+        background: #15b2f4;
+        border: none;
+        font-size: 14px;
+    }
     .bigbox{
         width: 100%;
         height: 100%;

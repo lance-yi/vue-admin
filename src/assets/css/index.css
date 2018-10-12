@@ -1,0 +1,25 @@
+.centerbox{
+    min-width: 1000px;
+    display:-webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    justify-content: space-between;
+}
+.title{
+    font-size: 20px;
+    color: #696C6F;
+    text-align: left;
+    margin-top: 20px;
+}
+.title span{
+    font-size: 16px;
+    display: inline-block;
+    margin-left: 5px;
+}
+.detailbox{
+    /*background: red;*/
+    margin: 20px 20% 0 20%;
+    min-width: 900px;
+}
