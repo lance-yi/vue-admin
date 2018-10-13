@@ -23,3 +23,12 @@
     margin: 20px 20% 0 20%;
     min-width: 900px;
 }
+.ivu-checkbox-checked .ivu-checkbox-inner:after{
+    width: 10px;
+    height: 14px;
+    top:0;
+}
+.ivu-checkbox-inner{
+    width: 20px;
+    height: 20px;
+}

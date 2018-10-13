@@ -1,9 +1,9 @@
 <template>
   <div class="top-bar">
-    <div class="logo">
-      <img src="../../public/img/logo2.png"/>
-    </div>
-    <img src="../../public/img/6.png"/>
+    <!--<div class="logo">-->
+      <!--<img src="../../public/img/logo2.png"/>-->
+    <!--</div>-->
+    <img src="../../public/img/6.png" style="margin-left: 20px"/>
     <div class="userbox">
       <div class="user-item">
         <img src="../../public/img/7.png"/><span>管理员</span>

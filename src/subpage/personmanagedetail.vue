@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-left: 18%;min-width: 1500px;">
+  <div style="padding-left: 260px;min-width: 1000px;">
     <div class="centerbox">
       <div class="title">
         <p>外场维护人员 <img src="../../public/img/big.png"/><span>页面详情</span></p>
@@ -104,7 +104,6 @@
           </div>
           <img src="../../public/img/timego.png" class="timego" v-if="certlist.certificateStatus == 2"/>
         </div>
-
       </div>
     </div>
 
@@ -114,17 +113,38 @@
       <div class="topline"></div>
       <div  class="msgtitle" style="border-left: 5px solid #1DD4FB">设备信息</div>
       <div class="buttons">
-        <button class="zhuanyixuke">转移许可</button>
-        <button class="yichuxuke">移除许可</button>
+        <button   class="zhuanyixuke" v-if="moveallowshow" @click="move">转移许可</button>
+          <button   class="zhuanyixukes" v-if="!moveallowshow" @click="move">返回</button>
+        <button  @click="removeallow"   :class="removeallowshow ? 'yichuxuke' : 'yichuxukes'" v-if="!moves">移除许可</button>
+          <button  @click="moveallow"   class='yichuxukes' v-if="moves">确认移除</button>
       </div>
-      </div>
+        <div class="contents">
+            <div class="morecontent">
+                <p>姓名：<span>{{usermsg.userName}}</span></p>
+                <p>单位名称：<span>{{usermsg.company}}</span></p>
+                <p>手机号：<span>{{usermsg.mobile}}</span></p>
+                <p>单位地址：<span>{{usermsg.companyAddress}}</span></p>
+            </div>
+            <div  class="forbox" v-for="(list,index) in devicelist" :key="index">
+                <div class="morecontent">
+                   <div style="display: flex">
+                       <Checkbox v-model="list.isCheck" v-if="!removeallowshow"  @on-change="checkAllGroupChange()"></Checkbox>
+                       <p>设备IP：<span>{{list.gatewayIp}}</span></p>
+                   </div>
+                    <p>安装地址：是否会的撒华枫科技士大夫艰苦和思考角度</p>
+                    <p>项目名称：收到甲方汇报时间快点放开</p>
+                    <p>授权端口数：3</p>
+                </div>
+            </div>
+        </div>
+    </div>
   </div>
 </template>
 
 <script>
 
   export default {
-    name: 'personmanage',
+    name: 'personmanagedetail',
     components: {
 
     },
@@ -133,6 +153,30 @@
         personshow:true,
         usermsg:[],
         certmsg:[],
+        single:'',
+        moveallowshow:true,
+        removeallowshow:true,
+        moves:false,
+        devicelist:[],
+        checklist:[],
+      }
+    },
+    watch:{
+      devicelist:{
+        handler: function(val,odlval) {
+          let Num = 0;
+          for (let i = 0; i< val.length;i++){
+            if(val[i].isCheck){
+              this.$set(this,"moves",true)
+            }else {
+              Num++;
+            }
+          }
+          if(Num == val.length){
+            this.$set(this,"moves",false)
+          }
+        },
+        deep:true
       }
     },
     created(){
@@ -141,16 +185,48 @@
       this.$http.get("oauth/certificate/getCertInfo",{userId:this.$route.query.uesrid},res=>{
           this.usermsg = res.data[0].userInfo
           this.certmsg = res.data[0].certInfo
-      },err=>{
-      })
-      console.log(this.$route.query.uesrid)
+      },err=>{});
+      this.shebei();
     },
     methods: {
       shebei(){
         this.personshow = false
+        this.$http.get("oauth/certificate/findAllBycertNo?certificate",{userId:this.$route.query.uesrid},res=>{
+          console.log(res.data);
+          this.devicelist = res.data;
+          for (let i=0; i< this.devicelist.length; i++){
+            this.$set(this.devicelist[i],'isCheck',false)
+          }
+        },err=>{})
       },
       renyuan(){
         this.personshow = true
+      },
+      move(){
+        if(this.moveallowshow == true&&this.removeallowshow == true){
+          this.moveallowshow = false
+          this.removeallowshow = true
+        }else if(this.moveallowshow == false){
+          this.moveallowshow = true
+        }else{
+          this.removeallowshow = true
+        }
+      },
+      moveallow(){
+        this.devicelist.forEach (el=>{ if(el.isCheck == true){this.checklist.push(el.id)}})
+        this.$http.delete("oauth/certificate/unboundCert",{userId:this.$route.query.uesrid,gatewayIds:JSON.stringify(this.checklist)},res=>{
+          this.checklist = []
+        },err=>{
+        })
+      },
+      removeallow(){
+        if( this.removeallowshow == true){
+          this.removeallowshow = false
+          this.moveallowshow = true
+        }
+      },
+      checkAllGroupChange(){
+        // this.devicelist.forEach (el=>{ if(el.isCheck == true){this.moves = true }})
       }
     }
   }
@@ -162,7 +238,7 @@
   position: relative;
 }
 .detailbox p{
-  margin-bottom: 5px;
+  margin-bottom: 5px
 }
 .detailbox img{
   border: 10px solid #D4E1FF;
@@ -282,7 +358,18 @@
     color: #2666FE;
     margin-right: 20px;
   }
-.yichuxuke{
+  .zhuanyixukes{
+      margin: 0;
+      padding: 5px 10px;
+      border: 1px solid #1D60FE;  //自定义边框
+  outline: none;
+      background: #1D60FE;
+      border-radius: 5px;
+      font-size: 14px;
+      color: #fff;
+      margin-right: 20px;
+  }
+  .yichuxuke{
   margin: 0;
   padding: 5px 10px;
   border: 1px solid #F14855;  //自定义边框
@@ -291,5 +378,15 @@
   border-radius: 5px;
   font-size: 14px;
   color: #F14855;
-}
+    }
+    .yichuxukes{
+        margin: 0;
+        padding: 5px 10px;
+        border: 1px solid #EF3543;  //自定义边框
+        outline: none;
+        background: #EF3543;
+        border-radius: 5px;
+        font-size: 14px;
+        color: #fff;
+    }
 </style>

@@ -35,8 +35,8 @@ export default {
   data () {
     return {
       formValidate: {
-        name: '',
-        password: ''
+        name: 'admin',
+        password: '123456'
       },
       ruleValidate: {
         name: [

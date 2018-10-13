@@ -1,13 +1,14 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import Api from './api';
+import Api from './api/index'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    noSide: false,
     loginState: false || Boolean(localStorage.getItem("token")), // 登录装填
-    userInfo: JSON.parse(localStorage.getItem("userInfo")) || {}, // 用户基本信息
+    userInfo: JSON.parse( localStorage.getItem("userInfo") ) || {}  // 用户基本信息
   },
   mutations: {
     // 登录状态
@@ -23,6 +24,9 @@ export default new Vuex.Store({
       state.loginState = false
       router.replace('/')
     },
+    changeSide(state,bl) {
+      state.noSide = bl;
+    }
   },
   actions: {
     userSignin({ commit },obj){

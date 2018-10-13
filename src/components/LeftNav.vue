@@ -1,9 +1,9 @@
 <template>
   <div class="nav-center">
-    <span class="switch" @click="noSide = !noSide">{{ noSide ? '显示导航' : '隐藏导航'}}</span>
+    <span class="switch" @click="changeSide(!noSide)">{{ noSide ? '显示导航' : '隐藏导航'}}</span>
     <div class="menu" :class="{ noSide: noSide }">
       <ul class="item">
-        <li v-for="(x,index) in lists" class="clearfix main-item" :key="index" :class="x._show ? 'on' : ''">
+        <router-link tag="li" :to="x.url" v-for="(x,index) in lists" class="clearfix main-item" :key="index" :class="x._show ? 'on' : ''">
           <img :src="x.icon" class="icon">
           <div class="inner">
             <a class="title" @click.stop="x._show = !x._show">
@@ -18,30 +18,14 @@
               </li>
             </ul>
           </div>
-        </li>
+        </router-link>
       </ul>
     </div>
   </div>
-  <!-- <div class="navbox">
-    <div class="headcom">
-      <div class="logobox">
-        <img src="../../public/img/logo2.png" class="logo"/>
-      </div>
-    </div>
-    <ul class="nav">
-      <li >
-        <img src="../../public/img/1.png" class="navicon"/>
-        <p>安全管理</p>
-      </li>
-      <li class="check">
-        <img src="../../public/img/2.png" class="navicon"/>
-        <p>人员管理</p>
-      </li>
-    </ul>
-  </div> -->
 </template>
 
 <script>
+import {mapState} from 'vuex'
 export default {
   name: 'LeftNav',
   props: {
@@ -49,9 +33,9 @@ export default {
   },
   data(){
     return {
-      noSide: false,
       lists: [
         {
+          url: '/anquan',
           title: "安全管理", 
           icon: require('../../public/img/1.png'), 
           _show: false, 
@@ -64,12 +48,14 @@ export default {
           ]
         },
         {
+          url: '/renyuan',
           title: "人员管理", 
           icon: require('../../public/img/2.png'), 
           _show: false, 
           children:[]
         },
         {
+          url: '/personmanage',
           title: "三角管理", 
           icon: require('../../public/img/33.png'), 
           _show: true, 
@@ -79,10 +65,18 @@ export default {
       ]
     }
   },
+  computed:{
+    ...mapState({
+      noSide: "noSide"
+    })
+  },
   mounted() {
     // this.asyncList(17)
   },
   methods: {
+    changeSide(bl){
+      this.$store.commit("changeSide",bl);
+    },
     asyncList: function (num) {
       var that = this
       setTimeout(function () {
@@ -122,7 +116,7 @@ export default {
   top: 0;
   left: 0;
   box-sizing: border-box;
-  padding-top: 80px;
+  padding-top: 60px;
   height: 100%;
   background: #fff;
   .switch {
@@ -131,7 +125,7 @@ export default {
     color: green;
   }
   .menu {
-    width: 260px;
+    width: 240px;
     height: 100%;
     box-sizing: border-box;
     overflow: scroll;
@@ -151,7 +145,7 @@ export default {
         position: absolute;
         top: 0;
         left: 110%;
-        width: 260px;
+        width: 240px;
         padding: 24px 16px;
         background-color: #F8F9FA;
         border-radius: 4px;
@@ -171,7 +165,7 @@ export default {
       padding: 10px 16px;
       cursor: pointer;
       border-left: 5px solid #F8F9FA;
-      &.on{
+      &.router-link-active{
         border-left: 5px solid #1D60FE;
         background: #fff;
       }
@@ -183,7 +177,7 @@ export default {
     }
     .title {
       display: block;
-      padding-left: 40px;
+      padding-left: 50px;
       text-align: left;
       cursor: pointer;
       font-size: 18px;

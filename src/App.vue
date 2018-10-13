@@ -4,17 +4,27 @@
     <top-bar v-if="$route.name != 'login' "></top-bar>
     <!-- 左边导航 -->
     <left-nav v-if="$route.name != 'login' "></left-nav>
-    <router-view/>
+    <router-view :style="{'padding-left': noSide ? '85px': '260px'}" />
     <BackTop :height="200"></BackTop>
   </div>
 </template>
 <script>
   import LeftNav from '@/components/LeftNav'
   import TopBar from '@/components/TopBar'
+  import { mapState } from 'vuex';
   export default {
     components: {
       LeftNav,
       TopBar
+    },
+    data(){
+      return{
+      }
+    },
+    computed:{
+      ...mapState({
+        noSide: "noSide"
+      })
     }
   }
 </script>

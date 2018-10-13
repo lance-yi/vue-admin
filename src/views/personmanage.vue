@@ -1,5 +1,5 @@
 <template>
-    <div style="padding-left: 18%;min-width: 1500px;">
+    <div style="padding-left: 260px;min-width: 1000px;">
         <div class="centerbox">
             <div class="title">
                 <p>外场维护人员</p>
