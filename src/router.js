@@ -24,7 +24,7 @@ const router = new Router({
     },
     {
       path: '/personmanagedetail',
-      name: 'personmanagedetail',
+      name: 'personmanage',
       component: personmanagedetail
     }
   ]

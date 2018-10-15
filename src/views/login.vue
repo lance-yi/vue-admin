@@ -26,7 +26,7 @@
 <script>
 // @ is an alias to /src
 import HelloWorld from '@/components/HelloWorld.vue'
-
+import axios from 'axios'
 export default {
   name: 'home',
   components: {
@@ -53,11 +53,21 @@ export default {
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          this.$Message.success('Success!');
-          this.$http.post("auth/jwt/token",{"username":this.formValidate.name,"password":this.formValidate.password},res=>{
-            localStorage.setItem('token',res.token)
-            this.$router.push({path: '/personmanage'});
-          },err=>{
+          // this.$Message.success('Success!');
+          axios({
+            method: 'post',
+            url: '/auth/jwt/token',
+            baseURL: 'http://192.168.8.185:8888/api',
+            dataType: 'json',
+            data:{"username":this.formValidate.name,"password":this.formValidate.password}
+          }).then(res=>{
+            localStorage.setItem('token',res.data.token);
+            // this.$router.push({path: '/personmanage'})
+            this.$http.get("oauth/userfront/currentUser",{},response=>{
+              console.log(response.data)
+              this.$store.commit("userSignin",response.data);
+              this.$router.push({path: '/personmanage'})
+            });
           })
         } else {
           this.$Message.error('Fail!');

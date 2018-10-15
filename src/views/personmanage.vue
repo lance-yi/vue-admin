@@ -1,5 +1,5 @@
 <template>
-    <div style="padding-left: 260px;min-width: 1000px;">
+    <div style="padding-left: 260px;min-width: 1000px;padding-top: 60px">
         <div class="centerbox">
             <div class="title">
                 <p>外场维护人员</p>
@@ -84,8 +84,9 @@
     },
     data () {
       return {
+        userdata:[],
         value: '',
-        totals:14,
+        totals:0,
         list:[],
         acardshow:true,
         boolsousuo:'',
@@ -215,10 +216,11 @@
         })
       },
       daochu(){
-        this.$http.post("oauth/userMaintain/downloadExcle",{},res=>{
-
-        },err=>{
-        })
+        window.location.href="http://192.168.8.185:8888/api/oauth/userMaintain/downloadExcle";
+        // this.$http.get("oauth/userMaintain/downloadExcle",{},res=>{
+        //
+        // },err=>{
+        // })
       },
       gotodetail(index){
         this.$router.push({path: '/personmanagedetail',query:{uesrid:this.list[index].userId}});
@@ -321,7 +323,6 @@
         margin-right: 5px;
     }
     .cardbox{
-
         margin-top: 30px;
         position: relative;
     }

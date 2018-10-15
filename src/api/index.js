@@ -1,4 +1,6 @@
 import axios from 'axios'
+import router from '@/router.js'
+
 // 配置API接口地址
 var root = 'http://192.168.8.185:8888/api'
 // var root = 'http://192.168.8.185:8888/api'
@@ -37,12 +39,25 @@ function apiAxios (method, url, params, success, failure) {
     baseURL: root,
     withCredentials: false
   }).then(function (res) {
-    if (res.data.status === true || res !== '') {
-      if (success) { success(res.data) }
-    } else {
-      if (failure) { failure(res.data) } else { throw new Error(res) }
+    if (res.data !== '' || res.data.status === true ) {
+      if (success) {
+        success(res.data)
+      }
+    }else {
+      if (failure) {
+        failure(res.data)
+      } else {
+        throw new Error(res)
+      }
     }
-  }).catch(function (err) { throw new Error(err) })
+  }).catch(function (err) {
+    console.log(err)
+    if(err.response.status == 401){
+      router.replace('/');
+    }else {
+      throw new Error(err)
+    }
+  })
 }
 
 // 返回在vue模板中的调用接口

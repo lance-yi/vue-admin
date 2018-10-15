@@ -13,6 +13,7 @@ export default new Vuex.Store({
   mutations: {
     // 登录状态
     userSignin(state, obj) {
+      console.log(obj)
       localStorage.setItem("userInfo", JSON.stringify(obj))
       state.loginState = true
       Object.assign(state.userInfo, obj)
@@ -29,15 +30,13 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    userSignin({ commit },obj){
+    userSignin1({ commit }){
       return new Promise((resolve, rejects)=>{
-        Api.post('/getuserinfo',{
-          token: obj.token
-        },res=>{
+        Api.post("/oauth/userfront/currentUser",null,res=>{
           commit("userSignin",res.data)
           resolve(res.data)
         },err=>{
-          rejects(res.data)
+          rejects(err.data);
         });
       })
     },

@@ -3,7 +3,7 @@
     <span class="switch" @click="changeSide(!noSide)">{{ noSide ? '显示导航' : '隐藏导航'}}</span>
     <div class="menu" :class="{ noSide: noSide }">
       <ul class="item">
-        <router-link tag="li" :to="x.url" v-for="(x,index) in lists" class="clearfix main-item" :key="index" :class="x._show ? 'on' : ''">
+        <router-link tag="li" :to="x.url" v-for="(x,index) in lists" class="clearfix main-item" :key="index" :class="x.url == '/'+$route.name ? 'on' : ''">
           <img :src="x.icon" class="icon">
           <div class="inner">
             <a class="title" @click.stop="x._show = !x._show">
@@ -48,14 +48,14 @@ export default {
           ]
         },
         {
-          url: '/renyuan',
+          url: '/personmanage',
           title: "人员管理", 
           icon: require('../../public/img/2.png'), 
           _show: false, 
           children:[]
         },
         {
-          url: '/personmanage',
+          url: '/renyuan',
           title: "三角管理", 
           icon: require('../../public/img/33.png'), 
           _show: true, 
@@ -165,7 +165,7 @@ export default {
       padding: 10px 16px;
       cursor: pointer;
       border-left: 5px solid #F8F9FA;
-      &.router-link-active{
+      &.router-link-active,&.on{
         border-left: 5px solid #1D60FE;
         background: #fff;
       }

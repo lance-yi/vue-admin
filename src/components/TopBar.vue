@@ -1,12 +1,13 @@
 <template>
   <div class="top-bar">
+
     <!--<div class="logo">-->
       <!--<img src="../../public/img/logo2.png"/>-->
     <!--</div>-->
     <img src="../../public/img/6.png" style="margin-left: 20px"/>
     <div class="userbox">
       <div class="user-item">
-        <img src="../../public/img/7.png"/><span>管理员</span>
+        <img src="../../public/img/7.png"/><span>{{userInfo.userName}}</span>
       </div>
       <div class="user-item edit" @click="confirm">
         <img src="../../public/img/15.png" /><span>退出</span>
@@ -16,6 +17,7 @@
 </template>
 
 <script>
+import {mapState } from 'vuex';
 export default {
   name: 'LeftNav',
   props: {
@@ -24,6 +26,11 @@ export default {
   data () {
     return {
     }
+  },
+  computed:{
+    ...mapState({
+      userInfo: "userInfo"
+    })
   },
   methods:{
     confirm () {
@@ -50,7 +57,7 @@ export default {
   padding: 10px 0;
   background: #fff;
   text-align: left;
-  position: relative;
+  position: fixed;
   border-bottom: 1px solid #eee;
   width: 100%;
   min-width: 1000px;
