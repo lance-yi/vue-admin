@@ -5,19 +5,19 @@
                 <p>外场维护人员</p>
             </div>
             <div>
-                <i-input v-model="value" placeholder="请输入..." style="width: 200px" class="sousuo"></i-input>
+                <i-input v-model="value" placeholder="姓名、公司名称" style="width: 200px" class="sousuo"></i-input>
                 <i-button type="primary" class="sure" @click="serach">搜索</i-button>
             </div>
             <div class="rightbox">
-                <div class="exj1">
+                <div class="exj1" @click="update">
                     <img src="../../public/img/lie5.png"/>
                     同步
                 </div>
-                <div class="exj2">
+                <div class="exj2" @click="upload">
                     <img src="../../public/img/lie6.png"/>
                     导入
                 </div>
-                <div class="exj3" @click="daochu">
+                <div class="exj3" @click="daochu" >
                     <img src="../../public/img/lie7.png"/>
                     导出
                 </div>
@@ -53,14 +53,14 @@
             </div>
 
            <div class="cardcontent">
-                <div v-for="(cards,index) in list" @click="gotodetail(index)">
+                <div v-for="(cards,index) in list" @click="gotodetail(index)" :key="index">
                     <img src="../../public/img/green.png" class="statuds" v-if="cards.certificateStatus==0"/>
                     <img src="../../public/img/red.png" class="statuds" v-if="cards.certificateStatus==1"/>
                     <img src="../../public/img/logo2.png" class="cardicon"/>
                     <p style="font-size: 18px">{{cards.userName}}</p>
                     <p style="font-size: 18px">{{cards.company}}</p>
                     <p>证书编号：<span>{{cards.certificateNo}}</span></p>
-                    <p>身份证号：<span>{{cards.idCard}}</span></p>
+                    <p>身份证号：<span>{{cards.idCard | hideMiddle}}</span></p>
                     <p>手机号：<span>{{cards.mobile}}</span></p>
                 </div>
 
@@ -73,6 +73,24 @@
             <i-table highlight-row stripe border :columns="columns1" :data="data1" @on-current-change="handleRowChange"></i-table>
             <Page :total='totals' show-total class="fullpage" @on-change="changeliebiaopage"></Page>
         </div>
+
+        <!-- 弹窗 -->
+        <div v-if="modal1" class="dialog">
+            <div class="dialogbox">
+                <div style="display:flex">
+                    <p>1.请先下载导入的模板文件</p>
+                    <div class="exj2" style="margin-left:10px" @click="xiazai">下载</div>
+                </div>
+                <div style="text-align:left;margin-top:20px;">
+                    <p style="margin-bottom:20px">2.请选择导入的文件</p>
+                    <input type="file" name="file" ref="file"/> 
+                </div>
+                <div class="iconlist">
+                    <p @click="closedialog">取消</p>
+                    <div class="exj1" style="margin-left:20px;background:#15b2f4;color:#fff;height:30px;border:1px solid #15b2f4" @click="confirmupload">确定上传</div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -84,6 +102,11 @@
     },
     data () {
       return {
+          headers: {
+    'Authorization' : localStorage.token
+    },
+        actionaddress:'//jsonplaceholder.typicode.com/posts/',
+        modal1:false,
         userdata:[],
         value: '',
         totals:0,
@@ -94,52 +117,72 @@
         columns1: [
           {
             title: '负责人',
-            key: 'userName'
+            key: 'userName',
+            className:'centers',
+            width:80,
           },
           {
             title: '所属单位',
             key: 'company',
+            className:'centers',
           },
           {
             title: '项目名称',
-            key: 'project_name'
+            key: 'project_name',
+            className:'address',
           },
           {
             title: '证书编号',
-            key: 'certificateNo'
+            key: 'certificateNo',
+            className:'centers',
+            // width:95,
           },
           {
             title: '单位地址',
             key: 'company_address',
+            className:'address',
             width:200,
           },
           {
             title: '联系方式',
             key: 'mobile',
-            width:200,
+            className:'centers',
+            width:120,
           },
           {
             title: '所属单位联系方式',
             key: 'company_phone',
-            width:200,
+            className:'centers',
+            width:150,
           },
           {
             title: '证书状态',
-            key: 'status'
+            className:'centers',
+            key: 'status',
+            width:95,
           },
           {
             title: '邮箱账号',
+            className:'centers',
             key: 'email',
-            width:200,
+            // width:170,
           },
           {
             title: '更多',
+            className:'centers',
             key:'more',
+            width:65,
           }
         ],
-        data1: []
+        data1: [],
+        uploadFile:[],
       }
     },
+    filters: {
+        hideMiddle(val) {
+            return `${val.substring(0,6)}********${val.substring(val.length-4)}`
+        }
+     },
     created(){
     },
     mounted(){
@@ -152,6 +195,9 @@
       })
     },
     methods: {
+        update(){
+            location.reload();
+        },
       liebiao(){
         this.acardshow = false
         if(this.boolsousuo){
@@ -177,6 +223,7 @@
           this.$http.get("oauth/certificate/findAllforApp",{value:this.value},res=>{
             this.totals = res.data.total
             this.list = res.data.list
+            
           },err=>{
           })
 
@@ -216,11 +263,10 @@
         })
       },
       daochu(){
-        window.location.href="http://192.168.8.185:8888/api/oauth/userMaintain/downloadExcle";
-        // this.$http.get("oauth/userMaintain/downloadExcle",{},res=>{
-        //
-        // },err=>{
-        // })
+        window.location.href=this.$http.root+'/oauth/userMaintain/downloadExcle';
+      },
+      upload(){
+          this.modal1 = true
       },
       gotodetail(index){
         this.$router.push({path: '/personmanagedetail',query:{uesrid:this.list[index].userId}});
@@ -228,14 +274,34 @@
       handleRowChange(currentRow, oldCurrentRow){
         console.log(currentRow)
         this.$router.push({path: '/personmanagedetail',query:{uesrid:currentRow.userId}});
-
-      }
-
+      },
+      xiazai(){
+           window.location.href=this.$http.root+'/oauth/userMaintain/excleDownload';
+      },
+      closedialog(){
+          this.modal1 = false
+      },
+      confirmupload(){
+          let file = this.$refs.file.files[0]
+          let parms = new FormData()
+          parms.append('file',file,file.name)
+          this.$http.post("oauth/userMaintain/userExcleImport",parms,res=>{
+            if(res.rel == false){
+                this.$Message.info('上传失败');
+            }else{
+                this.$Message.info('上传成功');
+                this.modal1 = false
+            }
+        },err=>{
+        })
+      },
     }
   }
 </script>
 <style scoped>
-
+    .aaa{
+        font-size:20px;
+    }
     .sousuo{
         margin-top: 20px;
     }
@@ -247,7 +313,7 @@
         width: 40px;
         padding: 0;
         border-radius: 0 4px 4px 0;
-        line-height: 32px;
+        /* line-height: 32px; */
     }
     .rightbox{
         display:-webkit-box;
@@ -276,7 +342,7 @@
         align-items: center;
         height: 25px;
         margin-right: 20px;
-        cursor:default;
+        cursor:pointer;
     }
     .exj2{
         border: 1px solid #26BDD2;
@@ -291,7 +357,7 @@
         align-items: center;
         height: 25px;
         margin-right: 20px;
-        cursor:default;
+        cursor:pointer;
     }
     .exj3{
         border: 1px solid #EF3543;
@@ -306,7 +372,7 @@
         align-items: center;
         height: 25px;
         margin-right: 20px;
-        cursor:default;
+        cursor:pointer;
     }
     .exj4{
         display:-webkit-box;
@@ -317,7 +383,7 @@
         align-items: center;
         margin-right: 20px;
         color: #717578;
-        cursor:default;
+        cursor:pointer;
     }
     .exj4 img{
         margin-right: 5px;
@@ -362,6 +428,7 @@
         position: relative;
         min-width: 200px;
         margin-right: 1.5%;
+        cursor:pointer;
     }
     .cardcontent div:hover{
         transform: scale(1.1);
@@ -383,11 +450,44 @@
         width: 25px;
         height: 25px;
     }
-    .fullpage{
-        margin-top: 30px;
-    }
     .tablebox{
         margin-top: 30px;
-        padding-right: 70px;
+        padding-right: 50px;
+    }
+    .dialog{
+        position:fixed;
+        width:100%;
+        height:100%;
+        left:0;
+        top:0px;
+        background-color: rgba(55, 55, 55, 0.6);
+        z-index:1012;
+    }
+    .dialogbox{
+        width: 400px;
+        height: 250px;
+        position: relative;
+        margin: 0 auto;
+        top:35%;
+        background:#fff;
+        border-radius: 5px;
+        padding: 20px;
+        font-size: 15px;
+    }
+    .ivu-btn-ghost{
+        color: #717578;
+    }
+    .iconlist{
+        position: absolute;
+        bottom: 20px;
+        right: 10px;
+        display: flex;
+        align-items:center;
+    }
+    .address{
+    text-align:left ;
+    }
+    .centers{
+    text-align:center;
     }
 </style>

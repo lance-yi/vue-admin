@@ -1,8 +1,9 @@
 import axios from 'axios'
 import router from '@/router.js'
+import {  Message } from 'iview';
 
 // 配置API接口地址
-var root = 'http://192.168.8.185:8888/api'
+var root = 'http://192.168.8.176:8888/api'
 // var root = 'http://192.168.8.185:8888/api'
 // 引用axios
 axios.defaults.withCredentials = true
@@ -51,8 +52,9 @@ function apiAxios (method, url, params, success, failure) {
       }
     }
   }).catch(function (err) {
-    console.log(err)
+    // router.replace('/');
     if(err.response.status == 401){
+      Message.info('登录信息过期，请重新登录');
       router.replace('/');
     }else {
       throw new Error(err)
@@ -62,7 +64,7 @@ function apiAxios (method, url, params, success, failure) {
 
 // 返回在vue模板中的调用接口
 export default {
-  // root,
+  root,
   // wwwroot,
   get: function (url, params, success, failure) {
     return apiAxios('GET', url, params, success, failure)

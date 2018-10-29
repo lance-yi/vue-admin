@@ -107,6 +107,7 @@ export default {
   }
   .edit{
     border-right: none;
+    cursor:pointer;
   }
 }
 .ivu-btn-primary {

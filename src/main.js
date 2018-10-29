@@ -10,6 +10,10 @@ import './assets/css/index.css'
 import api from './api'
 Vue.prototype.$http = api
 
+// 引入echarts
+import echarts from 'echarts'
+Vue.prototype.$echarts = echarts 
+
 Vue.use(iView, {
   // locale,
   transfer: true, // 浮层组件是否在body内

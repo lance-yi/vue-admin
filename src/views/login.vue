@@ -3,17 +3,17 @@
       <div class="posibox">
           <div class="flexbox">
               <div class="textbox">
-                  <img src="../../public/img/logo1.png"/>
-                  <p class="text">安全运维管理系统</p>
+                  <img src="../../public/img/logologo.png" style="width:80px;height:80px"/>
+                  <p class="text">武汉公安综合安全运维系统</p>
               </div>
           </div>
 
-          <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
+          <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" style="margin-left:40px">
               <FormItem label="账号" prop="name">
                   <Input v-model="formValidate.name" placeholder="请输入账号" />
               </FormItem>
               <FormItem prop="password" label="密码">
-                  <Input type="password" v-model="formValidate.password" placeholder="Password" />
+                  <Input type="password" v-model="formValidate.password" placeholder="请输入密码" />
               </FormItem>
               <FormItem>
                   <Button type="primary" @click="handleSubmit('formValidate')" @on-enter.stop="handleSubmit('formValidate')">登 陆</Button>
@@ -57,7 +57,7 @@ export default {
           axios({
             method: 'post',
             url: '/auth/jwt/token',
-            baseURL: 'http://192.168.8.185:8888/api',
+            baseURL: 'http://192.168.8.176:8888/api',
             dataType: 'json',
             data:{"username":this.formValidate.name,"password":this.formValidate.password}
           }).then(res=>{
@@ -124,6 +124,8 @@ export default {
         align-items:center;
         margin-bottom: 20px;
         padding: 0 18px;
+        width: 500px;
+        padding-left: 0px;
     }
     .text{
         font-size: 28px;

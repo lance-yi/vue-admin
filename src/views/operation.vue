@@ -1,0 +1,3003 @@
+<template>
+  <div @click="showno">
+
+    <div style="position:absolute;top:90px;left:50%;z-index:99">
+                <i-input  v-model="serachvalue" placeholder="安装地址、路口名称" style="width: 200px" class="sousuo"></i-input>
+                <i-button type="primary" class="sure" @click="serachroad">搜索</i-button>
+            </div>
+        <ArcgisMap  @ip="ip" :propsmap='serachvalues' />
+        <div class="rightdialog">
+            <div @click.stop="statusclick(0)">
+              <img src="../../public/img/xx.png"/>
+              <span>运行严重故障：</span>
+              <span style="color:#FE0302;font-size:22px;">{{statuslist.seriousAlertSize}}</span>
+            </div>
+            <div @click.stop="statusclick(1)">
+              <img src="../../public/img/y.png"/>
+              <span>运行一般故障：</span>
+              <span style="color:rgb(254,222,10);font-size:22px;">{{statuslist.normalAlertSize}}</span>
+            </div>
+            <div @click.stop="statustablenum(1)">
+              <img src="../../public/img/f3.png" />
+              <span>设备工单总数：</span>
+              <span style="color:#1D60FE;font-size:22px">{{statuslistnum.count}}</span>
+            </div>
+            <div @click.stop="statustablenum(2)">
+              <img src="../../public/img/f2.png"/>
+              <span>设备工单已反馈数：</span>
+              <span style="color:#1693FF;font-size:22px">{{statuslistnum.fbCount}}</span>
+            </div>
+            <div @click.stop="statustablenum(3)">
+              <img src="../../public/img/f1.png"/>
+              <span>设备工单待处理数：</span>
+              <span style="color:#F5A02C;font-size:22px">{{statuslistnum.remindCount}}</span>
+            </div>
+        </div>
+
+
+      <!-- 运维表格弹窗 -->
+      <div class="statusbox" style="width:95%;top:230px;z-index:2000;height:70%" v-if="statustable" @click.stop="statustable = true,bigrightshow = false,getwayip=''">
+        <p class="detailpage">工单管理 <img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px"/></p>
+            <div class="remindsbox" v-if="sendremindshow">
+              <div class="remindstitle">
+                  <p>请选择催单备注</p>
+                  <img src="../../public/img/xxx.png" @click="closeremind"/>
+              </div>
+                  <Radio-group  style="text-align:left;padding:20px 50px 25px 50px;"  v-model="deal">
+                      <Radio label="该设备工单特别紧急请加速处理" style="margin-top:30px">
+                          <span style="font-size:14px">该设备工单特别紧急请加速处理</span>
+                      </Radio>
+                      <Radio label="该设备工单未处理时间较长请快速处理" style="margin-top:30px">
+                          <span style="font-size:14px">该设备工单未处理时间较长请快速处理</span>
+                      </Radio>
+                  </Radio-group>
+                  <div style="position:relative;height:50px">
+                    <button   class="zhuanyixukes" style="padding:5px 30px;position:absolute;right:50px;" @click="senddeal">发送</button>
+                  </div>
+            </div>
+
+            <div class="remindsboxs" v-if="sendremindshows" style="width:790px;top:35%">
+              <div class="remindstitle" >
+                  <p>催单记录</p>
+                  <img src="../../public/img/xxx.png" @click="closeremind"/>
+              </div>
+              <div style="height:170px;overflow:auto">
+               <div class="workdetail-top" style="padding:10px 20px 0 20px" v-for="list in sendreminddatalist">
+                  <div class="workdetail-head" >
+                    <img src="../../public/img/ct.png" style="margin-right:5px"/>
+                    <p >催单时间：<span style="color:#1D60FE">{{list.remindTime}}</span></p>
+                  </div>
+                  <div class="workdetail-head" style="min-width:310px">
+                    <p >催单内容：<span style="color:#1D60FE">{{list.content}}</span></p>
+                  </div>
+                  <div class="workdetail-head">
+                     <p >催单人：<span style="color:#1D60FE">{{list.person}}</span></p>
+                  </div>
+                </div>
+               </div>  
+              <div class="remindstitle" style="margin-top:20px" >
+                  <p>再次催单</p>
+              </div>
+                  <Radio-group  style="text-align:left;padding:20px 145px 25px 145px;"  v-model="deal">
+                      <Radio label="该设备工单特别紧急请加速处理" style="margin-top:30px">
+                          <span style="font-size:14px">该设备工单特别紧急请加速处理</span>
+                      </Radio>
+                      <Radio label="该设备工单未处理时间较长请快速处理" style="margin-top:30px">
+                          <span style="font-size:14px">该设备工单未处理时间较长请快速处理</span>
+                      </Radio>
+                  </Radio-group>
+                  <div style="position:relative;height:70px">
+                    <button   class="zhuanyixukes" style="padding:5px 30px;position:absolute;right:50px;" @click="senddeal">发送</button>
+                  </div>
+            </div>
+
+            <div class="top-box" style="border-bottom:none">
+            <!-- <div>
+              <button   class="zhuanyixuke" @click="delwarn" v-if="!move">清除警告</button>
+              <button   class="zhuanyixukes" v-if="move" @click="movewarn">确认清除</button>
+              <button   class="zhuanyixuke" v-if="move" @click="back">返回</button>
+            </div> -->
+              <div style="margin-left:20%">
+               <span>派单时长：</span>
+                     <Radio-group v-model="tabletime" @on-change="changetime($event)" >
+                      <Radio label="一小时内">
+                          <span style="color:#1d60fe">一小时内</span>
+                      </Radio>
+                      <Radio label="四小时内">
+                          <span style="color:#1d60fe">四小时内</span>
+                      </Radio>
+                      <Radio label="大于一天">
+                          <span style="color:#1d60fe">大于一天</span>
+                      </Radio>
+                  </Radio-group>
+              </div>
+              <div style="margin-left:50px">
+                <i-input v-model="valuetable" placeholder="" style="width: 200px" ></i-input>
+                <i-button type="primary" class="sure" @click="serachtable">搜索</i-button>
+                <i-button type="primary" class="zhuanyixuke" @click="removeserachtable" style="margin-left:20px;font-size: 13px;">清除</i-button>
+              </div>
+            </div>
+            <div style="padding:0 20px" class="bigtable">
+             <i-table border stripe :columns="columns4" :data="data1"></i-table>
+              <Page :total='totals' show-total class="fullpage" @on-change="changeliebiaopage"></Page>
+            </div>
+      </div>
+
+
+
+
+      <div v-if="statusdata" @click.stop="statusdata = true,bigrightshow = false,getwayip=''">
+
+        <!-- 点击右侧选择状态后弹窗 -->
+        <div class="statusbox">
+            <div class="top-box">
+            <div>
+              <button   class="zhuanyixuke" @click="delwarn" v-if="!move">清除警告</button>
+              <button   class="zhuanyixukes" v-if="move" @click="movewarn">确认清除</button>
+              <button   class="zhuanyixuke" v-if="move" @click="back">返回</button>
+            </div>
+              <div style="margin-left:30%">
+                <i-input v-model="value" placeholder="" style="width: 200px" ></i-input>
+                <i-button type="primary" class="sure" @click="serach">搜索</i-button>
+              </div>
+            </div>
+
+            <div class="timelinebox">
+              <Timeline>
+              <Timeline-item v-for="list in timelinelist" >
+                <p class="time">{{list.occurTimeHead}}</p>
+                <p class="hour">{{list.occurTimeRoot}}</p>
+                  <img src="../../public/img/16.png" slot="dot" v-if="list.isAlert == 2" />
+                  <img src="../../public/img/17.png" slot="dot" v-if="list.isAlert == 0"/>
+                  <img src="../../public/img/nono.png" slot="dot" v-if="list.nono"  @click="checknono(list.gatewayIp)"/>
+                  <img src="../../public/img/19.png" slot="dot" v-if="list.isAlert == 4"  @click="checkicon(list.gatewayIp)"/>
+                  <img src="../../public/img/18.png" slot="dot" v-if="list.isAlert == 1" />
+                  <div class="timelinecont">
+                    <p style="min-width:140px">设备IP：<span>{{list.gatewayIp}}</span></p>
+                    <div style="display: flex;min-width:200px;margin-left: 10px">
+                        <p>安装地址：</p>
+                        <span style="text-align:left;flex: 1">{{list.installAddress}}</span>
+                      </div>
+                    <div style="display: flex;min-width:200px;margin-left: 10px">
+                        <p>项目名称：</p>
+                        <span style="text-align:left;flex: 1">{{list.projectName}}</span>
+                      </div>
+                    <p style="min-width:150px;margin-left: 5px">线杆编号：<span>{{list.poleNo}}</span></p>
+                    <p style="min-width:180px;margin-left: 5px">是否开始处置：<span>{{list.onDeal}}</span></p>
+                  </div>
+                  <p class="hadpro" @click.stop="ips(list.id)">故障描述：<a>{{list.description}}</a></p>
+              </Timeline-item>
+              </Timeline>
+            </div>
+          </div>
+        </div>
+
+         <!-- 点击工单详情弹窗 -->
+            <div class="workdetail" v-if="workdetail">
+                <div class="detail-title" style="margin-top:10px;">
+                  <p>工单详情</p>
+                </div>
+
+                <div class="workdetail-top">
+                  <div class="workdetail-head" v-if="this.remindlist">
+                    <img src="../../public/img/ct.png" style="margin-right:5px"/>
+                    <p v-if="this.remindlist">催单时间：<span style="color:#1D60FE">{{remindlist.remindTime}}</span></p>
+                  </div>
+                  <div class="workdetail-head">
+                    <p v-if="this.remindlist">催单内容：<span style="color:#1D60FE">{{remindlist.content}}</span></p>
+                  </div>
+                </div>
+                 <p class="workdetailtitle">工单状态：<span style="color:#1D60FE">{{formlists.processStatus}}</span></p>
+
+                 <div class="sendbox" >
+                   <img src="../../public/img/num.png"/>
+                    派单信息
+                 </div>
+                 <div class="content" style="border:none;" v-for="lists in devicelist">
+                    <div style="min-width:100%">
+                      <p style="font-size:16px">故障描述：</p>
+                      <span style="color:#F82A2A;font-size:16px;">{{lists.detail}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>端口号：</p>
+                      <span>{{lists.devicePort}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>设备类型：</p>
+                      <span>{{lists.deviceType}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>安装地址：</p>
+                      <span>{{lists.deviceInstallAddress}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>故障MAC地址：</p>
+                      <span>{{lists.deviceMac}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>设备IP地址：</p>
+                      <span>{{lists.deviceIp}}</span>
+                    </div>
+                    <div style="min-width:100%">
+                      <p>附件：</p>
+                      <span style="border-bottom:1px solid #1D60FE;cursor:pointer;margin-right:20px" @click="download(down)" v-for="down in lists.attachment">{{down}}</span>
+                    </div>
+                  </div>
+
+                  <div class="content" style="border:none;">
+                    <div style="min-width:30%">
+                        <p>工单编号：</p>
+                        <span>{{formlists.formId}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>线杆编号：</p>
+                        <span>{{formlists.poleNo}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>紧急程度：</p>
+                        <span>{{formlists.priority}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安全负责人：</p>
+                        <span>{{formlists.principals}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>手机号：</p>
+                        <span>{{formlists.principalsPhone}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>项目名称：</p>
+                        <span>{{formlists.projectName}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安全负责单位名称：</p>
+                        <span>{{formlists.principalsCompany}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>派单时间：</p>
+                        <span>{{formlists.createTime}}</span>
+                      </div>
+                      <div style="min-width:100%" v-if="formlists.processStatus == '待确认'">
+                        <p>说明：</p>
+                         <i-input type="textarea" :rows="4" v-model="closetext"></i-input>
+                      </div>
+                      <input type="file" multiple name="file"  style="margin:10px 30px" ref="closefile" @change="flieupload" v-if="formlists.processStatus == '待确认'"/> 
+                  </div>
+
+                 <div class="sendbox"  v-if="feebacklist.length>0">
+                   <img src="../../public/img/fg.png"/>
+                    反馈信息
+                 </div>
+                 <div class="content" style="border:none;" v-for="list in feebacklist" >
+                  <div style="min-width:20%">
+                    <p>反馈人：</p>
+                    <span>{{list.person}}</span>
+                  </div>
+                  <div style="min-width:40%">
+                    <p>反馈时间：</p>
+                    <span>{{list.feedbackTime}}</span>
+                  </div>
+                  <div style="min-width:30%">
+                    <p>承诺解决时长：</p>
+                    <span>{{list.promiseResolveTime}}</span>
+                  </div>
+                  <div style="min-width:30%">
+                    <p>反馈具体内容：</p>
+                    <span>{{list.content}}</span>
+                  </div>
+                 </div>
+                 <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="closetowork(formlists)">确认关闭工单</button>
+                 <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="backtowork(formlists)">退回</button>
+                <button   class="zhuanyixukes closebtn" @click.stop="closedetail">关闭</button>
+            </div>
+
+
+<transition name="fade">
+        <div class="bigright" v-show="bigrightshow" transiton="fade" @click.stop="bigrightshow = true" >
+           <p class="detailpage">详情页面</p>
+            <div class="detail-box" ref="bright">
+                <div class="detail-title">
+                  <img src="../../public/img/20.png"/>
+                  <p>基本信息</p>
+                </div>
+
+                <div class="detail-text" v-if="LANshow">
+                  <div style="left:50px;" class="fixedborder" v-if="wangguanshow"></div>
+                  <div style="left:22px;width:60px" class="fixedimg" @click="backwgs"></div>
+                  <div style="left:110px;" class="fixedborder" v-if="laneig"></div>
+                    <p class="fixedtext" style="left:85px;" v-if="laneig">{{devicetype.LAN8.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:88px;" class="fixedimg" v-if="devicetype.LAN8 != '' && devicetype.LAN8.alert == 2" @click="checklaneig"/>
+                    <img src="../../public/img/2.gif" style="left:88px;" class="fixedimg" v-if="devicetype.LAN8 != '' && devicetype.LAN8.alert == 1" @click="checklaneig"/>
+                    <img src="../../public/img/gg2.png" style="left:88px;" class="fixedimg" v-if="devicetype.LAN8 != '' && devicetype.LAN8.alert == 0" @click="checklaneig"/>
+                   <div style="left:160px;" class="fixedborder" v-if="lanseven"></div>
+                    <p class="fixedtext" style="left:135px;" v-if="lanseven">{{devicetype.LAN7.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:138px;" class="fixedimg" v-if="devicetype.LAN7 != '' && devicetype.LAN7.alert == 2" @click="checklansrven"/>
+                    <img src="../../public/img/2.gif" style="left:138px;" class="fixedimg" v-if="devicetype.LAN7 != '' && devicetype.LAN7.alert == 1" @click="checklansrven"/>
+                    <img src="../../public/img/gg2.png" style="left:138px;" class="fixedimg" v-if="devicetype.LAN7 != '' && devicetype.LAN7.alert == 0" @click="checklansrven"/>
+                   <div style="left:210px;" class="fixedborder" v-if="lansix"></div>
+                    <p class="fixedtext" style="left:185px;" v-if="lansix">{{devicetype.LAN6.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:188px;" class="fixedimg" v-if="devicetype.LAN6 != '' && devicetype.LAN6.alert == 2" @click="checklansix"/>
+                    <img src="../../public/img/2.gif" style="left:188px;" class="fixedimg" v-if="devicetype.LAN6 != '' && devicetype.LAN6.alert == 1" @click="checklansix"/>
+                    <img src="../../public/img/gg2.png" style="left:188px;" class="fixedimg" v-if="devicetype.LAN6 != '' && devicetype.LAN6.alert == 0" @click="checklansix"/>
+                   <div style="left:260px;" class="fixedborder" v-if="lanfive"></div>
+                    <p class="fixedtext" style="left:235px;" v-if="lanfive">{{devicetype.LAN5.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:237px;" class="fixedimg" v-if="devicetype.LAN5 != '' && devicetype.LAN5.alert == 2" @click="checklanfive"/>
+                    <img src="../../public/img/2.gif" style="left:237px;" class="fixedimg" v-if="devicetype.LAN5 != '' && devicetype.LAN5.alert == 1" @click="checklanfive"/>
+                    <img src="../../public/img/gg2.png" style="left:237px;" class="fixedimg" v-if="devicetype.LAN5 != '' && devicetype.LAN5.alert == 0" @click="checklanfive"/>
+                   <div style="left:320px;" class="fixedborder" v-if="lanfour"></div>
+                    <p class="fixedtext" style="left:295px;" v-if="lanfour">{{devicetype.LAN4.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:298px;" class="fixedimg" v-if="devicetype.LAN4 != '' && devicetype.LAN4.alert == 2" @click="checklanfour"/>
+                    <img src="../../public/img/2.gif" style="left:298px;" class="fixedimg" v-if="devicetype.LAN4 != '' && devicetype.LAN4.alert == 1" @click="checklanfour"/>
+                    <img src="../../public/img/gg2.png" style="left:298px;" class="fixedimg" v-if="devicetype.LAN4 != '' && devicetype.LAN4.alert == 0" @click="checklanfour"/>
+                   <div style="left:370px;" class="fixedborder" v-if="lanthree"></div>
+                   <p class="fixedtext" style="left:345px;" v-if="lanthree">{{devicetype.LAN3.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:348px;" class="fixedimg" v-if="devicetype.LAN3 != '' && devicetype.LAN3.alert == 2" @click="checklanthree"/>
+                    <img src="../../public/img/2.gif" style="left:348px;" class="fixedimg" v-if="devicetype.LAN3 != '' && devicetype.LAN3.alert == 1" @click="checklanthree"/>
+                    <img src="../../public/img/gg2.png" style="left:348px;" class="fixedimg" v-if="devicetype.LAN3 != '' && devicetype.LAN3.alert == 0" @click="checklanthree"/>
+                   <div style="left:420px;" class="fixedborder" v-if="lantwo"></div>
+                   <p class="fixedtext" style="left:395px;" v-if="lantwo">{{devicetype.LAN2.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:398px;" class="fixedimg" v-if="devicetype.LAN2 != '' && devicetype.LAN2.alert == 2" @click="checklantwo"/>
+                    <img src="../../public/img/2.gif" style="left:398px;" class="fixedimg" v-if="devicetype.LAN2 != '' && devicetype.LAN2.alert == 1" @click="checklantwo"/>
+                    <img src="../../public/img/gg2.png" style="left:398px;" class="fixedimg" v-if="devicetype.LAN2 != '' && devicetype.LAN2.alert == 0" @click="checklantwo"/>
+                   <div style="left:470px;" class="fixedborder" v-if="lanone"></div>
+                    <p class="fixedtext" style="left:445px;" v-if="lanone">{{devicetype.LAN1.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 2" @click="checklanone"/>
+                    <img src="../../public/img/2.gif" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 1" @click="checklanone"/>
+                    <img src="../../public/img/gg2.png" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 0" @click="checklanone"/>
+                   
+                   
+                  <img src="../../public/img/wg.png"/>
+                  <div class="detail-textbox">
+                      <p>安装地址：<span style="color:#1D60FE">{{rightlist.installAddress}}</span></p>
+                      <div>
+                        <span style="min-width:200px">设备IP：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkdevicelist(rightlist.poleNo)">{{rightlist.gatewayIp}}</span></span>
+                        <span >立杆号：<span style="color:#1D60FE">{{rightlist.poleNo}}</span></span>
+                      </div>
+                      <div>
+                        <span style="min-width:200px">经度：<span style="color:#1D60FE">{{rightlist.longitude}}</span></span>
+                        <span>纬度：<span style="color:#1D60FE">{{rightlist.latitude}}</span></span>
+                      </div>
+                      <div>
+                        <span style="min-width:200px">mac地址：<span style="color:#1D60FE">{{rightlist.mac}}</span></span>
+                        <span>责任人：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkperson(rightlist.maintenanceUserId)">{{rightlist.maintenanceUser}}</span></span>
+                      </div>
+                  </div>
+                </div>
+              
+                <div style="position:relative;margin-bottom:65px" v-if="backwg">
+                  <button   class="zhuanyixukes backwg" @click="backwgs">返回网关</button>
+                </div>
+                
+                <div class="detail-title">
+                  <img src="../../public/img/gx.png"/>
+                  <p>告警信息</p>
+                </div>
+                 <div class="top-box">
+                  <div>
+                    <button   class="zhuanyixuke" @click="delwarn" v-if="!move">清除警告</button>
+                    <button   class="zhuanyixukes" v-if="move" @click="movewarn">确认清除</button>
+                    <button   class="zhuanyixuke" v-if="move" @click="back">返回</button>
+                  </div>
+                 </div>
+                <div class="timelinebox" style="padding:20px">
+                <Timeline>
+                <Timeline-item v-for="list in msglist" >
+                    <img src="../../public/img/16.png" slot="dot" v-if="list.isAlert == 2" />
+                    <img src="../../public/img/nono.png" slot="dot" v-if="list.nono"  @click="checknono(list.gatewayIp)"/>
+                    <img src="../../public/img/19.png" slot="dot" v-if="list.isAlert == 4"  @click="checkicon(list.gatewayIp)"/>
+                    <img src="../../public/img/18.png" slot="dot" v-if="list.isAlert == 1" />
+                    <div class="timelinecont">
+                      <p style="min-width:200px">LAN8接入设备类型：<span>{{list.resType}}</span></p>
+                      <p style="min-width:80px;margin-left: 5px">状态：<span>{{list.state?"处理中":"待处理"}}</span></p>
+                      <p style="min-width:150px;margin-left: 5px">告警类型：<span>{{list.typeName}}</span></p>
+                       <p style="min-width:210px;margin-left: 5px">发生时间：<span>{{list.occurTime}}</span></p>
+                      
+                    </div>
+                    <div style="display:flex;font-size:14px;margin-top:10px">
+                      <div style="min-width:238px;text-align:left">
+                          <p>IP地址：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" >{{list.ipAddr}}</span></p>
+                        </div>
+                      <div style="margin-left: 10px;min-width:400px;text-align:left">
+                          <p>安装地址：<span style="color:#1D60FE;">{{list.attrs.installAddress}}</span></p>
+                      </div>
+                      <div style="margin-left: 10px">
+                          <p>分析报告：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">查看</span></p>
+                        </div>
+                     </div>
+                    <p class="hadpro" >故障描述：<a style="border:none;cursor:default">{{list.description}}</a></p>
+                </Timeline-item>
+                </Timeline>
+              </div>
+            
+
+
+
+            
+                <button   class="zhuanyixukes" @click="sendwork" v-if="boolsend" style="margin-top:36px">发送工单</button>
+            
+             
+             
+             
+
+             <div class="detail-title" v-if="this.nowworklist.length>0" style="margin-top:40px;">
+                  <img src="../../public/img/worknum.png"/>
+                  <p>当前工单</p>
+            </div>
+            <div class="content-box" v-if="this.nowworklist.length>0">
+            <div class="content" v-for="list in nowworklist">
+              <div style="min-width:250px">
+                <p>工单状态：</p>
+                <span>{{list.processStatus}}</span>
+              </div>
+               <div style="min-width:270px">
+                <p>工单编号：</p>
+                <span style="border-bottom:1px solid #1D60FE;cursor:pointer;" @click="gotodetal(list.formId)">{{list.formId}}</span>
+              </div>
+               <div style="min-width:100px">
+                <p>责任人：</p>
+                <span>{{list.principals}}</span>
+              </div>
+              <div style="min-width:150px">
+                <p>电话：</p>
+                <span>{{list.principalsPhone}}</span>
+              </div>
+              <div style="min-width:250px">
+                <p>反馈内容：</p>
+                <span>{{list.feedbackContent}}</span>
+              </div>
+               <div style="min-width:270px">
+                <p>承若解决时间：</p>
+                <span>{{list.promiseResolveTime}}</span>
+              </div>
+               <div style="min-width:100px">
+                <p>是否催单：</p>
+                <span v-if="list.remindTimes != 0">是</span>
+                <span v-if="list.remindTimes == 0">否</span>
+              </div>
+            </div>
+           </div>
+
+
+           <div class="detail-title" v-if="this.hisworklist.length>0">
+                  <img src="../../public/img/hist.png"/>
+                  <p>历史工单</p>
+            </div>
+
+          <div class="historywork" v-if="this.hisworklist.length>0">
+            <Timeline>
+              <Timeline-item v-for="(hislist,index) in hisworklist" style="padding-bottom:40px;">
+                <div  slot="dot" class="iconhis">{{index+1}}</div>
+                  <div class="timelinecont">
+                    <p style="min-width:270px">工单编号：<span style="border-bottom:1px solid #1D60FE;cursor:pointer;" @click="gotodetal(hislist.formId)">{{hislist.formId}}</span></p>
+                    <p style="min-width:220px;margin-left: 5px">责任人：<span>{{hislist.principals}}</span></p>
+                    <p style="min-width:220px;margin-left: 5px">联系电话：<span>{{hislist.principalsPhone}}</span></p>
+                    <div style="display: flex;min-width:200px;margin-left: 10px">
+                        <p>故障描述：</p>
+                        <span style="text-align:left;flex: 1;color:#1d60fe">{{hislist.detail}}</span>
+                      </div>
+                  </div>
+                  <div class="timelinecont" style="margin-top:20px;">
+                    <p style="min-width:270px">处理时长：<span>{{hislist.intervaTime}}</span></p>
+                    <p style="min-width:220px;margin-left: 5px">派单时间：<span>{{hislist.createTime}}</span></p>
+                    <p style="min-width:220px;margin-left: 5px">关单时间：<span>{{hislist.updateTime}}</span></p>
+                    <div style="display: flex;min-width:200px;margin-left: 10px">
+                        <p>反馈内容：</p>
+                        <span style="text-align:left;flex: 1;color:#1d60fe">{{hislist.feedbackContent}}</span>
+                      </div>
+                  </div>
+
+              </Timeline-item>
+          </Timeline>
+          </div>
+           
+
+
+          <!-- 发送工单弹窗 -->
+          <div class="workdetail" v-if="workdetailsend" style="padding:0">
+             <Collapse   v-model="collegeIndex">
+              <Panel  v-for="(list,index) in newlists" :key="index" :name="String(index)">
+            <!-- <div v-for="(list,index) in newlists" :key="index"> -->
+                <!-- <div class="detail-title" style="margin-top:10px;"> -->
+                  <img src="../../public/img/num2.png" style="vertical-align:middle;margin-right:5px" v-if="(index+1)%2 == 0"/>
+                  <img src="../../public/img/num.png" style="vertical-align:middle;margin-right:5px" v-if="(index+1)%2 != 0"/>工单编号 ({{list.comm.id}})
+                <!-- </div> -->
+
+                <div class="content worksendbox" style="border:none" slot="content">
+                  <div style="min-width:40%">
+                    <p>安全负责人：</p>
+                    <span >{{list.comm.principals}}</span>
+                  </div>
+                  <div style="min-width:30%">
+                    <p>项目名称：</p>
+                    <span>{{list.comm.projectName}}</span>
+                  </div>
+                  <div style="min-width:20%">
+                    <p>联系方式：</p>
+                    <span>{{list.comm.principalsPhone}}</span>
+                  </div>
+                  <div style="min-width:40%">
+                    <p>安全负责人单位名称：</p>
+                    <span >{{list.comm.principalsCompany}}</span>
+                  </div>
+                   <div style="min-width:30%">
+                    <p>紧急程度：</p>
+                    <Radio-group :v-model="list.comm.id" @on-change="changelevel($event,list,newlists[index].device)" style="margin-top:0">
+                      <Radio :label="bb.id" v-for="(bb,nums) in priorityName" :key="nums">
+                          <span style="margin-right:10px;color:#FE3D3D" v-if="nums == 0">{{bb.priorityName}}</span>
+                          <span style="margin-right:10px;color:#F6B36C" v-if="nums == 1">{{bb.priorityName}}</span>
+                          <span style="margin-right:10px;color:#8DEC9B" v-if="nums == 2">{{bb.priorityName}}</span>
+                      </Radio>
+                  </Radio-group>
+                  </div>
+                  <div style="min-width:20%">
+                    <p>线杆编号：</p>
+                    <span >{{list.comm.poleNo}}</span>
+                  </div>
+                </div>
+
+                <!-- <div class="detail-title" style="margin-top:10px;" slot="content">
+                  <p style="color:#1d60fe">设备信息</p>
+                </div> -->
+
+                <div class="content"  v-for="(aa,indexs) in list.device" :key="indexs" slot="content">
+                    <div style="min-width:10%;position:relative" >
+                      <img src="../../public/img/2142.png"/>
+                      <span style="position:absolute;left:7px;top:16px;color:#F6B46F">{{aa.devicePort}}</span>
+                      <span style="position:absolute;left:0px;top:45px;color:#1D60FE" v-if="aa.deviceType != '网关'">{{aa.deviceType}}</span>
+                      <span style="position:absolute;left:11px;top:45px;color:#1D60FE" v-if="aa.deviceType == '网关'">{{aa.deviceType}}</span>
+                    </div>
+                    <!-- <div style="min-width:30%">
+                      <p>设备类型：</p>
+                      <span>{{aa.deviceType}}</span>
+                    </div> -->
+                    <div style="min-width:40%">
+                      <p>故障MAC地址：</p>
+                      <span  style="color:#696C6F">{{aa.deviceMac}}</span>
+                    </div>
+                    <div style="min-width:40%">
+                      <p>设备IP地址：</p>
+                      <span  style="color:#696C6F">{{aa.deviceIp}}</span>
+                    </div>
+                     <div style="min-width:90%;margin-left:10%">
+                      <p>安装地址：</p>
+                      <span style="color:#696C6F">{{aa.deviceInstallAddress}}</span>
+                    </div>
+                    <div style="min-width:90%;margin-left:10%">
+                        <p>故障描述：</p>
+                        <i-input type="textarea" :rows="4" :placeholder="aa.detail"  v-model="aa.detail"></i-input>
+                    </div>
+                   <input type="file" multiple name="file" :id="aa.deviceMac" style="margin:20px 30px;padding-left:10%" @change="confirmupload(aa.deviceMac,index,indexs)"/> 
+            </div>
+
+
+          
+
+
+
+
+
+            </Panel>
+    </Collapse>
+            <button   class="zhuanyixukes" v-if="entersendwork" @click="aaaa">确认发送</button>
+            <button   class="zhuanyixukes closebtn" @click="closedetails">关闭</button>
+          </div>
+
+
+
+
+              <!-- 点击责任人弹窗 -->
+            <div v-if="personshow" class="workdetail">
+              <div class="detail-title" style="margin-top:10px;">
+                  <p style="color:#1d60fe">人员信息</p>
+                </div>
+
+              <div class="content worksendbox" style="border:none">
+                <div style="min-width:30%">
+                  <p>姓名：</p>
+                  <span>{{usermsg.userName}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>APP ID：</p>
+                  <span>{{usermsg.appId}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>单位名称：</p>
+                  <span>{{usermsg.company}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>性别：</p>
+                  <span style="color: #696C6F" v-if="usermsg.sex == 0">男</span>
+                  <span style="color: #696C6F" v-if="usermsg.sex == 1">女</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>手机号：</p>
+                  <span>{{usermsg.mobile}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>单位地址：</p>
+                  <span>{{usermsg.companyAddress}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>年龄：</p>
+                  <span>{{usermsg.age}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>邮箱号码：</p>
+                  <span>{{usermsg.email}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>所属单位电话：</p>
+                  <span>{{usermsg.companyPhone}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>身份证号：</p>
+                  <span>{{usermsg.idCard}}</span>
+                </div>
+              </div>
+
+                <div class="detail-title" style="margin-top:10px;">
+                  <p style="color:#1d60fe">证书信息</p>
+                </div>
+
+                 <div>
+                    <div v-for="certlist in certmsg" class="content" style="position:relative">
+                      <p style="font-size: 16px;width:100%;margin-top:20px">证书编号：
+                        <span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.certificateNo}}</span>
+                        <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.certificateNo}}</span>
+                        <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.certificateNo}}</span>
+                      </p>
+                      <div class="morecontent">
+                        <p style="min-width: 15%">发证类型：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.certificateType}}</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.certificateType}}</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.certificateType}}</span>
+                        </p>
+                        <p style="min-width: 30%">授权设备类型：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.installType}}</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.installType}}</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.installType}}</span>
+                        </p>
+                        <p style="min-width: 35%">发证日期：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.applyTime}}</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.applyTime}}</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.applyTime}}</span>
+                        </p>
+                        <p style="min-width: 35%">证书失效日期：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.endTime}}</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.endTime}}</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">{{certlist.endTime}}</span></p>
+                        <p style="min-width: 20%">证书状态：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">正常</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">过期</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">停用({{certlist.updateTime}})</span></p>
+                      </div>
+                      <img src="../../public/img/timego.png" class="timego" v-if="certlist.certificateStatus == 2"/>
+                    </div>
+                 </div>
+                 <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button>
+            </div>
+ 
+             <!-- 点击ip弹窗 -->
+            <div class="workdetail" v-if="workdetailshow">
+              <Tabs active-key="0">
+                <Tab-pane :label="list.portName ?list.deviceType+'('+list.portName+')':list.deviceType" :key="index" v-for="(list,index) in workdetaillist">
+                  <div class="detail-title" style="margin-top:10px;">
+                    <p >基本信息</p>
+                  </div>
+                  <div class="content" style="border:none;" v-if="list.deviceType == 'wifi嗅探' || list.deviceType == '电子围栏'">
+                    <div style="min-width:30%">
+                        <p>编码：</p>
+                        <span>{{list.entity.snCode}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>品牌：</p>
+                        <span>{{list.entity.manufacturer}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安装位置：</p>
+                        <span>{{list.entity.installAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>维护人员：</p>
+                        <span>{{list.entity.maintenanceUser}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>管理单位：</p>
+                        <span>{{list.entity.managementUnit}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>IP地址：</p>
+                        <span>{{list.entity.ipAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>MAC地址：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>附件：</p>
+                        <span style="border-bottom:1px solid #1D60FE;cursor:pointer;margin-right:20px" @click="download(down)" v-for="down in list.entity.enclosureUrl">{{down}}</span>
+                      </div>
+                  </div>
+
+                  <div class="content" style="border:none;" v-if="list.deviceType == '安全网关'">
+                    <div style="min-width:30%">
+                        <p>中心端地址：</p>
+                        <span>{{list.entity.centPortAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>本机地址：</p>
+                        <span>{{list.entity.localAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>网关序列号：</p>
+                        <span>{{list.entity.snCode}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>网关IP：</p>
+                        <span>{{list.entity.gatewayIp}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>MAC地址：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>经度：</p>
+                        <span>{{list.entity.longitude}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>纬度：</p>
+                        <span>{{list.entity.latitude}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>地址掩码：</p>
+                        <span>{{list.entity.addressMask}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安装地址：</p>
+                        <span>{{list.entity.installAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>管理单位：</p>
+                        <span>{{list.entity.managementUnit}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>维护人员：</p>
+                        <span>{{list.entity.maintenanceUser}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>网关名称：</p>
+                        <span>{{list.entity.gatewayName}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>用户名：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>出场编码：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>系统时间：</p>
+                        <span>{{list.entity.systemTime}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>出场时间：</p>
+                        <span>{{list.entity.factoryTime}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>设备厂商：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>终端状态：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                  </div>
+
+
+                  <div class="content" style="border:none;" v-if="list.deviceType == '摄像机'">
+                    <div style="min-width:30%">
+                        <p>设备名称：</p>
+                        <span>{{list.entity.cameraName}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>设备厂商：</p>
+                        <span>{{list.entity.manufacturer}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>设备型号：</p>
+                        <span>{{list.entity.model}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安装地址：</p>
+                        <span>{{list.entity.installAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>行政区域：</p>
+                        <span>{{list.entity.areaCode}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>国标编码：</p>
+                        <span>{{list.entity.nationnalId}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>摄像机编码格式：</p>
+                        <span>{{list.entity.cameraCode}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安装时间：</p>
+                        <span>{{list.entity.installTime}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>补光类型：</p>
+                        <span>{{list.entity.lightingType}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>摄像机类型：</p>
+                        <span>{{list.entity.cameraType}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>录像保存天数：</p>
+                        <span>{{list.entity.videoSaveDays}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>联网属性：</p>
+                        <span >{{list.entity.networkProperties?'未联网':'已联网'}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>IPv4地址：</p>
+                        <span>{{list.entity.ipAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>MAC地址：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>IPv6地址：</p>
+                        <span>{{list.entity.ipv6Address}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>设备状态：</p>
+                        <span>{{list.entity.deviceStatus?'异常':'正常'}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>监控点位类型：</p>
+                        <span>{{list.entity.pointType}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>监控方位：</p>
+                        <span>{{list.entity.cameraPosition}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>点位名称：</p>
+                        <span>{{list.entity.pointName}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>维护人员：</p>
+                        <span>{{list.entity.maintenanceUser}}</span>
+                      </div>
+                  </div>
+
+                  <div class="detail-title" style="margin-top:10px;" v-if="list.deviceType == '摄像机'">
+                    <p >基本信息</p>
+                  </div>
+                  <div class="content" style="border:none;" v-if="list.deviceType == '摄像机'">
+                      <div style="min-width:30%">
+                        <p>经度：</p>
+                        <span>{{list.entity.longitude}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>纬度：</p>
+                        <span>{{list.entity.latitude}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>管理单位：</p>
+                        <span>{{list.entity.managementUnit}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>是否上报：</p>
+                        <span>{{list.entity.isReport?"否":"是"}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>所属辖区公安机关：</p>
+                        <span>{{list.entity.deptId}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>管理单位联系方式：</p>
+                        <span>{{list.entity.managementPhone}}</span>
+                      </div>
+                      <div style="min-width:100%">
+                        <p>摄像机功能类型：</p>
+                        <span>{{list.entity.cameraFunctionType}}</span>
+                      </div>
+                      <div style="min-width:100%">
+                        <p>摄像机位置类型：</p>
+                        <span>{{list.entity.cameraPositionType}}</span>
+                      </div>
+                      <div style="min-width:100%">
+                        <p>所属部门行业：</p>
+                        <span>{{list.entity.industry}}</span>
+                      </div>
+                  </div>
+
+
+
+                </Tab-pane>
+                <!-- <Tab-pane label="标签二" key="key2">标签二的内容</Tab-pane> -->
+            </Tabs>
+            <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button>
+            </div>
+
+
+
+
+            <!-- <div style="height:400px;width:500px;"></div> -->
+
+
+            </div>
+
+            
+        </div>
+        </transition>
+  </div>
+
+</template>
+<script>
+import ArcgisMap from "@/components/ArcgisMap";
+import ArcgisMapsmall from "@/components/ArcgisMapsmall";
+import Vue from "vue";
+// let echarts = require('echarts/lib/echarts');
+export default {
+  name: "operation",
+  components: {
+    ArcgisMap,
+    ArcgisMapsmall
+  },
+  data() {
+    return {
+      statustablevalue:'',
+      sendreminddatalist:[],
+      sendremindshows:false,
+      formid:'',
+      deal:'',
+      sendremindshow:false,
+      valuetable:'',
+      changetimedata:'',
+      totalstype:'',
+      totals:0,
+      statustable:false,
+      statuslistnum:[],
+      tabletime:'',
+      collegeIndex:'0',
+      attachment:'',
+      closetext:'',
+      timeechartlist:[],
+      workdetaillist:[],
+      entersendwork:false,
+      sendparam:[],
+      deviceValue:0,
+      workdetailshow:false,
+      usermsg:[],
+      certmsg:[],
+      personshow:false,
+      boolsend:false,
+      entersend:{},
+      sendworkshow:false,
+      formIdlist:'',
+      priorityName:[],
+      newlists:[],
+      workdetailsend:false,
+      formlists:[],
+      devicelist:[],
+      feebacklist:[],
+      remindlist:[],
+      workdetail:false,
+      olddata:[],
+      hisworklist:[],
+      nowworklist:[],
+      device:[],
+      serachvalue:'',
+      serachvalues:'',
+      msgtypelist:[],
+      backwg:false,
+      wangguanshow:true,
+      lanone:false,
+      lantwo:false,
+      lanthree:false,
+      lanfour:false,
+      lanfive:false,
+      lansix:false,
+      lanseven:false,
+      laneig:false,
+      LANshow:false,
+      devicetype:[],
+      msglist:[],
+      changeobj:{},
+      phone:'',
+      opendata:true,
+      opendatas:false,
+      typeone:true,
+      bigrightshow:false,
+      move: false,
+      statusdata: false,
+      value: "",
+      levels: "",
+      level:'cc',
+      ss: "",
+      statuslist: [],
+      timelinelist: [],
+      iplist: [],
+      getwayip:'',
+      rightlist:[],
+      type:'',
+      typelist:[],
+      columns1: [{title: '采样时间',key: 'creatTime', width:155,},
+                {title: '网络延时',key: 'status',width:95,},
+                {title: '丢包率',key: 'packetLoss',width:80,},
+                 {title: '在ping一下',key:'ping',width:115,
+              render: (h, params) => {
+                    return h('div', [
+                        h('div', {
+                            on: {
+                                click: () => {
+                                  this.boolping()
+                                }
+                            }
+                        }, 'ping')
+                    ]);
+                  }
+                 }
+                ],
+      dataone: [],
+      columns2: [{title: '设备类型',key: 'deviceType', width:90,},
+                {title: 'IP',key: 'gatewayIp',width:120,},
+                {title: '安装地址',key: 'installAddress',width:150,className:'address'},
+                {title: '在线状态',key: 'isOnline',width:90,},
+                {title: '检测时间',key: 'updateTime',width:155,className:'updatetime'}
+                ],
+      data2: [],
+      columns4: [{type: 'selection',width: 60,align: 'center'},
+                  {title: '工单编号',key: 'formId',width: 160},
+                  {title: '运维负责人',key: 'principals',width: 85},
+                  {title: '项目名称',key: 'projectName'},
+                   {title: 'IP地址',key: 'deviceIp',width: 108,
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 padding:'0 10px',
+                                 display:'inline-block'
+                              }
+                          },params.row.deviceIp)
+                        }
+                  },
+                  {title: 'MAC地址',key: 'deviceMac',width: 108},
+                  {title: '线杆编号',key: 'poleNo'},
+                  {title: '安装地址',key: 'deviceInstallAddress'},
+                  {title: '故障描述',key: 'detail'},
+                  {title: '派单时长',key: 'intervaTime',width:90,
+                    render:(h,params)=>{
+                          let tmpStr = "";
+                          if(params.row.intervaTime > 24){
+                            tmpStr="大于一天";
+                          }else if(params.row.intervaTime < 4 && params.row.intervaTime > 1){
+                            tmpStr="4小时内";
+                          }else if(params.row.intervaTime < 1){
+                            tmpStr="1小时内";
+                          }
+                          return h('span',{
+                              style:{
+                                 background: (params.row.intervaTime > 24)?"#EC626B":(params.row.intervaTime < 4 && params.row.intervaTime > 1?"#F1C61B":"#6FC833"),
+                                 color:'#fff',
+                                 padding:'4px 12px',
+                                 display:'inline-block',
+                              }
+                          },tmpStr)
+                        }
+                  },
+                  {title: '反馈人',key: 'feedbackPerson',width:80,},
+                  {title: '反馈时间',key: 'feedbackTime',width:140,},
+                  {title: '承诺解决时间',key: 'promiseResolveTime',width:100,},
+                  {title: '工单状态',key: 'processStatus',width:80,
+                   render:(h,params)=>{
+                          // let tmpStr = "";
+                          if(params.row.processStatus=="处理中"){
+                            // tmpStr="未通过";
+                          }else if(params.row.processStatus=="待确认"){
+                            // tmpStr="已通过";
+                          }else if(params.row.processStatus=="关闭"){
+                            // tmpStr="正在审核";
+                          }
+                          return h('span',{
+                              style:{
+                                 background: (params.row.processStatus=="处理中")?"#EC626B":(params.row.processStatus=='待确认'?"#9CD875":"#7C7C7C"),
+                                 color:'#fff',
+                                 padding:'4px 12px',
+                                 display:'inline-block',
+                              }
+                          },params.row.processStatus)
+                        }
+                  },
+                  {title: '操作',key: 'remindTimes',width:80,
+                    render: (h, params) => {
+                          let tmpStr = "";
+                          if(params.row.remindTimes==0){
+                            tmpStr="催单";
+                          }else if(params.row.remindTimes != 0){
+                            tmpStr='已催单'+params.row.remindTimes+'次';
+                          }
+                      return h('div', [
+                          h('div', {
+                              on: {
+                                  click: () => {
+                                    this.remindwork(params.row.formId)
+                                  }
+                              },
+                              style:{color:'#FE3333',cursor:'pointer'}
+                          },tmpStr)
+                      ]);
+                    }
+                  },
+                  {title: '详情',key: 'action',width:70,
+                    render: (h, params) => {
+                      return h('div', [
+                          h('div', {
+                              on: {
+                                  click: () => {
+                                    this.gotodetal(params.row.formId)
+                                  }
+                              },
+                              style:{color:'#1d60fe',cursor:'pointer'}
+                          }, '查看详情')
+                      ]);
+                    }
+                  }
+                ],
+      data1: []
+    };
+  },
+
+  mounted() {
+    // this.drawLine();
+    this.drawLines();
+    this.$http.get("alert/warning/getAlertStatistics",{requestModular:2},res => {
+        this.statuslist = res.data;
+      },
+      err => {}
+    );
+    //右侧表单信息数
+    this.$http.get("workflow/workflow/findFormStatistics",{},res => {
+      this.statuslistnum = res.data;
+      //  console.log(res)
+      },
+      err => {}
+    );
+  },
+  methods: {
+    drawLine(data){
+        // 基于准备好的dom，初始化echarts实例
+        let myChart = this.$echarts.init(document.getElementById('myChart'))
+
+        var mytime24 = new Array();
+			var i=0;
+			var ttt=1533139200000;
+			for(;i<23;i++){
+				mytime24.push([ttt,'']);//传入value的值为‘’则该值点不会显示在图表中
+				ttt=ttt+3600000;
+ 
+			}//生成24小时的时间范围数组数据。
+        // 绘制图表
+        myChart.setOption({
+            xAxis: {
+            splitLine:'false',
+			    	name:'时间',
+			    	type:'time',
+            data: [],
+    },
+    title: {
+        subtext: "通讯流量状况"
+    },
+    tooltip: {
+        trigger: "axis",
+        showDelay: 0,
+        axisPointer: {
+            type: "cross",
+            lineStyle: {
+                type: "dashed",
+                width: 1
+            }
+        }
+    },
+    grid:{
+      left:55
+    },
+    yAxis: {
+      name: 'kb',
+        type: 'value',
+         max: function(value) { //设置y轴最大值
+             return value.max + 30;
+         }
+    },
+    series: [{
+        data: data,
+        type: 'line'
+    }]
+        });
+    },
+    drawLines(data){
+        // 基于准备好的dom，初始化echarts实例
+        let myCharts = this.$echarts.init(document.getElementById('myCharts'))
+        // 绘制图表
+        myCharts.setOption({
+            xAxis: {
+       splitLine:'false',
+			    	name:'时间',
+			    	type:'time',
+            data: [],
+    },
+    title: {
+        subtext: "网络状况"
+    },
+    tooltip: {
+        trigger: "axis",
+        showDelay: 0,
+        axisPointer: {
+            type: "cross",
+            lineStyle: {
+                type: "dashed",
+                width: 1
+            }
+        }
+    },
+    grid:{
+      left:55
+    },
+    yAxis: {
+        type: 'value',
+          scale: false,
+            min: 0,
+            max: 1,
+            splitNumber: 1,
+            margin: 20,
+            axisTick: {
+                length: 0,
+                inside: true,
+                interval: 0,
+                show: false
+            },
+            
+            axisLabel: {
+                formatter: function (value) {
+                  var texts = [];
+                  if(value==0){
+                  texts.push('在线');
+                  }
+                  else if (value ==1) {
+                  texts.push('离线');
+                  }
+                  return texts;
+                  },
+                textStyle: {
+                    color: "#333"
+                },
+                margin: 5
+            }
+    },
+    series: [{
+        data: data,
+        // symbolSize: 20,
+        type: 'scatter',
+        itemStyle:{
+					normal:{color:function(value){
+						if(value.data[1]=="0")
+							return "#ED5565";
+						else if(value.data[1]=="1")
+              return "#8CC152";
+          }}
+    },
+    }]
+        });
+    },
+    statusclick(index) {
+      this.statusdata = true;
+      this.statustable = false
+      this.value = "";
+      if (index == 0) {
+        this.$http.get(
+          "alert/warning/getDeviceInfo?&param=",
+          { level: 2 },
+          res => {
+            this.timelinelist = res.data;
+            this.levels = 2;
+            this.move = false;
+            for (let i = 0; i < this.timelinelist.length; i++) {
+              this.$set(this.timelinelist[i], "nono", false);
+            }
+          },
+          err => {}
+        );
+      } else if (index == 1) {
+        this.$http.get(
+          "alert/warning/getDeviceInfo?&param=",
+          { level: 1 },
+          res => {
+            this.timelinelist = res.data;
+            this.levels = 1;
+            this.move = false;
+            for (let i = 0; i < this.timelinelist.length; i++) {
+              this.$set(this.timelinelist[i], "nono", false);
+            }
+          },
+          err => {}
+        );
+      } else if (index == 2) {
+        this.$http.get(
+          "alert/warning/getDeviceInfo?&param=",
+          { level: 0 },
+          res => {
+            this.timelinelist = res.data;
+            this.levels = 0;
+            this.move = false;
+            for (let i = 0; i < this.timelinelist.length; i++) {
+              this.$set(this.timelinelist[i], "nono", false);
+            }
+          },
+          err => {}
+        );
+      } else if (index == 3) {
+        this.$http.get(
+          "alert/warning/getDeviceInfo?&param=",
+          { level: 4 },
+          res => {
+            this.timelinelist = res.data;
+            this.levels = 4;
+            this.move = false;
+            for (let i = 0; i < this.timelinelist.length; i++) {
+              this.$set(this.timelinelist[i], "nono", false);
+            }
+          },
+          err => {}
+        );
+      }
+    },
+    serach() {
+      this.$http.get(
+        "/alert/warning/getDeviceInfo?",
+        { param: this.value, level: this.levels },
+        res => {
+          this.timelinelist = res.data;
+          this.levels = this.levels;
+          for (let i = 0; i < this.timelinelist.length; i++) {
+            this.$set(this.timelinelist[i], "nono", false);
+          }
+        },
+        err => {}
+      );
+    },
+    checkicon(ip, imgcheck, status) {
+      this.timelinelist.forEach(el => {
+        if (el.gatewayIp == ip) {
+          (el.nono = true), (el.isAlert = 5);
+        }
+      });
+    },
+    checknono(ip) {
+      this.timelinelist.forEach(el => {
+        if (el.gatewayIp == ip) {
+          (el.nono = false), (el.isAlert = 4);
+        }
+      });
+    },
+    delwarn() {
+      this.timelinelist.forEach(el => {
+        if (el.isAlert != 0) {
+          (el.nono = true), (el.isAlert = 5);
+        }
+      });
+      this.move = true;
+    },
+    back() {
+      this.$http.get(
+        "alert/warning/getDeviceInfo?",
+        { level: this.levels, param: this.value },
+        res => {
+          this.timelinelist = res.data;
+          for (let i = 0; i < this.timelinelist.length; i++) {
+            this.$set(this.timelinelist[i], "nono", false);
+          }
+        },
+        err => {}
+      );
+      this.move = false;
+    },
+    movewarn() {
+      this.iplist = [];
+      this.timelinelist.forEach(el => {
+        if (el.isAlert == 4) {
+          this.iplist.push(el.gatewayIp);
+        }
+      });
+      if(this.iplist.length > 0){
+          this.$http.put("alert/warning/cleanAlert",{ gatewayIpList: this.iplist },res => {
+          if(res.rel == true){
+            this.$Message.success('清除警告成功');
+            this.$http.get( "alert/warning/getDeviceInfo?",{ level: this.levels, param: this.value },res => {
+              this.timelinelist = res.data;
+              for (let i = 0; i < this.timelinelist.length; i++) {
+                this.$set(this.timelinelist[i], "nono", false);
+              }
+            },
+            err => {}
+          );
+          this.$http.get("alert/warning/getAlertStatistics",{},res => {
+            this.statuslist = res.data;
+          },
+          err => {}
+        );
+          this.move = false;
+
+          }else if(res.rel == false){
+            this.$Message.error('清楚警告失败');
+          }
+        },
+        err => {}
+      );
+      }
+      
+    },
+    
+    showno(){
+      this.statusdata = false
+      this.statustable = false
+      if(this.bigrightshow == true){
+        this.bigrightshow = false
+         this.getwayip = ''
+      }else if(this.bigrightshow == false && this.getwayip !== ''){
+        this.bigrightshow = true
+      }
+    },
+    ip(data){
+      // this.bigrightshow = true
+      this.deviceValue = 0
+      this.olddata = data
+      this.device=[]
+      this.data2 = []
+      this.lansix = false
+      this.lanone = false
+      this.lantwo = false
+      this.lanseven = false
+      this.laneig = false
+      this.wangguanshow = true
+      this.lanfive = false
+      this.lanthree = false
+      this.lanfour = false
+      this.getwayip = data
+      this.typeone = true
+       this.$http.get("gis/gis/getGatewayById?",{gatewayId:data},res=>{
+          this.rightlist = res.data
+          //图表加载插口
+           this.$http.get("res/resState/getLanDeviceType?",{gatewayId:data},res=>{
+             this.LANshow = true
+             this.devicetype = res.data
+          },err=>{});
+
+
+         //发送工单按钮显示隐藏
+          this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:data},res=>{
+            if(res.data.alertId.length > 0){
+                this.boolsend = true
+            }else{
+                this.boolsend = false
+            }
+            
+          },err=>{});
+
+
+          // 信息栏信息
+          this.$http.get("alert/warning/getAlertByGatewayId?",{gatewayId:data},res=>{
+              this.msglist = res.data.list
+              console.log(res)
+          },err=>{});
+
+
+
+          //当前工单
+           this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:data},res=>{
+            if(res.data){
+              this.nowworklist = res.data
+            }else{
+              this.nowworklist = []
+            }
+          },err=>{});
+
+          //历史工单
+          this.$http.get("workflow/workflow/findFormListHis?",{gatewayId:data},res=>{
+            if(res.data){
+              this.hisworklist = res.data
+            }else{
+              this.hisworklist = []
+            }
+          },err=>{});
+
+          //通讯状况表
+          this.$http.get("gis/gis/getGatewayState?",{gatewayId:this.olddata},res=>{
+              this.drawLines(res.data.gatewayState)
+          },err=>{});
+
+      },err=>{});
+
+
+    },
+    ips(data){
+      // this.statusdata = false
+      this.bigrightshow = true
+      this.deviceValue = 0
+      this.olddata = data
+      this.device=[]
+      this.data2 = []
+      this.lansix = false
+      this.lanone = false
+      this.lantwo = false
+      this.lanseven = false
+      this.laneig = false
+      this.wangguanshow = true
+      this.lanfive = false
+      this.lanthree = false
+      this.lanfour = false
+      this.getwayip = data
+      this.typeone = true
+       this.$http.get("gis/gis/getGatewayById?",{gatewayId:data},res=>{
+          this.rightlist = res.data
+          //图表加载插口
+           this.$http.get("res/resState/getLanDeviceType?",{gatewayId:data},res=>{
+             this.LANshow = true
+             this.devicetype = res.data
+          },err=>{});
+
+
+         //发送工单按钮显示隐藏
+          this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:data},res=>{
+            if(res.data.alertId.length > 0){
+                this.boolsend = true
+            }else{
+                this.boolsend = false
+            }
+            
+          },err=>{});
+
+
+          // 信息栏信息
+          this.$http.get("alert/warning/getAlertByGatewayId?",{gatewayId:data},res=>{
+              this.msglist = res.data.list
+              console.log(res)
+          },err=>{});
+
+          //表格1
+          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.rightlist.gatewayIp},res=>{
+              this.dataone = res.data
+              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+          },err=>{});
+
+          //表格2
+          this.$http.get("gis/gis/getCrossGatewayByIp?",{gatewayIp:this.rightlist.gatewayIp},res=>{
+              this.data2 = res.data
+              this.data2.forEach (el=>{ if(el.isOnline == 0) { el.isOnline = '在线' }else{el.isOnline = '离线'}})
+              // console.log(this.data2)
+          },err=>{});
+
+          //当前工单
+           this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:data},res=>{
+            if(res.data){
+              this.nowworklist = res.data
+            }else{
+              this.nowworklist = []
+            }
+          },err=>{});
+
+          //历史工单
+          this.$http.get("workflow/workflow/findFormListHis?",{gatewayId:data},res=>{
+            if(res.data){
+              this.hisworklist = res.data
+            }else{
+              this.hisworklist = []
+            }
+          },err=>{});
+
+          //通讯状况表
+          this.$http.get("gis/gis/getGatewayState?",{gatewayId:this.olddata},res=>{
+              this.drawLines(res.data.gatewayState)
+          },err=>{});
+
+      },err=>{});
+  
+    },
+    typeswitch(){
+      this.typeone = false
+    },
+    switchchange(i,val){
+      if(val == false){
+        var aa = 0
+      }else if(val == true){
+        var aa = 1
+      }
+      this.$set(this.changeobj, 'LAN'+i, aa)
+    },
+    changetypes(val){
+      if(val == 'apple'){
+        this.$set(this.changeobj, 'teminalType', 0)
+      }else if(val == 'android'){
+        this.$set(this.changeobj, 'teminalType', 2)
+      }
+    },
+    changelevel(val,list,device){
+      // console.log(val)
+      var sendwork = {}
+        this.$set(sendwork, "formKey","deviceMaintain")
+        this.$set(sendwork, "formId",list.comm.id)
+        this.$set(sendwork, "priority",val)
+        this.$set(sendwork, "device",device)
+        if(this.sendparam.length==0){
+          this.sendparam.push(sendwork)
+        }else{
+        var num = 0
+          for (let i=0; i< this.sendparam.length; i++){
+            console.log(this.sendparam[i].formId)
+            if(list.comm.id == this.sendparam[i].formId){
+              this.$set(this.sendparam[i], "priority",val)
+            }else {
+              num++
+            
+            }
+          }
+          if(num == this.sendparam.length){
+                this.sendparam.push(sendwork)
+          }
+        }
+        console.log(this.sendparam)
+        if(this.sendparam.length == this.newlists.length){
+          this.entersendwork = true
+        }
+    },
+    allowchangetype(){
+      this.$http.put("gis/gis/changePortStatus",{gatewayId:this.rightlist.id,portMap:this.changeobj},res=>{
+        
+      },err=>{});
+    },
+    boolping(){
+      this.$Message.info('正在ping,请稍等');
+      //表格1
+          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.rightlist.gatewayIp},res=>{
+              this.dataone = res.data
+              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+          },err=>{});
+    },
+    checklansix(){
+      this.deviceValue = 6
+      this.boolsend = false
+        this.backwg = true
+        this.lansix = true
+        this.lanone = false
+        this.lantwo = false
+        this.lanseven = false
+        this.laneig = false
+        this.wangguanshow = false
+        this.lanfive = false
+        this.lanthree = false
+        this.lanfour = false
+        this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN6.deviceType,ipAddress:this.devicetype.LAN6.deviceIp},res=>{
+              this.msgtypelist = res.data
+          },err=>{});
+          //发送工单按钮显示隐藏
+          this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN6',onlyPort:1},res=>{
+            if(res.data.alertId.length > 0){
+                this.boolsend = true
+            }
+          },err=>{}); 
+
+          //表格1
+          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN6.deviceIp},res=>{
+              this.dataone = res.data
+              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+          },err=>{});
+          
+          //当前工单
+           this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN6'},res=>{
+              if(res.data){
+              this.nowworklist = res.data
+            }else{
+              this.nowworklist = []
+            }
+          },err=>{});
+
+          //历史工单
+          this.$http.get("workflow/workflow/findFormListHis?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN6'},res=>{
+              if(res.data){
+              this.hisworklist = res.data
+            }else{
+              this.hisworklist = []
+            }
+          },err=>{});
+
+          //通讯流图表
+          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN6',gatewayId:this.olddata},res=>{
+              this.drawLine(res.data.lanFlow)
+          },err=>{});
+
+          //通讯状况表
+          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN6',gatewayId:this.olddata},res=>{
+              this.drawLines(res.data.gatewayState)
+          },err=>{});
+    },
+    checklanfive(){
+      this.deviceValue = 5
+      this.boolsend = false
+      this.backwg = true
+        this.lanfive = true
+        this.lanthree = false
+        this.lanfour = false
+        this.lansix = false
+        this.lanone = false
+        this.lantwo = false
+        this.lanseven = false
+        this.laneig = false
+        this.wangguanshow = false
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN5.deviceType,ipAddress:this.devicetype.LAN5.deviceIp},res=>{
+              // console.log(res)
+              this.msgtypelist = res.data
+          },err=>{});
+            //发送工单按钮显示隐藏
+          this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN5',onlyPort:1},res=>{
+            if(res.data.alertId.length > 0){
+                this.boolsend = true
+                
+            }
+          },err=>{});  
+          //表格1
+          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN5.deviceIp},res=>{
+              this.dataone = res.data
+              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+          },err=>{});
+          //当前工单
+           this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN5'},res=>{
+              if(res.data){
+              this.nowworklist = res.data
+            }else{
+              this.nowworklist = []
+            }
+          },err=>{});
+
+          //历史工单
+          this.$http.get("workflow/workflow/findFormListHis?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN5'},res=>{
+              if(res.data){
+              this.hisworklist = res.data
+            }else{
+              this.hisworklist = []
+            }
+          },err=>{});
+
+          //通讯流图表
+          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN5',gatewayId:this.olddata},res=>{
+              this.drawLine(res.data.lanFlow)
+          },err=>{});
+
+          //通讯状况表
+          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN5',gatewayId:this.olddata},res=>{
+              this.drawLines(res.data.gatewayState)
+          },err=>{});
+    },
+    checklanfour(){
+      this.deviceValue = 4
+      this.boolsend = false
+      this.backwg = true
+        this.lanfour = true
+        this.lansix = false
+        this.lanfive = false
+        this.lanone = false
+        this.lantwo = false
+        this.lanseven = false
+        this.laneig = false
+        this.lanthree = false
+        this.wangguanshow = false
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN4.deviceType,ipAddress:this.devicetype.LAN4.deviceIp},res=>{
+              // console.log(res)
+              this.msgtypelist = res.data
+          },err=>{});
+          //发送工单按钮显示隐藏
+          this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN4',onlyPort:1},res=>{
+            if(res.data.alertId.length > 0){
+                this.boolsend = true
+            }
+          },err=>{}); 
+          
+          //表格1
+          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN4.deviceIp},res=>{
+              this.dataone = res.data
+              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+          },err=>{});
+          //当前工单
+           this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN4'},res=>{
+              if(res.data){
+              this.nowworklist = res.data
+            }else{
+              this.nowworklist = []
+            }
+          },err=>{});
+
+          //历史工单
+          this.$http.get("workflow/workflow/findFormListHis?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN4'},res=>{
+              if(res.data){
+              this.hisworklist = res.data
+            }else{
+              this.hisworklist = []
+            }
+          },err=>{});
+
+          //通讯流图表
+          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN4',gatewayId:this.olddata},res=>{
+              this.drawLine(res.data.lanFlow)
+          },err=>{});
+
+          //通讯状况表
+          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN4',gatewayId:this.olddata},res=>{
+              this.drawLines(res.data.gatewayState)
+          },err=>{});
+    },
+    checklanthree(){
+      this.deviceValue = 3
+      this.boolsend = false
+      this.backwg = true
+        this.lanthree = true
+        this.lanfour = false
+        this.lansix = false
+        this.lanfive = false
+        this.lanone = false
+        this.lantwo = false
+        this.lanseven = false
+        this.laneig = false
+        this.wangguanshow = false
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN3.deviceType,ipAddress:this.devicetype.LAN3.deviceIp},res=>{
+              // console.log(res)
+              this.msgtypelist = res.data
+          },err=>{});
+          //发送工单按钮显示隐藏
+          this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN3',onlyPort:1},res=>{
+            if(res.data.alertId.length > 0){
+                this.boolsend = true
+                
+            }
+          },err=>{});  
+          //表格1
+          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN3.deviceIp},res=>{
+              this.dataone = res.data
+              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+          },err=>{});
+          //当前工单
+           this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN3'},res=>{
+              if(res.data){
+              this.nowworklist = res.data
+            }else{
+              this.nowworklist = []
+            }
+          },err=>{});
+
+          //历史工单
+          this.$http.get("workflow/workflow/findFormListHis?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN3'},res=>{
+              if(res.data){
+              this.hisworklist = res.data
+            }else{
+              this.hisworklist = []
+            }
+          },err=>{});
+
+          //通讯流图表
+          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN3',gatewayId:this.olddata},res=>{
+              this.drawLine(res.data.lanFlow)
+          },err=>{});
+
+          //通讯状况表
+          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN3',gatewayId:this.olddata},res=>{
+              this.drawLines(res.data.gatewayState)
+          },err=>{});
+
+    },
+    checklantwo(){
+      this.deviceValue = 2
+      this.boolsend = false
+      this.backwg = true
+        this.lantwo = true
+        this.lanthree = false
+        this.lanfour = false
+        this.lansix = false
+        this.lanfive = false
+        this.lanone = false
+        this.lanseven = false
+        this.laneig = false
+        this.wangguanshow = false
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN2.deviceType,ipAddress:this.devicetype.LAN2.deviceIp},res=>{
+              // console.log(res)
+              this.msgtypelist = res.data
+          },err=>{});
+          //发送工单按钮显示隐藏
+          this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN2',onlyPort:1},res=>{
+            if(res.data.alertId.length > 0){
+                this.boolsend = true
+                
+            }
+          },err=>{}); 
+          //表格1
+          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN2.deviceIp},res=>{
+              this.dataone = res.data
+              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+          },err=>{});
+          //当前工单
+           this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN2'},res=>{
+              if(res.data){
+              this.nowworklist = res.data
+            }else{
+              this.nowworklist = []
+            }
+          },err=>{});
+
+          //历史工单
+          this.$http.get("workflow/workflow/findFormListHis?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN2'},res=>{
+              if(res.data){
+              this.hisworklist = res.data
+            }else{
+              this.hisworklist = []
+            }
+          },err=>{});
+
+          //通讯流图表
+          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN2',gatewayId:this.olddata},res=>{
+              this.drawLine(res.data.lanFlow)
+          },err=>{});
+
+          //通讯状况表
+          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN2',gatewayId:this.olddata},res=>{
+              this.drawLines(res.data.gatewayState)
+          },err=>{});
+    },
+    checklanone(){
+      this.deviceValue = 1
+      this.boolsend = false
+      this.backwg = true
+        this.lanone = true
+        this.lantwo = false
+        this.lanthree = false
+        this.lanfour = false
+        this.lansix = false
+        this.lanfive = false
+        this.lanseven = false
+        this.laneig = false
+        this.wangguanshow = false
+        this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN1.deviceType,ipAddress:this.devicetype.LAN1.deviceIp},res=>{
+              // console.log(res)
+              this.msgtypelist = res.data
+          },err=>{});
+          //发送工单按钮显示隐藏
+          this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN1',onlyPort:1},res=>{
+            if(res.data.alertId.length > 0){
+                this.boolsend = true
+                this.deviceValue = 1
+            }
+          },err=>{}); 
+          //表格1
+          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN1.deviceIp},res=>{
+              this.dataone = res.data
+              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+          },err=>{});
+           //当前工单
+           this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN1'},res=>{
+              if(res.data){
+              this.nowworklist = res.data
+            }else{
+              this.nowworklist = []
+            }
+          },err=>{});
+
+          //历史工单
+          this.$http.get("workflow/workflow/findFormListHis?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN1'},res=>{
+              if(res.data){
+              this.hisworklist = res.data
+            }else{
+              this.hisworklist = []
+            }
+          },err=>{});
+
+          //通讯流图表
+          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN1',gatewayId:this.olddata},res=>{
+              this.drawLine(res.data.lanFlow)
+          },err=>{});
+
+          //通讯状况表
+          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN1',gatewayId:this.olddata},res=>{
+              this.drawLines(res.data.gatewayState)
+          },err=>{});
+    },
+    checklansrven(){
+      this.deviceValue = 7
+      this.boolsend = false
+      this.backwg = true
+        this.lanseven = true
+        this.lanone = false
+        this.lantwo = false
+        this.lanthree = false
+        this.lanfour = false
+        this.lansix = false
+        this.lanfive = false
+        this.laneig = false
+        this.wangguanshow = false
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN7.deviceType,ipAddress:this.devicetype.LAN7.deviceIp},res=>{
+              // console.log(res)
+              this.msgtypelist = res.data
+          },err=>{});
+          //发送工单按钮显示隐藏
+          this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN7',onlyPort:1},res=>{
+            if(res.data.alertId.length > 0){
+                this.boolsend = true
+                this.deviceValue = 7
+            }
+          },err=>{}); 
+          //表格1
+          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN7.deviceIp},res=>{
+              this.dataone = res.data
+              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+          },err=>{});
+          //当前工单
+           this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN7'},res=>{
+              if(res.data){
+              this.nowworklist = res.data
+            }else{
+              this.nowworklist = []
+            }
+          },err=>{});
+
+          //历史工单
+          this.$http.get("workflow/workflow/findFormListHis?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN7'},res=>{
+              if(res.data){
+              this.hisworklist = res.data
+            }else{
+              this.hisworklist = []
+            }
+          },err=>{});
+
+          //通讯流图表
+          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN7',gatewayId:this.olddata},res=>{
+              this.drawLine(res.data.lanFlow)
+          },err=>{});
+
+          //通讯状况表
+          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN7',gatewayId:this.olddata},res=>{
+              this.drawLines(res.data.gatewayState)
+          },err=>{});
+    },
+    checklaneig(){
+      this.deviceValue = 8
+      this.boolsend = false
+      this.backwg = true
+        this.laneig = true
+        this.lanseven = false
+        this.lanone = false
+        this.lantwo = false
+        this.lanthree = false
+        this.lanfour = false
+        this.lansix = false
+        this.lanfive = false
+        this.wangguanshow = false
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN8.deviceType,ipAddress:this.devicetype.LAN8.deviceIp},res=>{
+              // console.log(res)
+              this.msgtypelist = res.data
+          },err=>{});
+          //发送工单按钮显示隐藏
+          this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN8',onlyPort:1},res=>{
+            if(res.data.alertId.length > 0){
+                this.boolsend = true
+            }
+          },err=>{}); 
+          //表格1
+          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN8.deviceIp},res=>{
+              this.dataone = res.data
+              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+          },err=>{});
+          //当前工单
+           this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN8'},res=>{
+              if(res.data){
+              this.nowworklist = res.data
+            }else{
+              this.nowworklist = []
+            }
+          },err=>{});
+
+          //历史工单
+          this.$http.get("workflow/workflow/findFormListHis?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN8'},res=>{
+              if(res.data){
+              this.hisworklist = res.data
+            }else{
+              this.hisworklist = []
+            }
+          },err=>{});
+
+          //通讯流图表
+          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN8',gatewayId:this.olddata},res=>{
+              this.drawLine(res.data.lanFlow)
+          },err=>{});
+
+          //通讯状况表
+          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN8',gatewayId:this.olddata},res=>{
+              this.drawLines(res.data.gatewayState)
+          },err=>{});
+          
+    },
+    backwgs(){
+      this.ip(this.olddata)
+        this.typeone = true
+        this.backwg = false
+        this.laneig = false
+        this.lanseven = false
+        this.lanone = false
+        this.lantwo = false
+        this.lanthree = false
+        this.lanfour = false
+        this.lansix = false
+        this.lanfive = false
+        this.wangguanshow = true
+        
+    },
+    serachroad(){
+      // console.log(this.serachvalue)
+      this.serachvalues = this.serachvalue
+        
+    },
+    //发送工单
+    sendwork(){
+      this.workdetailsend = true
+       this.$refs.bright.style.overflow = "hidden"
+       if(this.deviceValue == 0){
+         this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata},res=>{
+            for (let i = 0; i< res.data.workFlow.length;i++){
+              this.$set(res.data.workFlow[i].comm,'workType','安全事件')
+            }
+              this.$http.post("workflow/workflow/initForm",{param:res.data.workFlow},res=>{
+                this.newlists = res.data
+             
+              },err=>{});
+          },err=>{});
+       }else if(this.deviceValue == 1){
+         this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN1',onlyPort:0},res=>{
+            for (let i = 0; i< res.data.workFlow.length;i++){
+              this.$set(res.data.workFlow[i].comm,'workType','安全事件')
+            }
+              this.$http.post("workflow/workflow/initForm",{param:res.data.workFlow},res=>{
+                this.newlists = res.data
+                
+              },err=>{});
+          },err=>{});
+       }else if(this.deviceValue == 2){
+         this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN2',onlyPort:0},res=>{
+            for (let i = 0; i< res.data.workFlow.length;i++){
+              this.$set(res.data.workFlow[i].comm,'workType','安全事件')
+            }
+              this.$http.post("workflow/workflow/initForm",{param:res.data.workFlow},res=>{
+                this.newlists = res.data
+                
+              },err=>{});
+          },err=>{});
+       }else if(this.deviceValue == 3){
+         this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN3',onlyPort:0},res=>{
+            for (let i = 0; i< res.data.workFlow.length;i++){
+              this.$set(res.data.workFlow[i].comm,'workType','安全事件')
+            }
+              this.$http.post("workflow/workflow/initForm",{param:res.data.workFlow},res=>{
+                this.newlists = res.data
+                
+              },err=>{});
+          },err=>{});
+       }else if(this.deviceValue == 4){
+         this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN4',onlyPort:0},res=>{
+            for (let i = 0; i< res.data.workFlow.length;i++){
+              this.$set(res.data.workFlow[i].comm,'workType','安全事件')
+            }
+              this.$http.post("workflow/workflow/initForm",{param:res.data.workFlow},res=>{
+                this.newlists = res.data
+                
+              },err=>{});
+          },err=>{});
+       }else if(this.deviceValue == 5){
+         this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN5',onlyPort:0},res=>{
+            for (let i = 0; i< res.data.workFlow.length;i++){
+              this.$set(res.data.workFlow[i].comm,'workType','安全事件')
+            }
+              this.$http.post("workflow/workflow/initForm",{param:res.data.workFlow},res=>{
+                this.newlists = res.data
+                
+              },err=>{});
+          },err=>{});
+       }else if(this.deviceValue == 6){
+         this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN6',onlyPort:0},res=>{
+            for (let i = 0; i< res.data.workFlow.length;i++){
+              this.$set(res.data.workFlow[i].comm,'workType','安全事件')
+            }
+              this.$http.post("workflow/workflow/initForm",{param:res.data.workFlow},res=>{
+                this.newlists = res.data
+                
+              },err=>{});
+          },err=>{});
+       }else if(this.deviceValue == 7){
+         this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN7',onlyPort:0},res=>{
+            for (let i = 0; i< res.data.workFlow.length;i++){
+              this.$set(res.data.workFlow[i].comm,'workType','安全事件')
+            }
+              this.$http.post("workflow/workflow/initForm",{param:res.data.workFlow},res=>{
+                this.newlists = res.data
+                
+              },err=>{});
+          },err=>{});
+       }else if(this.deviceValue == 8){
+         this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:this.olddata,port:'LAN8',onlyPort:0},res=>{
+            for (let i = 0; i< res.data.workFlow.length;i++){
+              this.$set(res.data.workFlow[i].comm,'workType','安全事件')
+            }
+              this.$http.post("workflow/workflow/initForm",{param:res.data.workFlow},res=>{
+                this.newlists = res.data
+                
+              },err=>{});
+          },err=>{});
+       }
+       
+        
+        //获取优先级id
+       this.$http.get("workflow/common/findPriority",{},res=>{
+            this.priorityName = res.data
+          },err=>{});
+     
+
+      
+    },
+    gotodetal(id){
+
+          this.workdetail = true
+          this.$refs.bright.style.overflow = "hidden"
+          //工单详情
+          this.$http.get("workflow/workflow/findFormDetail?",{formId:id},res=>{
+            //反馈信息
+              this.feebacklist = res.data[0].feedback
+            //催单信息
+              this.remindlist = res.data[0].remind[0]
+            //派单信息故障
+              this.devicelist = res.data[0].device
+            //派单信息公有
+              this.formlists = res.data[0].form
+          },err=>{});
+   
+    },
+    closedetail(){
+          this.workdetail = false
+          this.$refs.bright.style.overflow = "auto"
+    },
+    closedetails(){
+          this.sendparam = []
+          this.entersendwork = false
+          this.$refs.bright.style.overflow = "auto"
+          this.formIdlist = ''
+          for (let i = 0; i< this.newlists.length;i++){
+            this.formIdlist += this.newlists[i].comm.id + ","
+          }
+          this.formIdlist = this.formIdlist.substring(0,this.formIdlist.length-1)
+          var that = this
+          this.$http.delete("workflow/workflow/deleteFormByFormId/"+that.formIdlist,{},res=>{
+            this.workdetailsend = false
+          },err=>{});
+    },
+    checkperson(id){
+         this.$http.get("oauth/certificate/getCertInfo",{userId:id},res=>{
+          this.usermsg = res.data[0].userInfo
+          if(res.data[0].certInfo[0] !== null){
+            this.certmsg = res.data[0].certInfo
+            this.certmsg.forEach (el=>{ if(el.certificateStatus == 0) {this.oldcertificateNo = el.certificateNo}})
+          }
+          this.personshow = true
+          this.$refs.bright.style.overflow = "hidden"
+      },err=>{});
+    },
+    checkdevicelist(num){
+        this.workdetailshow = true
+        this.$refs.bright.style.overflow = "hidden"
+        this.$http.get("res/pole/getPoleDeviceByNo?",{poleNo:num},res=>{
+          this.workdetaillist = res.data
+          },err=>{});
+    },
+    closecard(){
+      this.personshow = false
+      this.workdetailshow = false
+      this.$refs.bright.style.overflow = "auto"
+    },
+    aaaa(){
+      this.$http.post("workflow/workflow/startProcess",{param:this.sendparam},res=>{
+           if(res.message == '派单成功'){
+             this.$Message.info('派单成功');
+             this.workdetailsend = false
+             this.$refs.bright.style.overflow = "auto"
+             this.backwgs()
+           }
+          },err=>{});
+    },
+    confirmupload(deviceMac){
+          var files = document.getElementById(deviceMac).files
+          var formData = new FormData(); 
+        //追加文件数据  
+          for(var i=0;i<files.length;i++){    
+                formData.append("files["+i+"]", files[i],files[i].name);  
+          } 
+          this.$http.post("workflow/file/upload",formData,res=>{
+              this.newlists.forEach((items,index)=>{
+            items.device.forEach((item,indexs)=>{
+              if(deviceMac == item.deviceMac){
+                this.$set(item,"attachment",res.data)
+              }  
+            })
+          })
+          },err=>{});
+          
+    },
+    download(down){
+       window.location.href=this.$http.root+'/workflow/file/downLoad?filePath='+down+'&isOnLine=false';
+    },
+    flieupload(){
+       let files = this.$refs.closefile.files
+        let formData = new FormData()
+        //追加文件数据  
+          for(var i=0;i<files.length;i++){    
+                formData.append("files["+i+"]", files[i],files[i].name);  
+          } 
+        this.$http.post("workflow/file/upload",formData,res=>{
+                this.attachment = res.data
+          },err=>{});
+          
+    },
+    backtowork(list){
+       this.$http.post("/workflow/workflow/completeProcess ",{formKey:'deviceMaintain',formId:list.formId,taskId:list.taskId,outcome:'back',attachment:this.attachment,comment:this.closetext},res=>{
+           if(res.rel == true){
+             this.$Message.info(res.message);
+             this.workdetail = false
+             this.$refs.bright.style.overflow = "auto"
+              this.backwgs()
+           }
+          },err=>{});
+    },
+    closetowork(list){
+       this.$http.post("/workflow/workflow/completeProcess ",{formKey:'deviceMaintain',formId:list.formId,taskId:list.taskId,outcome:'pass',attachment:this.attachment,comment:this.closetext},res=>{
+           if(res.rel == true){
+             this.$Message.info(res.message);
+             this.workdetail = false
+             this.$refs.bright.style.overflow = "auto"
+              this.backwgs()
+           }
+          },err=>{});
+    },
+    onetypelist(poleNos){
+      this.workdetailshow = true
+      this.$refs.bright.style.overflow = "hidden"
+      this.$http.get("res/pole/getPoleDeviceByNo?",{poleNo:poleNos,portName:'LAN'+this.deviceValue},res=>{
+               this.workdetaillist = res.data
+          },err=>{});
+    },
+    //点击右侧订单数
+    statustablenum(i){
+      this.statustablevalue = i
+      this.tabletime = ''
+      this.changetimedata = ''
+      this.statusdata = false
+       if(i == 1){
+         this.$http.get("/workflow/workflow/findFormListCurrent",{},res=>{
+           if(res.data.form){
+             this.data1 = res.data.form
+             this.totals = res.data.total
+             this.totalstype = ''
+           }else{
+             this.data1 = []
+             this.totals = 0
+           }
+          },err=>{});
+         this.statustable = true
+       }else if(i == 2){
+         this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'feedback'},res=>{
+           if(res.data.form){
+             this.data1 = res.data.form
+             this.totals = res.data.total
+             this.totalstype = 'feedback'
+           }else{
+             this.data1 = []
+             this.totals = 0
+           }
+          },err=>{});
+         this.statustable = true
+       }else if(i == 3){
+         this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'detail'},res=>{
+           if(res.data.form){
+             this.data1 = res.data.form
+             this.totals = res.data.total
+             this.totalstype = 'detail'
+           }else{
+             this.data1 = []
+             this.totals = 0
+           }
+          },err=>{});
+         this.statustable = true
+       }
+    },
+    //表格分页
+    changeliebiaopage(i){
+        if(this.totalstype == ''){
+          this.$http.get("/workflow/workflow/findFormListCurrent",{pageNum:i},res=>{
+            if(res.data){
+              this.data1 = res.data.form
+              this.totals = res.data.total
+            }
+            },err=>{});
+          this.statustable = true
+        }else if(this.totalstype == 'feedback'){
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'feedback',pageNum:i},res=>{
+           if(res.data){
+             this.data1 = res.data.form
+             this.totals = res.data.total
+           }
+          },err=>{});
+         this.statustable = true
+        }else if(this.totalstype == 'detail'){
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'detail',pageNum:i},res=>{
+           if(res.data){
+             this.data1 = res.data.form
+             this.totals = res.data.total
+           }
+          },err=>{});
+         this.statustable = true
+        } 
+    },
+    //单选表格派单时间
+    changetime(val){
+      console.log(val)
+      this.changetimedata = val
+    },
+    //表格上的搜索
+    serachtable(){
+      if(this.totalstype == ''){
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interval:this.changetimedata,param:this.valuetable},res=>{
+            if(res.data.form){
+               this.data1 = res.data.form
+               this.totals = res.data.total
+            }else{
+              this.data1 = []
+              this.totals = 0
+            }
+          },err=>{});
+        }else if(this.totalstype == 'feedback'){
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interval:this.changetimedata,param:this.valuetable,interactive:'feedback'},res=>{
+            if(res.data.form){
+               this.data1 = res.data.form
+               this.totals = res.data.total
+            }else{
+              this.data1 = []
+              this.totals = 0
+            }
+          },err=>{});
+        }else if(this.totalstype == 'detail'){
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interval:this.changetimedata,param:this.valuetable,interactive:'detail'},res=>{
+           if(res.data.form){
+               this.data1 = res.data.form
+               this.totals = res.data.total
+            }else{
+              this.data1 = []
+              this.totals = 0
+            }
+          },err=>{});
+        } 
+    },
+    //清除搜索栏
+    removeserachtable(){
+      this.valuetable = ''
+      this.tabletime = ''
+      this.changetimedata = ''
+      if(this.totalstype == ''){
+          this.$http.get("/workflow/workflow/findFormListCurrent",{},res=>{
+            if(res.data.form){
+              this.data1 = res.data.form
+              this.totals = res.data.total
+            }else{
+             this.data1 = []
+             this.totals = 0
+           }
+            },err=>{});
+          this.statustable = true
+        }else if(this.totalstype == 'feedback'){
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'feedback'},res=>{
+           if(res.data.form){
+             this.data1 = res.data.form
+             this.totals = res.data.total
+           }else{
+             this.data1 = []
+             this.totals = 0
+           }
+          },err=>{});
+         this.statustable = true
+        }else if(this.totalstype == 'detail'){
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'detail'},res=>{
+           if(res.data.form){
+             this.data1 = res.data.form
+             this.totals = res.data.total
+           }else{
+             this.data1 = []
+             this.totals = 0
+           }
+          },err=>{});
+         this.statustable = true
+        } 
+    },
+    //点击操作栏弹窗判断
+    remindwork(id){
+      this.sendremindshows = false
+      this.sendremindshow = false
+      this.deal = ''
+      this.formid = id
+      this.$http.get("/workflow/workflow/findRemind",{formId:id},res=>{
+           if(res.data.length >0){
+             this.sendremindshows = true
+             this.sendreminddatalist = res.data
+           }else{
+             this.sendremindshow = true
+           }
+      },err=>{});
+    },
+    //关闭催单备注的弹窗
+    closeremind(){
+      this.deal = ''
+      this.sendremindshow = false
+      this.sendremindshows = false
+    },
+    //确认发送催单
+    senddeal(){
+      if(this.deal == ''){
+        this.$Message.info('请先选择催单备注');
+      }else{
+        this.$http.post("/workflow/workflow/addRemind",{formId:this.formid,content:this.deal},res=>{
+           this.$Message.info(res.message);
+           this.deal = ''
+           this.statustablenum(this.statustablevalue)
+           this.sendremindshow = false
+           this.sendremindshows = false
+        },err=>{});
+      }
+    },
+    closerebigmind(){
+      this.statustable = false
+    }
+  }
+};
+</script>
+<style scoped>
+.rightdialog {
+  width: 260px;
+  height: 340px;
+  background: rgba(0, 0, 0, 0.4);
+  position: fixed;
+  right: 0;
+  top: 60px;
+  z-index: 99;
+  padding: 30px;
+}
+.rightdialog div {
+  font-size: 15px;
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: left;
+  cursor: pointer;
+}
+.rightdialog div span {
+  display: inline-block;
+  vertical-align: middle;
+}
+.rightdialog div img {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+.rightdialog div span:last-child {
+  text-shadow: #000 2px 2px 4px;
+}
+.statusbox {
+  min-width: 950px;
+  width: 65%;
+  background: #fff;
+  height: 65%;
+  position: absolute;
+  top: 150px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
+  z-index: 20;
+}
+.top-box {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f5f5f5;
+  margin: 0px 20px;
+  padding: 20px 0;
+  text-align: left;
+}
+.sure {
+  height: 32px;
+  border-radius: 0;
+  background: #1d60fe;
+  width: 40px;
+  padding: 0;
+  border-radius: 0 4px 4px 0;
+}
+.timelinebox {
+  padding: 20px;
+  height: calc(100% - 74px);
+  overflow: auto;
+  padding-left: 150px;
+}
+.timelinecont {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.timelinecont p {
+  text-align: left;
+}
+.timelinecont p span {
+  color: #1d60fe;
+}
+.hadpro {
+  font-size: 14px;
+  text-align: left;
+  margin-top: 20px;
+  margin-bottom: 65px;
+}
+.hadpro a {
+  color: #ff3636;
+  border-bottom: 1px solid #1d60fe;
+}
+.time {
+  position: absolute;
+  left: -90px;
+  top: 17px;
+  font-size: 14px;
+}
+.hour {
+  position: absolute;
+  left: -83px;
+  top: 40px;
+  font-size: 14px;
+}
+
+.bigright{
+  min-width: 1000px;
+  width: 62%;
+  height: 100%;
+  background:#fff;
+  position: fixed;
+  right: 0;
+  top:60px;
+  z-index: 100;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s
+}
+.fade-enter, .fade-leave-active {
+  opacity: 0
+}
+/* 详情 */
+.detailpage{
+  margin: 0px 20px;
+  border-bottom: 1px solid #C7C7C7;
+  font-size:16px;
+  text-align: left;
+  padding: 10px 0;
+}
+.detail-box{
+  margin:0 0px 0 40px; 
+  overflow-y:auto;
+  height: 1000px;
+  padding-bottom: 400px;
+}
+.detail-title{
+  display: flex;
+  font-size: 15px;
+  border-bottom: 1px solid #E5E5E5;
+  height: 40px;
+  align-items: center;
+  margin-top: 20px;
+}
+.detail-title p{
+  margin-left: 10px;
+}
+.detail-text{
+  display: flex;
+  align-items: center;
+  padding-top:20px;
+  border-bottom: 2px solid #1D60FE;
+  padding-bottom: 60px;
+  margin-bottom: 20px;
+  position: relative;
+}
+.detail-text img{
+  width: 600px;
+  height: 200px;
+}
+.fixedborder{
+  height:30px;
+  border-right:2px solid #1D60FE;
+  position:absolute;
+  bottom:0;
+}
+.detail-text .fixedimg{
+  height:60px;
+  width: 48px;
+  position:absolute;
+  bottom:80px;
+}
+.detail-text .fixedtext{
+  position:absolute;
+  bottom: 31px;
+  font-size: 14px;
+}
+
+.detail-textbox{
+  text-align: left;
+  font-size: 14px;
+  margin-left: 30px;
+  width: calc(100% - 620px)
+}
+.detail-textbox div{
+  margin-top: 20px;
+}
+.detail-textbox div span{
+  display: inline-block;
+}
+.detail-textbox div span:first-child{
+  margin-right: 10px;
+}
+/* 控制栏 */
+.control{
+  margin:40px 40px 60px 40px;
+  text-align: left;
+  font-size: 14px;
+  position: relative;
+}
+.control div {
+   margin-top: 30px;
+}
+.control div span{
+  display: inline-block;
+}
+.controls{
+  margin:40px 40px 60px 40px;
+  text-align: left;
+  font-size: 14px;
+  position: relative;
+}
+.controls p {
+  font-size:14px;
+}
+.controls div span{
+  font-size:14px;
+}
+.typechange{
+  position: absolute;
+  right: 150px;
+  top:0;
+}
+.control-top{
+  display: flex;
+}
+.switch{
+  margin-top:30px; 
+  display: flex;
+}
+.switch p {
+  font-size:14px;
+}
+.ivu-switch{
+  margin-right: 20px;
+  margin-left: 5px;
+}
+.buttonpos{
+  position: absolute;
+  left: 560px;
+  bottom:0;
+  min-width: 78px;
+}
+.msgbox{
+  display: flex;
+  flex-wrap:wrap;
+}
+.msgbox p{
+  margin-bottom: 20px;
+}
+.tablechangebox{
+  margin-left:30px;
+  margin-top:20px
+}
+.tablechangebox p{
+  text-align: left;
+  font-size: 13px;
+  margin-top: 20px;
+  font-weight: bold;
+}
+.tablechangebox p span{
+  font-weight: normal;
+  color: #1d60fe;
+}
+.roadstatus{
+  color: #BDBDBD;
+  text-align: left;
+  margin-top: 60px;
+}
+.backwg{
+  position: absolute;
+  right: 40px;
+}
+.msgbox div{
+  display: flex;
+  padding: 0 40px;
+}
+.msgbox div p{
+  font-size: 14px;
+  margin-right: 20px;
+}
+.msgbox div p:last-child{
+   margin-right: 0px;
+}
+.msgbox div p span{
+  color: #1D60FE;
+  display: inline-block;
+  font-size: 14px;
+}
+.epilog{
+  font-size: 16px;
+  text-align: left;
+  margin: 30px 0 10px 20%;
+}
+.epilog span{
+  color: #ff3636;
+}
+.content-box div:last-child{
+  border-bottom: none;
+    padding-bottom: 0;
+}
+.content{
+    display: flex;
+    /* justify-content: space-between; */
+    text-align: left;
+    flex-wrap:wrap;
+    padding: 0 40px;
+    border-bottom: 1px solid #E5E5E5;
+    padding-bottom: 20px;
+    min-width: 800px;
+  }
+.content div{
+  margin-top: 25px;
+  display: flex;
+  align-items: center;
+}
+.content div p{
+  font-size: 14px;
+  min-width: 100px;
+  text-align: right;
+}
+.content div span{
+  color: #3C7FEE;
+  font-size: 14px;
+}
+.worksendbox div span{
+  color: #696C6F; 
+}
+.historywork{
+  margin: 20px 40px;
+  position: relative;
+}
+.iconhis{
+  border: 1px solid  #00A0E9;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  color: #F8CA9E;
+}
+.historywork .ivu-timeline-item-tail{
+  left: -5px;
+  position:absolute;
+}
+.workdetail{
+  position: fixed;
+  top:7%;
+  background: #fff;
+  width: 70%;
+  left: 20%;
+  padding: 0px 20px;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
+  z-index: 9999999999;
+  height: 80%;
+  overflow-y: scroll;
+  min-height: 500px;
+}
+.workdetail-top{
+  padding: 20px;
+  display: flex;
+}
+.workdetail-head{
+  text-align: left;
+  display: flex;
+  font-size: 14px;
+  margin-right: 20px;
+}
+.workdetailtitle{
+  text-align: left;
+  font-size: 14px;
+  padding-left: 40px;
+}
+.sendbox{
+  text-align: left;
+  font-size: 14px;
+  padding-left: 20px;
+  /* border-left: 5px solid #22BCD1; */
+  margin-top: 60px;
+  border-bottom: 1px solid #E5E5E5;
+  padding-bottom: 10px;
+}
+.sendbox img{
+  vertical-align: middle;
+  margin-right: 5px;
+}
+.closebtn{
+  background: #B5B5B5;
+  margin-bottom: 40px;
+  border: none;
+  padding:5px 20px;
+  margin-top: 20px;
+}
+.ivu-upload-list{
+ width: 500px;
+}
+.ivu-upload-select{
+  margin-left: 30px;
+}
+.ivu-btn-ghost{
+  color: #1d60fe;
+}
+.timego{
+  position: absolute;
+  left:845px;
+  top:8px;
+}
+.remindsbox{
+    position: fixed;
+    width: 420px;
+    height: 260px;
+    background: #fff;
+    z-index: 9999;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 40%;
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
+}
+.remindsboxs{
+   position: fixed;
+    width: 420px;
+    /* height: 260px; */
+    background: #fff;
+    z-index: 9999;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 40%;
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
+}
+.remindstitle{
+  display: flex;
+  justify-content: space-between;
+  margin: 0 20px;
+  border-bottom: 1px solid #E5E5E5;
+  height: 40px;
+  align-items: center;
+  font-size: 15px;
+}
+</style>

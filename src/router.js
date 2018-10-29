@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import login from '@/views/login.vue'
 import personmanage from '@/views/personmanage.vue'
+import safemanage from '@/views/safemanage.vue'
+import operation from '@/views/operation.vue'
 import personmanagedetail from '@/subpage/personmanagedetail.vue'
 import iView from 'iview'
 
@@ -21,10 +23,19 @@ const router = new Router({
       path: '/personmanage',
       name: 'personmanage',
       component: personmanage
+    },{
+      path: '/operation',
+      name: 'operation',
+      component: operation
+    },
+    {
+      path: '/safemanage',
+      name: 'safemanage',
+      component: safemanage
     },
     {
       path: '/personmanagedetail',
-      name: 'personmanage',
+      name: 'personmanagedetail',
       component: personmanagedetail
     }
   ]

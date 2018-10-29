@@ -8,7 +8,7 @@
     justify-content: space-between;
 }
 .title{
-    font-size: 20px;
+    font-size: 17px;
     color: #696C6F;
     text-align: left;
     margin-top: 20px;
@@ -31,4 +31,31 @@
 .ivu-checkbox-inner{
     width: 20px;
     height: 20px;
+}
+.zhuanyixuke{
+    margin: 0;
+    padding: 5px 10px;
+    border: 1px solid #2666FE;  //自定义边框
+    outline: none;
+    background: #fff;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #2666FE;
+    margin-right: 20px;
+    cursor:pointer;
+  }
+  .zhuanyixukes{
+    margin: 0;
+    padding: 5px 10px;
+    border: 1px solid #1D60FE;  //自定义边框
+outline: none;
+    background: #1D60FE;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #fff;
+    margin-right: 20px;
+    cursor:pointer;
+}
+.fullpage{
+    margin-top: 30px;
 }

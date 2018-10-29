@@ -35,7 +35,7 @@ export default {
     return {
       lists: [
         {
-          url: '/anquan',
+          url: '/safemanage',
           title: "安全管理", 
           icon: require('../../public/img/1.png'), 
           _show: false, 
@@ -46,18 +46,24 @@ export default {
             //   _show: false
             // }
           ]
-        },
-        {
-          url: '/personmanage',
-          title: "人员管理", 
+        },{
+          url: '/operation',
+          title: "运维管理", 
           icon: require('../../public/img/2.png'), 
           _show: false, 
           children:[]
         },
         {
+          url: '/personmanage',
+          title: "人员管理", 
+          icon: require('../../public/img/gl.png'), 
+          _show: false, 
+          children:[]
+        },
+        {
           url: '/renyuan',
-          title: "三角管理", 
-          icon: require('../../public/img/33.png'), 
+          title: "日志管理", 
+          icon: require('../../public/img/gz.png'), 
           _show: true, 
           children:[
           ]
@@ -180,7 +186,7 @@ export default {
       padding-left: 50px;
       text-align: left;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 17px;
       margin-top: 0;
     }
   }

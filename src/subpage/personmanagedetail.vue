@@ -41,7 +41,7 @@
     <div class="personbox" v-if="personshow">
       <div class="topline"></div>
       <div  class="msgtitle"><img src="../../public/img/sss.png"/>人员信息</div>
-      <i-button type="primary">修改</i-button>
+      <!-- <i-button type="primary">修改</i-button> -->
       <div class="content">
         <div>
           <p>姓名：</p>
@@ -92,18 +92,18 @@
     <div class="personbox" v-if="personshow">
       <div  class="msgtitle"><img src="../../public/img/mmm.png"/>证书信息</div>
       <div class="contents">
-        <div v-for="certlist in certmsg" class="forbox">
+        <div v-for="(certlist,index) in certmsg" class="forbox" :key="index">
           <p style="font-size: 16px">证书编号：
             <span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.certificateNo}}</span>
             <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.certificateNo}}</span>
             <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.certificateNo}}</span>
           </p>
           <div class="morecontent">
-            <p style="min-width: 200px">发证类型：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.certificateType}}</span>
+            <p style="min-width: 60px">发证类型：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.certificateType}}</span>
               <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.certificateType}}</span>
               <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.certificateType}}</span>
             </p>
-            <p style="min-width: 200px">授权设备类型：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.installType}}</span>
+            <p style="min-width: 180px">授权设备类型：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.installType}}</span>
               <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.installType}}</span>
               <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.installType}}</span>
             </p>
@@ -111,12 +111,12 @@
               <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.applyTime}}</span>
               <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.applyTime}}</span>
             </p>
-            <p>证书有效时期：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.startTime}} 至 {{certlist.endTime}}</span>
-              <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.startTime}} 至 {{certlist.endTime}}</span>
-              <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">{{certlist.startTime}} 至 {{certlist.endTime}}</span></p>
+            <p>证书失效日期：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.endTime}}</span>
+              <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.endTime}}</span>
+              <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">{{certlist.endTime}}</span></p>
             <p>证书状态：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">正常</span>
               <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">过期</span>
-              <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">停用</span></p>
+              <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">停用({{certlist.updateTime}})</span></p>
           </div>
           <img src="../../public/img/timego.png" class="timego" v-if="certlist.certificateStatus == 2"/>
           <button   class="qiyong" v-if="certlist.certificateStatus == 1"  @click="set(0,certlist.certificateNo)">启用</button>
@@ -129,7 +129,7 @@
 
     <div class="personbox" v-if="!personshow">
       <div class="topline"></div>
-      <div  class="msgtitle" style="margin-top: 25px;min-width: 400px;width:30%;" v-if="moveallowshow"><img src="../../public/img/uuu.png"/>当前责任人信息</div>
+      <div  class="msgtitle" style="margin-top: 25px;min-width: 300px;width:30%;" v-if="moveallowshow"><img src="../../public/img/uuu.png"/>当前责任人信息</div>
       <div  class="msgtitle" style="margin-top: 25px" v-if="!moveallowshow">当前责任人管理设备共<p>{{total.total}}</p>台</div>
       <div class="buttons">
         <button   class="zhuanyixuke" v-if="moveallowshow" @click="move">转移许可</button>
@@ -148,7 +148,7 @@
             </div>
           </div>
           <div class="left-box">
-            <div  class="forbox" v-for="(list,index) in devicelist" :key="index" style="min-width:850px;width:60%">
+            <div  class="forbox" v-for="(list,index) in devicelist" :key="index" style="min-width:700px;margin-right:20px">
               <div class="morecontent" style="width: 50%">
                 <div style="display: flex">
                   <Checkbox v-model="list.isChecks"   @on-change="checkAllGroupChange()"></Checkbox>
@@ -156,13 +156,16 @@
                   <!-- <p style="min-width:140px">设备IP：<span>1234567891</span></p> -->
                 </div>
 
-                <div style="display: flex;min-width:300px;margin-left: 10px">
+                <div style="display: flex;min-width:200px;margin-left: 10px">
                   <p>安装地址：</p>
-                  <span style="text-align:left;flex: 1">按时间大数据看多了就暗水电费健康了时代峰峻示阿斯加</span>
-                  <!--<span style="text-align:left;flex: 1">{{list.installAddress}}</span>-->
+                  <!-- <span style="text-align:left;flex: 1">按时间大数据看多了就暗水电费健康了时代峰峻示阿斯加</span> -->
+                  <span style="text-align:left;flex: 1">{{list.installAddress}}</span>
                 </div>
-                <p style="min-width:220px;margin-left: 5px">项目名称：世纪东方数据量的咖啡</p>
-                <p style="min-width:120px;margin-left: 5px">授权端口数：1,2,3</p>
+                 <div style="display: flex;min-width:200px;margin-left: 10px">
+                <p >项目名称：</p>
+                <span style="text-align:left;flex: 1">{{list.projectName}}</span>
+                 </div>
+                <p style="min-width:120px;margin-left: 5px">授权端口：{{list.ifPort}}</p>
               </div>
             </div>
           </div>
@@ -170,14 +173,14 @@
         <div>
           <img src="../../public/img/12.png" style="margin:0 10px;"/>
         </div>
-        <div style="width:40%;min-width:350px;margin-top:20px">
+        <div style="width:30%;min-width:300px;margin-top:20px">
           <div style="display:flex; align-items: center;">
             <i-input v-model="serachvalue" placeholder="请输入..." style="width: 220px" class="sousuo"></i-input>
             <button type="primary" class="sure"  @click="serach">搜索</button>
           </div>
         <div >
           <div class="companybox">
-              <div v-for="(commsg,index) in companylist" @click="checkcompany(index)">
+              <div v-for="(commsg,index) in companylist" @click="checkcompany(index)" :key="index">
                 <span :class="commsg.more?'companybox-span':'companybox-spans'">姓名：</span>
                 <span :class="commsg.more?'companybox-span':'companybox-spans'">{{commsg.userName}}</span>
                 <span :class="commsg.more?'companybox-span':'companybox-spans'" style="margin-left:10px">单位名称：</span>
@@ -196,24 +199,27 @@
                 <p>单位名称：<span>{{usermsg.company}}</span></p>
                 <p>单位地址：<span>{{usermsg.companyAddress}}</span></p>
                 <p>手机号：<span>{{usermsg.mobile}}</span></p>
-                <div  class="msgtitle" style="border:none;min-width:250px;padding-left:0;font-size:14px;margin-top:0;" v-if="moveallowshow">当前责任人管理设备共<p style="padding:5px 2px;">{{total.total}}</p>台</div>   
+                <div  class="msgtitle" style="border:none;min-width:220px;padding-left:0;font-size:14px;margin-top:0;" v-if="moveallowshow">当前责任人管理设备共<p style="padding:2px 5px;">{{total.total}}</p>台</div>   
             </div>
         </div>
         <div class="rightbox-remove" v-if="moveallowshow">
-          <div  class="msgtitle" style="margin-top: 10px;width:100%;" v-if="moveallowshow"><img src="../../public/img/uuu.png"/>当前责任人信息</div>
-            <div  class="forbox" v-for="(list,index) in devicelist" :key="index" v-if="moveallowshow" style="min-width:750px;width:100%;text-align:left;">
+          <div  class="msgtitle" style="margin-top: 10px;width:100%;min-width:600px" v-if="moveallowshow"><img src="../../public/img/yyy.png"/>当前责任人管理设备</div>
+            <div  class="forbox" v-for="(list,index) in devicelist" :key="index" v-if="moveallowshow" style="min-width:700px;width:100%;text-align:left;">
                 <div class="morecontent">
                    <div style="display: flex">
                        <Checkbox v-model="list.isCheck" v-if="!removeallowshow"  @on-change="checkAllGroupChange()"></Checkbox>
                        <p style="min-width:140px">设备IP：<span>{{list.gatewayIp}}</span></p>
                    </div>
-                    <div style="display: flex;min-width:300px;margin-left: 10px">
+                  <div style="display: flex;min-width:200px;margin-left: 10px">
                   <p>安装地址：</p>
-                  <span style="text-align:left;flex: 1">按时间大数据看多了就暗水电费健康了时代峰峻示阿斯加</span>
-                  <!--<span style="text-align:left;flex: 1">{{list.installAddress}}</span>-->
+                  <!-- <span style="text-align:left;flex: 1">按时间大数据看多了就暗水电费健康了时代峰峻示阿斯加</span> -->
+                  <span style="text-align:left;flex: 1">{{list.installAddress}}</span>
                 </div>
-                    <p style="min-width:200px;margin-left: 5px">项目名称：</p>
-                    <p style="min-width:150px;margin-left: 5px">授权端口数：1,2,3,4,5</p>
+                 <div style="display: flex;min-width:200px;margin-left: 10px">
+                    <p>项目名称：</p>
+                    <span style="text-align:left;flex: 1">{{list.projectName}}</span>
+                 </div>
+                    <p style="min-width:120px;margin-left: 5px">授权端口：{{list.ifPort}}</p>
                 </div>
             </div>
         </div>
@@ -271,9 +277,11 @@
     mounted(){
       this.$http.get("oauth/certificate/getCertInfo",{userId:this.$route.query.uesrid},res=>{
           this.usermsg = res.data[0].userInfo
-          this.certmsg = res.data[0].certInfo
+          if(res.data[0].certInfo[0] !== null){
+            this.certmsg = res.data[0].certInfo
+            this.certmsg.forEach (el=>{ if(el.certificateStatus == 0) {this.oldcertificateNo = el.certificateNo}})
+          }
           this.personshow = true
-           this.certmsg.forEach (el=>{ if(el.certificateStatus == 0) {this.oldcertificateNo = el.certificateNo}})
       },err=>{});
       this.$http.get("oauth/certificate/findUser",{},res=>{
           this.companylist = res.data
@@ -285,19 +293,29 @@
       shebei(){
         this.personshow = false
         this.$http.get("oauth/certificate/findAllBycertNo?certificate",{userId:this.$route.query.uesrid},res=>{
-          console.log(res.data);
-          this.devicelist = res.data[0];
-          this.total = res.data[1];
-          for (let i=0; i< this.devicelist.length; i++){
-            this.$set(this.devicelist[i],'isCheck',false)
-            this.$set(this.devicelist[i],'isChecks',false)
+          if( res.data[1].total !== 0){
+            this.devicelist = res.data[0];
+            this.total = res.data[1];
+            for (let i=0; i< this.devicelist.length; i++){
+              this.$set(this.devicelist[i],'isCheck',false)
+              this.$set(this.devicelist[i],'isChecks',false)
+            }
+          }else{
+            this.total.total = 0
+            this.devicelist =[]
           }
+         
         },err=>{})
       },
       renyuan(){
         this.personshow = true
       },
       move(){
+        if(this.devicelist.length == 0){
+          this.$Message.info('目前没有设备可以转移');
+        }
+        this.moves = false
+        this.devicelist.forEach (el=>{ {el.isCheck = false}})
         if(this.moveallowshow == true&&this.removeallowshow == true){
           this.moveallowshow = false
           this.removeallowshow = true
@@ -311,10 +329,16 @@
         this.checklist = []
         this.devicelist.forEach (el=>{ if(el.isCheck == true){this.checklist.push(el.id)}})
         this.$http.delete("oauth/certificate/unboundCert",{userId:this.$route.query.uesrid,gatewayIds:JSON.stringify(this.checklist)},res=>{
+          this.$Message.info(res.message);
+          this.moves = false
+          this.shebei()
         },err=>{
         })
       },
       removeallow(){
+        if(this.devicelist.length == 0){
+          this.$Message.info('目前没有设备可以转移');
+        }
         if( this.removeallowshow == true){
           this.removeallowshow = false
           this.moveallowshow = true
@@ -398,8 +422,11 @@
           title: '您确定要转移吗',
         // content: '<p>一些对话框内容</p><p>一些对话框内容</p>',
          onOk: () => {
-           this.$http.put("oauth/certificate/gatewayChangeUser",{certificateNo:this.checkone,gatewayIds:JSON.stringify(this.makelist),oldCertificateNo:this.oldcertificateNo},res=>{
-          console.log(res)
+           this.$http.put("oauth/certificate/gatewayChangeUser",{certificateNo:this.checkone,gatewayIds:this.makelist,oldCertificateNo:this.oldcertificateNo},res=>{
+          
+          // location.reload();
+          this.$Message.info(res.message);
+          this.shebei()
             },err=>{
             })
         },
@@ -417,6 +444,8 @@
   color: #1D60FE;
   font-size: 16px;
   position: relative;
+  cursor:pointer;
+
 }
 .detailbox p{
   margin-bottom: 5px
@@ -443,7 +472,7 @@
 }
   .personbox{
     /*background: red;*/
-    margin: 20px 10% 3% 5%;
+    margin: 20px 5% 3% 5%;
     position: relative;
     min-width: 1100px;
   }
@@ -556,47 +585,28 @@
     top:20px;
     z-index:222;
   }
-  .zhuanyixuke{
-    margin: 0;
-    padding: 5px 10px;
-    border: 1px solid #2666FE;  //自定义边框
-    outline: none;
-    background: #fff;
-    border-radius: 5px;
-    font-size: 14px;
-    color: #2666FE;
-    margin-right: 20px;
-  }
-  .zhuanyixukes{
-      margin: 0;
-      padding: 5px 10px;
-      border: 1px solid #1D60FE;  //自定义边框
-  outline: none;
-      background: #1D60FE;
-      border-radius: 5px;
-      font-size: 14px;
-      color: #fff;
-      margin-right: 20px;
-  }
+  
     .yichuxuke{
       margin: 0;
       padding: 5px 10px;
-      border: 1px solid #F14855;  //自定义边框
+      border: 1px solid #F14855; 
       outline: none;
       background: #fff;
       border-radius: 5px;
       font-size: 14px;
       color: #F14855;
+      cursor:pointer;
     }
     .yichuxukes{
         margin: 0;
         padding: 5px 10px;
-        border: 1px solid #EF3543;  //自定义边框
+        border: 1px solid #EF3543;  
         outline: none;
         background: #EF3543;
         border-radius: 5px;
         font-size: 14px;
         color: #fff;
+        cursor:pointer;
     }
   .qiyong{
     right:0;
@@ -604,12 +614,13 @@
     position: absolute;
     margin: 0;
     padding: 2px 10px;
-    border: 1px solid #2666FE;  //自定义边框
+    border: 1px solid #2666FE;  
     outline: none;
     background:#fff;
     border-radius:5px;
     font-size:14px;
     color:#2666FE;
+    cursor:pointer;
   }
   .tingyong{
     right:0;
@@ -617,15 +628,18 @@
     position: absolute;
     margin: 0;
     padding: 2px 10px;
-    border: 1px solid #F14855;  //自定义边框
+    border: 1px solid #F14855;  
     outline: none;
     background: #fff;
     border-radius: 5px;
     font-size: 14px;
     color:#F14855;
+    cursor:pointer;
   }
   .movebox{
     padding: 30px 0px 30px 1%;
+    padding-right:0;
+    width: 70%;
   }
   .sure{
         height: 32px;
@@ -663,7 +677,8 @@
     }
     .left-box{
       border:1px solid #1D60FE;
-      width: 62%;min-width: 900px;
+      /* width: 62%; */
+      min-width: 750px;
       padding-left: 20px;
       padding-bottom: 20px;
       /* margin-left:-50px; */
@@ -671,11 +686,11 @@
       overflow: auto;
     }
     .left-msgbpx{
-      min-width: 400px;
+      min-width: 300px;
       width: 30%;
       display: flex;
       justify-content: center;
-      padding: 100px 0 0 50px;
+      padding: 100px 0 0 10px;
     }
     .left-msgbpx img{
       margin-right: 30px;
@@ -691,12 +706,12 @@
       padding-left:20px;
       height:500px;
       overflow:auto;
-      min-width:900px;
-      width:68%;
+      min-width:750px;
+      width:65%;
       padding-bottom:40px;
       position:absolute;
       right:0;
       top:16px;
-      left:32%; 
+      left:32%;
     }
 </style>
