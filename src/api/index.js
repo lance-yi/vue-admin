@@ -3,7 +3,7 @@ import router from '@/router.js'
 import {  Message } from 'iview';
 
 // 配置API接口地址
-var root = 'http://192.168.8.176:8888/api'
+var root = 'http://192.168.8.180:8888/api'
 // var root = 'http://192.168.8.185:8888/api'
 // 引用axios
 axios.defaults.withCredentials = true

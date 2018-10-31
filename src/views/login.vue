@@ -57,7 +57,7 @@ export default {
           axios({
             method: 'post',
             url: '/auth/jwt/token',
-            baseURL: 'http://192.168.8.176:8888/api',
+            baseURL: 'http://192.168.8.180:8888/api',
             dataType: 'json',
             data:{"username":this.formValidate.name,"password":this.formValidate.password}
           }).then(res=>{

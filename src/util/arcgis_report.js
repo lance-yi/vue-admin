@@ -3,40 +3,19 @@ import { loadScript, loadCss, loadModules } from 'esri-loader';
 import tileInfo from './tileInfo';
 
 export default {
-    name: 'ArcgisMap',
-    props: {propsmap:{type:String}},
+    name: 'Arcgisrepoet',
+    props: {propsmap:{type:Object,},
+},
     data() {
         return {
             mapObj: {},
             point:[],
-            centerlist:'',
         };
     },
     mounted() {
         this.init();
-        // console.log(this.propsmap)
         
     },
-    watch:{
-        propsmap:{
-          handler: function(val,odlval) {
-              var that = this
-              this.centerlist = val
-            this.$http.get("res/socGateway/getGatewayByInstallOrCrossVillage?",{param:this.centerlist},res=>{
-                    if(res.data.length>0){
-                        var pt = new that.mapObj.Point(res.data[0].longitude, res.data[0].latitude); // 设置中心点
-                        that.mapObj.map.centerAndZoom(pt,8); // 设置中心点和缩放级别;
-                    }else{
-                        this.$Message.info('没有找到您要搜索的东西');
-                    }
-                },err=>{
-                })
-            
-   
-          },
-          deep:true
-        }
-      },
     methods: {
         init() {
             // 加载js;
@@ -116,37 +95,40 @@ export default {
             };
         },
         initMap(obj) {
-            this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
-            let map = new obj.Map('map', {logo: false,basemap: "streets-navigation-vector",});// 创建地图实例
-            let pt = new obj.Point(114.197099, 30.535668); // 设置中心点
-            map.centerAndZoom(pt,8); // 设置中心点和缩放级别;
-            let img = new TDT('img'); // 影像
-            let cia = new TDT('cia');//路网
-            map.addLayer(img); // 将图层添加到map对象
-            map.addLayer(cia);
-            this.mapObj.map = map;
             
-            this.$http.get("gis/gis/getLalontude",{requestModular:1},res=>{
-                // console.log(res.data)
-                this.point = res.data
-                var that = this
-                this.point.forEach (el=>{ 
-                    if(el.isAlert == 1){
-                        that.createCircle(el)
-                    }else if(el.isAlert == 2){
-                        that.createCircless(el)
-                    }else if(el.isAlert == 0){
-                        that.createCircles(el)
-                    }
-                    // that.createCircle(el)
-                })
-              },err=>{
-              })
+            this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
+            let map = new obj.Map('mapreport', {logo: false,basemap: "streets-navigation-vector",slider:false});// 创建地图实例
+                let pt = new obj.Point(this.propsmap.longitude, this.propsmap.latitude); // 设置中心点
+                map.centerAndZoom(pt,7); // 设置中心点和缩放级别;
+                let img = new TDT('img'); // 影像
+                let cia = new TDT('cia');//路网
+                map.addLayer(img); // 将图层添加到map对象
+                map.addLayer(cia);
+                this.mapObj.map = map;
+    
+                // this.$http.get("gis/gis/getLalontude",{},res=>{
+                //     // console.log(res.data)
+                    // this.point = propsname
+                    var that = this
+               
+                        // that.createCircle(el)
+                        // if(this.propsmap.alert == 1){
+                        //     that.createCircle(this.propsmap)
+                        // }else if(this.propsmap.alert == 2){
+                        //     that.createCircless(this.propsmap)
+                        // }else if(this.propsmap.alert == 0){
+                        //     that.createCircles(this.propsmap)
+                        // }
+                        that.createCircle(this.propsmap)
+        
+           
+            //   },err=>{
+            //   })
              
         },
         createCircle(el) {
             var that = this
-            let gl = new this.mapObj.GraphicsLayer({id:el.gatewayId});
+            let gl = new this.mapObj.GraphicsLayer({id:el.gatewayIp});
             this.mapObj.map.addLayer(gl);
             var labelPoint=new esri.geometry.Point(el.longitude,el.latitude);
             var labelSymbol =  new esri.symbol.PictureMarkerSymbol({

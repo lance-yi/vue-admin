@@ -3,7 +3,7 @@ import { loadScript, loadCss, loadModules } from 'esri-loader';
 import tileInfo from './tileInfo';
 
 export default {
-    name: 'ArcgisMap',
+    name: 'ArcgisMaps',
     props: {propsmap:{type:String}},
     data() {
         return {
@@ -126,7 +126,7 @@ export default {
             map.addLayer(cia);
             this.mapObj.map = map;
             
-            this.$http.get("gis/gis/getLalontude",{requestModular:1},res=>{
+            this.$http.get("gis/gis/getLalontude",{requestModular:2},res=>{
                 // console.log(res.data)
                 this.point = res.data
                 var that = this

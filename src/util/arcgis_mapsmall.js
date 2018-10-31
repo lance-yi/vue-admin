@@ -4,16 +4,17 @@ import tileInfo from './tileInfo';
 
 export default {
     name: 'ArcgisMapsmall',
-    props: {propsname:{type:Array,}},
+    props: {propsname:{type:Array,},
+    propsmap:{type:Object,}
+},
     data() {
         return {
             mapObj: {},
             point:[],
+            msgtypelist:[],
         };
     },
     mounted() {
-        // console.log(this.propsname)
-
         this.init();
         
     },
@@ -96,32 +97,51 @@ export default {
             };
         },
         initMap(obj) {
+
             this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
             let map = new obj.Map('maps', {logo: false,basemap: "streets-navigation-vector",slider:false});// 创建地图实例
-            let pt = new obj.Point(this.propsname[0].longitude, this.propsname[0].latitude); // 设置中心点
-            map.centerAndZoom(pt,7); // 设置中心点和缩放级别;
-            let img = new TDT('img'); // 影像
-            let cia = new TDT('cia');//路网
-            map.addLayer(img); // 将图层添加到map对象
-            map.addLayer(cia);
-            this.mapObj.map = map;
+            if(this.propsmap){
+                this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:'摄像机',ipAddress:this.propsmap.ipAddr},res=>{
+                    this.msgtypelist = res.data
+                    let pt = new obj.Point(this.msgtypelist.longitude, this.msgtypelist.latitude); // 设置中心点
+                    map.centerAndZoom(pt,7); // 设置中心点和缩放级别;
+                    let img = new TDT('img'); // 影像
+                    let cia = new TDT('cia');//路网
+                    map.addLayer(img); // 将图层添加到map对象
+                    map.addLayer(cia);
+                    this.mapObj.map = map;
+                      // if(this.propsmap.alert == 1){
+                        //     that.createCircle(this.propsmap)
+                        // }else if(this.propsmap.alert == 2){
+                        //     that.createCircless(this.propsmap)
+                        // }else if(this.propsmap.alert == 0){
+                        //     that.createCircles(this.propsmap)
+                        // }
+                        that.createCircle(this.propsmap)
+                },err=>{});
 
-            // this.$http.get("gis/gis/getLalontude",{},res=>{
-            //     // console.log(res.data)
-                // this.point = propsname
-                var that = this
-                this.propsname.forEach (el=>{ 
-                    // that.createCircle(el)
-                    if(el.alert == 1){
-                        that.createCircle(el)
-                    }else if(el.alert == 2){
-                        that.createCircless(el)
-                    }else if(el.alert == 0){
-                        that.createCircles(el)
-                    }
-                })
-            //   },err=>{
-            //   })
+                
+            }else{
+                let pt = new obj.Point(this.propsname[0].longitude, this.propsname[0].latitude); // 设置中心点
+                map.centerAndZoom(pt,7); // 设置中心点和缩放级别;
+                let img = new TDT('img'); // 影像
+                let cia = new TDT('cia');//路网
+                map.addLayer(img); // 将图层添加到map对象
+                map.addLayer(cia);
+                this.mapObj.map = map;
+                    var that = this
+                    this.propsname.forEach (el=>{ 
+                        // that.createCircle(el)
+                        if(el.alert == 1){
+                            that.createCircle(el)
+                        }else if(el.alert == 2){
+                            that.createCircless(el)
+                        }else if(el.alert == 0){
+                            that.createCircles(el)
+                        }
+                    })
+            }
+                
              
         },
         createCircle(el) {
