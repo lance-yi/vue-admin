@@ -3,7 +3,8 @@ import router from '@/router.js'
 import {  Message } from 'iview';
 
 // 配置API接口地址
-var root = 'http://192.168.8.180:8888/api'
+var root = window.g.ApiUrl
+console.log(window.g.ApiUrl)
 // var root = 'http://192.168.8.185:8888/api'
 // 引用axios
 axios.defaults.withCredentials = true
@@ -34,9 +35,9 @@ function apiAxios (method, url, params, success, failure) {
     method: method,
     headers: { 'Authorization': localStorage.token },
     url: url,
-    data: method === 'POST' || method === 'PUT' ? params : null,
+    data: method === 'POST' || method === 'PUT' || method === 'DELETE' ? params : null,
     dataType: 'json',
-    params: method === 'GET' || method === 'DELETE' ? params : null,
+    params: method === 'GET'  ? params : null,
     baseURL: root,
     withCredentials: false
   }).then(function (res) {

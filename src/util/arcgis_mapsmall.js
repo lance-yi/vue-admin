@@ -97,28 +97,36 @@ export default {
             };
         },
         initMap(obj) {
-
+            obj.basemaps.delorme = {baseMapLayers: [{url: "http://100.16.3.40:6080/arcgis/rest/services/wuhann/MapServer"}]}
             this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
-            let map = new obj.Map('maps', {logo: false,basemap: "streets-navigation-vector",slider:false});// 创建地图实例
+            // let map = new obj.Map('maps', {logo: false,basemap: "streets-navigation-vector",slider:false});// 创建地图实例
+            let map = new obj.Map('map', {logo: false,basemap: "delorme",},);
             if(this.propsmap){
-                this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:'摄像机',ipAddress:this.propsmap.ipAddr},res=>{
-                    this.msgtypelist = res.data
-                    let pt = new obj.Point(this.msgtypelist.longitude, this.msgtypelist.latitude); // 设置中心点
-                    map.centerAndZoom(pt,7); // 设置中心点和缩放级别;
+                    let pt = new obj.Point(this.propsmap.gateway.longitude,this.propsmap.gateway.latitude); // 设置中心点
+                    map.centerAndZoom(pt,8); // 设置中心点和缩放级别;
                     let img = new TDT('img'); // 影像
                     let cia = new TDT('cia');//路网
                     map.addLayer(img); // 将图层添加到map对象
                     map.addLayer(cia);
                     this.mapObj.map = map;
-                      // if(this.propsmap.alert == 1){
-                        //     that.createCircle(this.propsmap)
-                        // }else if(this.propsmap.alert == 2){
-                        //     that.createCircless(this.propsmap)
-                        // }else if(this.propsmap.alert == 0){
-                        //     that.createCircles(this.propsmap)
-                        // }
-                        that.createCircle(this.propsmap)
-                },err=>{});
+                    var that = this
+                      if(this.propsmap.gateway.isAlert == 1){
+                            that.createCircle(this.propsmap.gateway)
+                        }else if(this.propsmap.gateway.isAlert == 2){
+                            that.createCircless(this.propsmap.gateway)
+                        }else if(this.propsmap.gateway.isAlert == 0){
+                            that.createCircles(this.propsmap.gateway)
+                        }
+
+                        if(this.propsmap.camera.isAlert == 1){
+                            that.createCircle(this.propsmap.camera)
+                        }else if(this.propsmap.camera.isAlert == 2){
+                            that.createCircless(this.propsmap.camera)
+                        }else if(this.propsmap.camera.isAlert == 0){
+                            that.createCircles(this.propsmap.camera)
+                        }
+                        // that.createCircle(this.propsmap)
+       
 
                 
             }else{

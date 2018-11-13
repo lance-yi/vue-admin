@@ -1,9 +1,17 @@
 <template>
   <div class="nav-center">
-    <span class="switch" @click="changeSide(!noSide)">{{ noSide ? '显示导航' : '隐藏导航'}}</span>
+    <!-- <span class="switch" @click="changeSide(!noSide)">{{ noSide ? '显示导航' : '隐藏导航'}}</span> -->
+    <div style="background:#F8F9FA;padding-top:10px">
+       <div @click="changeSide(!noSide)" v-if="!noSide">
+         <img src="../../public/img/ss1.png" />
+      </div>
+      <div @click="changeSide(!noSide)" v-if="noSide">
+        <img src="../../public/img/ss2.png" />
+      </div>
+    </div>
     <div class="menu" :class="{ noSide: noSide }">
       <ul class="item">
-        <router-link tag="li" :to="x.url" v-for="(x,index) in lists" class="clearfix main-item" :key="index" :class="x.url == '/'+$route.name ? 'on' : ''">
+        <router-link tag="li" :to="x.url" v-for="(x,index) in lists" class="clearfix main-item" :key="index" :class="x.url == '/'+$route.name ? 'on' : ''"   @click.native="gotopage(x.url)">
           <img :src="x.icon" class="icon">
           <div class="inner">
             <a class="title" @click.stop="x._show = !x._show">
@@ -61,13 +69,21 @@ export default {
           children:[]
         },
         {
-          url: '/renyuan',
+          url: '/log',
           title: "日志管理", 
           icon: require('../../public/img/gz.png'), 
           _show: true, 
           children:[
           ]
         },
+        {
+          url: '/system',
+          title: "系统管理", 
+          icon: require('../../public/img/sz.png'), 
+          _show: true, 
+          children:[
+          ]
+        }
       ]
     }
   },
@@ -82,6 +98,11 @@ export default {
   methods: {
     changeSide(bl){
       this.$store.commit("changeSide",bl);
+    },
+    gotopage(url){
+      if(url == this.$route.path){
+        this.$router.go(0)
+      }
     },
     asyncList: function (num) {
       var that = this
@@ -135,7 +156,7 @@ export default {
     height: 100%;
     box-sizing: border-box;
     overflow: scroll;
-    padding: 24px 0;
+    padding: 10px 0;
     border-right: 1px solid #eee;
     background-color: #F8F9FA;
     font-size: 14px;
@@ -170,9 +191,9 @@ export default {
       position: relative;
       padding: 10px 16px;
       cursor: pointer;
-      border-left: 5px solid #F8F9FA;
+      border-left: 8px solid #F8F9FA;
       &.router-link-active,&.on{
-        border-left: 5px solid #1D60FE;
+        border-left: 8px solid #1D60FE;
         background: #fff;
       }
       .icon{

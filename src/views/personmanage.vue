@@ -70,24 +70,24 @@
 
         <!--列表模式-->
         <div v-if="!acardshow" class="tablebox">
-            <i-table highlight-row stripe border :columns="columns1" :data="data1" @on-current-change="handleRowChange"></i-table>
+            <i-table highlight-row stripe border :columns="columns1" :data="data1" ></i-table>
             <Page :total='totals' show-total class="fullpage" @on-change="changeliebiaopage"></Page>
         </div>
 
         <!-- 弹窗 -->
         <div v-if="modal1" class="dialog">
             <div class="dialogbox">
-                <div style="display:flex">
-                    <p>1.请先下载导入的模板文件</p>
-                    <div class="exj2" style="margin-left:10px" @click="xiazai">下载</div>
-                </div>
-                <div style="text-align:left;margin-top:20px;">
-                    <p style="margin-bottom:20px">2.请选择导入的文件</p>
+                <div style="text-align:left;margin-top:20px;display:flex">
+                    <p style="margin-bottom:20px;margin-right:20px">请选择导入的文件</p>
                     <input type="file" name="file" ref="file"/> 
                 </div>
                 <div class="iconlist">
                     <p @click="closedialog">取消</p>
                     <div class="exj1" style="margin-left:20px;background:#15b2f4;color:#fff;height:30px;border:1px solid #15b2f4" @click="confirmupload">确定上传</div>
+                </div>
+                <div class="downwrod">
+                    <p>下载 导入文件模板</p>
+                    <div  style="margin-left:10px;color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="xiazai">下载</div>
                 </div>
             </div>
         </div>
@@ -116,19 +116,14 @@
         current:1,
         columns1: [
           {
-            title: '负责人',
+            title: '姓名',
             key: 'userName',
             className:'centers',
             width:80,
           },
           {
-            title: '所属单位',
-            key: 'company',
-            className:'centers',
-          },
-          {
             title: '项目名称',
-            key: 'project_name',
+            key: 'projectName',
             className:'address',
           },
           {
@@ -138,8 +133,13 @@
             // width:95,
           },
           {
+            title: '单位名称',
+            key: 'company',
+            className:'centers',
+          },
+          {
             title: '单位地址',
-            key: 'company_address',
+            key: 'companyAddress',
             className:'address',
             width:200,
           },
@@ -151,7 +151,7 @@
           },
           {
             title: '所属单位联系方式',
-            key: 'company_phone',
+            key: 'companyPhone',
             className:'centers',
             width:150,
           },
@@ -160,6 +160,13 @@
             className:'centers',
             key: 'status',
             width:95,
+            render:(h,params)=>{
+                return h('span',{
+                    style:{
+                        color:(params.row.status=="在用")?"#EC626B":"#6FC833",
+                    }
+                },params.row.status)
+            }
           },
           {
             title: '邮箱账号',
@@ -172,6 +179,17 @@
             className:'centers',
             key:'more',
             width:65,
+            render: (h, params) => {
+                    return h('div', [
+                        h('div', {
+                            on: {
+                                click: () => {
+                                  this.handleRowChange(params.row)
+                                }
+                            }
+                        }, '更多')
+                    ]);
+                  }
           }
         ],
         data1: [],
@@ -196,7 +214,17 @@
     },
     methods: {
         update(){
-            location.reload();
+            this.$http.put("oauth/userMaintain/userSynchronize",{},res=>{
+              this.$Message.info(res.message);
+              this.$http.get("oauth/certificate/findAllforApp",{},res=>{
+                this.totals = res.data.total
+                this.list = res.data.list
+                this.data1 = res.data.list
+                this.data1.forEach (el=>{ if(el.certificateStatus == 0) { el.status = '正常' }else{el.status = '停用'}})
+            },err=>{
+            })
+          },err=>{
+          })
         },
       liebiao(){
         this.acardshow = false
@@ -271,7 +299,7 @@
       gotodetail(index){
         this.$router.push({path: '/personmanagedetail',query:{uesrid:this.list[index].userId}});
       },
-      handleRowChange(currentRow, oldCurrentRow){
+      handleRowChange(currentRow){
         console.log(currentRow)
         this.$router.push({path: '/personmanagedetail',query:{uesrid:currentRow.userId}});
       },
@@ -464,7 +492,7 @@
         z-index:1012;
     }
     .dialogbox{
-        width: 400px;
+        width: 485px;
         height: 250px;
         position: relative;
         margin: 0 auto;
@@ -479,10 +507,16 @@
     }
     .iconlist{
         position: absolute;
-        bottom: 20px;
-        right: 10px;
+        bottom: 100px;
+        right: 162px;
         display: flex;
         align-items:center;
+    }
+    .downwrod{
+        position: absolute;
+        bottom: 20px;
+        right: 30px;
+        display: flex;
     }
     .address{
     text-align:left ;

@@ -118,6 +118,7 @@
               <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">过期</span>
               <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">停用({{certlist.updateTime}})</span></p>
           </div>
+          <img src="../../public/img/tingyong.png" class="timego" v-if="certlist.certificateStatus == 1" style="right:80px"/>
           <img src="../../public/img/timego.png" class="timego" v-if="certlist.certificateStatus == 2"/>
           <button   class="qiyong" v-if="certlist.certificateStatus == 1"  @click="set(0,certlist.certificateNo)">启用</button>
           <button   class="tingyong" v-if="certlist.certificateStatus == 0" @click="set(1,certlist.certificateNo)">停用</button>

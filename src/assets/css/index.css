@@ -59,3 +59,17 @@ outline: none;
 .fullpage{
     margin-top: 30px;
 }
+.brspan{
+    color:#FF5E5E;
+    margin-left:74px;
+  }
+  .brspan:first-child{
+     margin-left:0;
+  }
+  .brspans{
+    color:#FF5E5E;
+    margin-left:69px;
+  }
+  .brspans:first-child{
+     margin-left:0;
+  }

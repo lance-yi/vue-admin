@@ -5,6 +5,8 @@ import personmanage from '@/views/personmanage.vue'
 import safemanage from '@/views/safemanage.vue'
 import operation from '@/views/operation.vue'
 import personmanagedetail from '@/subpage/personmanagedetail.vue'
+import log from '@/views/log.vue'
+import system from '@/views/system.vue'
 import iView from 'iview'
 
 Vue.use(iView)
@@ -37,6 +39,16 @@ const router = new Router({
       path: '/personmanagedetail',
       name: 'personmanagedetail',
       component: personmanagedetail
+    },
+    {
+      path: '/log',
+      name: 'log',
+      component: log
+    },
+    {
+      path: '/system',
+      name: 'system',
+      component: system
     }
   ]
 })

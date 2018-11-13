@@ -13,7 +13,6 @@ export default new Vuex.Store({
   mutations: {
     // 登录状态
     userSignin(state, obj) {
-      console.log(obj)
       localStorage.setItem("userInfo", JSON.stringify(obj))
       state.loginState = true
       Object.assign(state.userInfo, obj)
