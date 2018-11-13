@@ -30,7 +30,7 @@
                   <button   class="zhuanyixuke" @click="changerole">修改</button>
                   <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" @click="detelerole">删除</button>
                    <button   class="zhuanyixukes" @click="power">分配权限</button>
-                  <button   class="zhuanyixukes" >分配用户</button>
+                  <button   class="zhuanyixukes" @click="allotuser">分配用户</button>
                       <Row>
                        <Col span="7" style="margin-right: 20px;">
                            <div class="head-left">角色管理</div>
@@ -169,7 +169,15 @@
         </Modal>
 
 
-
+        <Modal
+            v-model="modal6"
+            :title="formrole.name"
+            width='800'
+            @on-ok="okpaddword('formpaddword')"
+            >
+            <i-table highlight-row stripe border :columns="columns1" :data="data1" ></i-table>
+            <Page :total='searchUsertotla' show-total style="text-align:center;margin-top:20px"></Page>
+        </Modal>
 
 
 
@@ -232,6 +240,16 @@
             }
         };
       return {
+          data1:[],
+          columns1:[
+              {type: 'selection',width: 60,align: 'center',},
+              {title: '姓名',key: 'personName',width:150,align: 'center',},
+              {title: '登录账号',key: 'personName',align: 'center'},
+              {title: '部门',key: 'personName',width:150,align: 'center'},
+              {title: '公司名称',key: 'personName',align: 'center'},
+          ],
+          searchUsertotla:0,
+          modal6:false,
           modal5:false,
           colornum:'xx',
           roletabledata:[],
@@ -787,6 +805,25 @@
                 },err=>{
                 })
           }
+      },
+      allotuser(){
+           if(this.roledata.length == 0){
+              this.$Message.error('请选择条目！');
+          }else if(this.roledata.length > 1){
+              this.$Message.error('请勿选择多条数据！');
+          }else{
+             this.$http.get("oauth/group/"+this.roledata,{},res=>{
+                  this.modal6 = true
+                  this.formrole.name = res.data.name
+                   this.$http.get("oauth/user/searchUser?",{param:'',current:1},res=>{
+                          this.searchUsertotla = res[0].total
+                          this.data1 = res[0].user
+                          console.log(res[0].total)
+                        },err=>{});
+                  
+                },err=>{
+                })
+          }
       }
     }
   }
@@ -838,4 +875,5 @@
 .ivu-checkbox-wrapper + span, .ivu-checkbox + span{
     margin-right: 0px;
 }
+
 </style>
