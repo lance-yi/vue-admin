@@ -211,8 +211,10 @@
                  </div>
                  <div class="content" style="border:none;" v-for="(lists,index) in devicelist" :key="index">
                     <div style="min-width:100%">
-                      <p style="font-size:16px">故障描述：</p>
-                      <span style="color:#F82A2A;font-size:16px;">{{lists.detail}}</span>
+                      <div style="display:block" >
+                      <span style="font-size:16px">故障描述：</span>
+                      <span v-for="(cc,indexs) in lists.detail"  :key="indexs" id="desrcspan" :style="indexs==0?'margin-left:0px':'margin-left:80px'">{{cc.descr}}<br /></span>
+                      </div>
                     </div>
                     <div style="min-width:30%">
                       <p>端口号：</p>
@@ -607,9 +609,18 @@
                       <p>安装地址：</p>
                       <span style="color:#696C6F">{{aa.deviceInstallAddress}}</span>
                     </div>
-                    <div style="min-width:90%;margin-left:10%">
-                        <p>故障描述：</p>
-                        <i-input type="textarea" :rows="4" :placeholder="aa.detail"  v-model="aa.detail"></i-input>
+                    <div style="min-width:90%;margin-left:10%;align-items:flex-start" >
+                        <p >故障描述：</p>
+                        <div style="display:block;width:100%;margin-top:0">
+                        <div v-for="(list,num) in aa.detail" :key="num" style="margin-top:0">
+                            <!-- <i-input type="textarea" :rows="4" :placeholder="list.alertDescription" style="width:50%;margin-right:10px" ></i-input><span style="margin-top:20px">检测时间：2018-11-05 09:40:58</span> -->
+                            <span style="color:#ff3636">{{list.descr}}</span><span style="margin-left:10px">检测时间：{{list.monitorTime}}</span>
+                        </div>
+                        </div>
+                    </div>
+                     <div style="min-width:90%;margin-left:10%">
+                      <p>备注：</p>
+                      <i-input type="textarea" :rows="4" placeholder="请输入..." v-model="aa.comment"></i-input>
                     </div>
                    <input type="file" multiple name="file" :id="aa.deviceMac" style="margin:20px 30px;padding-left:10%" @change="confirmupload(aa.deviceMac,index,indexs)"/> 
             </div>
@@ -3439,5 +3450,9 @@ export default {
 }
 .statusbox:hover{
   z-index: 140;
+}
+.content div  #desrcspan{
+  color:#F82A2A;
+  font-size:16px;
 }
 </style>

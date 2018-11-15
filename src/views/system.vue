@@ -47,10 +47,10 @@
                            <i-table border  :columns="roletablehead" :data="roletabledata" id="wordbook" @on-selection-change="checkbookchange"></i-table>
                        </Col>
                       </Row>
-   
-
-
                  </div>
+            </Tab-pane>
+            <Tab-pane label="菜单管理" key="key4" name="菜单管理">
+                
             </Tab-pane>
         </Tabs>
         <div id="personbox">
@@ -163,9 +163,9 @@
         <Modal
             v-model="modal5"
             :title="formrole.name"
-            @on-ok="okpaddword('formpaddword')"
+            @on-ok="okuser()"
             >
-             
+            <Tree :data="data2" show-checkbox @on-check-change="treechange"></Tree>
         </Modal>
 
 
@@ -173,10 +173,14 @@
             v-model="modal6"
             :title="formrole.name"
             width='800'
-            @on-ok="okpaddword('formpaddword')"
+            @on-ok="okallotuser()"
             >
-            <i-table highlight-row stripe border :columns="columns1" :data="data1" ></i-table>
-            <Page :total='searchUsertotla' show-total style="text-align:center;margin-top:20px"></Page>
+            <div style="text-align:center;margin-bottom:20px">
+                <i-input v-model="value" placeholder="请输入" style="width: 200px" class="sousuo"></i-input>
+                <i-button type="primary" class="sure" @click="serachuser">搜索</i-button>
+            </div>
+            <i-table highlight-row stripe border :columns="columns1" :data="data1" @on-selection-change="checkuserchange"></i-table>
+            <Page :total='searchUsertotla' show-total style="text-align:center;margin-top:20px" @on-change="changemodal6page"></Page>
         </Modal>
 
 
@@ -223,11 +227,11 @@
     </div>
 </template>
 <script>
-// import ArcgisMaplog from "@/components/ArcgisMaplog";
+// import TreeGrid from '@/components/TreeGrid'
   export default {
     name: 'system',
     components: {
-        // ArcgisMaplog
+        // TreeGrid
     },
     data () {
         const pwdCheckValidate = (rule, value, callback) => {
@@ -244,10 +248,20 @@
           columns1:[
               {type: 'selection',width: 60,align: 'center',},
               {title: '姓名',key: 'personName',width:150,align: 'center',},
-              {title: '登录账号',key: 'personName',align: 'center'},
-              {title: '部门',key: 'personName',width:150,align: 'center'},
-              {title: '公司名称',key: 'personName',align: 'center'},
+              {title: '登录账号',key: 'account',align: 'center'},
+              {title: '部门',key: 'department',width:150,align: 'center',
+              render:function(h,params){
+                                return h('span',params.row.department?params.row.department.deptName:''); 
+                            }  
+              },
+              {title: '公司名称',key: 'company',align: 'center'},
           ],
+          data2:[],
+          userlist:[],
+          bb:0,
+          treevalue:0,
+          treelist:[],
+          value:'',
           searchUsertotla:0,
           modal6:false,
           modal5:false,
@@ -560,6 +574,10 @@
         checkpersonchange(val){
            this.deteleperson = val
         },
+        checkuserchange(val){
+            this.userlist = val
+            this.bb = 2
+        },
         detele(){
           var deletedata = []
           this.detelebook.forEach (el=>{deletedata.push(el.dictId)})
@@ -735,6 +753,7 @@
                     name:this.formrole.name,
                     id:''
                     },res=>{
+                        this.$Message.info(res.message);
                         this.$http.get("oauth/group/all",{},res=>{
                         this.rolelist = res.data
                         this.roledata = []
@@ -762,6 +781,8 @@
         })
       },
       addrole(){
+          this.formrole.name = ''
+          this.formrole.num = ''
           this.roledata = []
           this.modal4 = true
           this.addrolenum = 0
@@ -790,6 +811,8 @@
                         },err=>{});
       },
       power(){
+          this.treevalue = 0
+          this.treelist = []
           if(this.roledata.length == 0){
               this.$Message.error('请选择条目！');
           }else if(this.roledata.length > 1){
@@ -798,7 +821,22 @@
              this.$http.get("oauth/group/"+this.roledata,{},res=>{
                   this.modal5 = true
                   this.formrole.name = res.data.name
-                   this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
+                  this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
+                      this.data2 = res.data
+                      this.$http.get("oauth/group/"+this.roledata+"/authority/menu?",{},res=>{
+                          var list = res.data
+                       for(var i=0;i<this.data2.length;i++){
+                           if(this.data2[i].children.length == 0){
+                               list.forEach(el=>{if(this.data2[i].id==el.id&&el.parentId == -1){this.$set(this.data2[i],'checked',true)}})
+                           }else{
+                               list.forEach(el=>{if(this.data2[i].id==el.id&&el.parentId == -1){this.$set(this.data2[i],'expand',true)}})
+                                for(var j=0;j<this.data2[i].children.length;j++){
+                                        list.forEach(el=>{if(this.data2[i].children[j].id==el.id&&el.parentId != -1){this.$set(this.data2[i].children[j],'checked',true)}})
+                                }
+                           }
+                           
+                       }
+                        },err=>{});
                         
                         },err=>{});
                   
@@ -807,6 +845,9 @@
           }
       },
       allotuser(){
+          this.data1=[]
+          this.value = ''
+          this.bb = 0
            if(this.roledata.length == 0){
               this.$Message.error('请选择条目！');
           }else if(this.roledata.length > 1){
@@ -818,12 +859,60 @@
                    this.$http.get("oauth/user/searchUser?",{param:'',current:1},res=>{
                           this.searchUsertotla = res[0].total
                           this.data1 = res[0].user
-                          console.log(res[0].total)
+                           this.$http.get("oauth/group/"+this.roledata+"/user",{},res=>{
+                               for(var i=0;i<res.data.length;i++){    
+                                     this.data1.forEach (el=>{if(res.data[i].id==el.id){this.$set(el,'_checked',true)}})
+                                } 
+                            },err=>{});
                         },err=>{});
                   
                 },err=>{
                 })
           }
+      },
+      changemodal6page(i){
+          this.$http.get("oauth/user/searchUser?",{param:this.value,current:i},res=>{
+                this.searchUsertotla = res[0].total
+                this.data1 = res[0].user
+          },err=>{});
+      },
+      serachuser(){
+          this.$http.get("oauth/user/searchUser?",{param:this.value,current:1},res=>{
+              this.searchUsertotla = res[0].total
+                this.data1 = res[0].user
+                this.$http.get("oauth/group/"+this.roledata+"/user",{},res=>{
+                    for(var i=0;i<res.data.length;i++){    
+                            this.data1.forEach (el=>{if(res.data[i].id==el.id){this.$set(el,'_checked',true)}})
+                    } 
+                },err=>{});
+          },err=>{});
+      },
+      okallotuser(){
+          var userlistid = []
+          if(this.bb = 2&&this.userlist.length != 0){
+              this.userlist.forEach (el=>{userlistid.push(el.id)})
+          }
+           this.$http.put("oauth/group/"+this.roledata+"/user",userlistid,res=>{
+                
+            },err=>{});
+      },
+      okuser(){
+          if(this.treevalue == 1){
+              this.$http.put("oauth/group/"+this.roledata+"/authority/menu",this.treelist,res=>{
+                 if(res.rel == true){
+                        this.$Message.info('分配权限成功！');
+                        this.$http.get("oauth/group/all",{},res=>{
+                        this.rolelist = res.data
+                        this.roledata = []
+                        },err=>{});
+                 }
+            },err=>{});
+          }
+      },
+      treechange(val){
+          this.treevalue = 1
+          var list = val
+          list.forEach (el=>{this.treelist.push(el.id)})
       }
     }
   }

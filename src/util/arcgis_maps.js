@@ -40,17 +40,18 @@ export default {
     methods: {
         init() {
             // 加载js;
-            loadScript({
-                url: 'https://js.arcgis.com/3.22/',
-                dojoConfig: {
-                    async: true
-                }
-            });
+            // loadScript({
+            //     // url: 'https://js.arcgis.com/3.22/',
+            //     dojoConfig: {
+            //         async: true
+            //     }
+            // });
             // 加载css;
-            loadCss('https://js.arcgis.com/3.22/esri/css/esri.css');
+            // loadCss('https://js.arcgis.com/3.22/esri/css/esri.css');
             // 加载模块
             loadModules([
                 'esri/map',
+                'esri/basemaps',
                 'esri/layers/TiledMapServiceLayer',
                 'esri/SpatialReference',
                 'esri/geometry/Extent',
@@ -62,13 +63,14 @@ export default {
                 'esri/layers/GraphicsLayer',
                 "esri/symbols/SimpleMarkerSymbol",
             ], {
-                url: 'https://js.arcgis.com/3.22/',
+                // url: 'https://js.arcgis.com/3.22/',
             }).then(this.TDTinstance)
                 .then(this.initMap);
         },
         TDTinstance(
             [
                 Map,
+                basemaps,
                 TiledMapServiceLayer,
                 SpatialReference,
                 Extent,
@@ -103,6 +105,7 @@ export default {
             });
             return {
                 Map,
+                basemaps,
                 TiledMapServiceLayer,
                 SpatialReference,
                 Extent,
@@ -116,12 +119,12 @@ export default {
             };
         },
         initMap(obj) {
-            obj.basemaps.delorme = {baseMapLayers: [{url: "http://100.16.3.40:6080/arcgis/rest/services/wuhann/MapServer"}]}
+            // obj.basemaps.delorme = {baseMapLayers: [{url: "http://100.16.3.40:6080/arcgis/rest/services/wuhann/MapServer"}]}
             this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
-            // let map = new obj.Map('map', {logo: false,basemap: "streets-navigation-vector",});// 创建地图实例
-            let map = new obj.Map('map', {logo: false,basemap: "delorme",},);
-            let pt = new obj.Point(114.197099, 30.535668); // 设置中心点
-            map.centerAndZoom(pt,8); // 设置中心点和缩放级别;
+            let map = new obj.Map('map', {logo: false,basemap: "streets-navigation-vector",});// 创建地图实例
+            // let map = new obj.Map('map', {logo: false,basemap: "delorme",},);
+            let pt = new obj.Point(114.420148, 30.474698); // 设置中心点
+            map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
             let img = new TDT('img'); // 影像
             let cia = new TDT('cia');//路网
             map.addLayer(img); // 将图层添加到map对象
