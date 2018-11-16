@@ -5,6 +5,9 @@ import personmanage from '@/views/personmanage.vue'
 import safemanage from '@/views/safemanage.vue'
 import operation from '@/views/operation.vue'
 import personmanagedetail from '@/subpage/personmanagedetail.vue'
+import book from '@/subpage/book.vue'
+import role from '@/subpage/role.vue'
+import menu from '@/subpage/menu.vue'
 import log from '@/views/log.vue'
 import system from '@/views/system.vue'
 import iView from 'iview'
@@ -48,7 +51,24 @@ const router = new Router({
     {
       path: '/system',
       name: 'system',
-      component: system
+      component: system,
+      children: [  //这里就是二级路由的配置
+        {
+          path: '/system/book',
+          name: 'book',
+          component: book
+        },
+        {
+          path: '/system/role',
+          name: 'role',
+          component: role
+        },
+        {
+          path: '/system/menu',
+          name: 'menus',
+          component: menu
+        }
+      ]
     }
   ]
 })

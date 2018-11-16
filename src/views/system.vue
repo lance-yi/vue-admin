@@ -16,15 +16,17 @@
                 <Page :total='total' show-total style="margin-top:10px" :current.sync="pages" @on-change="changeliebiaopage" v-if="showpage"></Page>
             </Tab-pane>
             <Tab-pane label="字典配置" key="key2" name="字典配置">
-                 <div style="padding:0 20px;text-align:left" >
-                      <!-- <button   class="zhuanyixuke" >修改</button> -->
+                 
+                 <!-- <div style="padding:0 20px;text-align:left" >
                       <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" @click="addbook">新增</button>
                       <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" @click="detele">删除</button>
                  <i-table border stripe :columns="wordbookhead" :data="wordbookdata" id="wordbook" @on-selection-change="checkbookchange"></i-table>
-                 </div>
+                 </div> -->
+                 <router-view></router-view>
             </Tab-pane>
              <Tab-pane label="角色管理" key="key3" name="角色管理">
-                 <div style="padding:0 20px;text-align:left" >
+                 <router-view></router-view>
+                 <!-- <div style="padding:0 20px;text-align:left" >
                   
                   <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" @click="addrole">新增</button>
                   <button   class="zhuanyixuke" @click="changerole">修改</button>
@@ -47,10 +49,21 @@
                            <i-table border  :columns="roletablehead" :data="roletabledata" id="wordbook" @on-selection-change="checkbookchange"></i-table>
                        </Col>
                       </Row>
-                 </div>
+                 </div> -->
             </Tab-pane>
             <Tab-pane label="菜单管理" key="key4" name="菜单管理">
-                
+                <router-view></router-view>
+                <!-- <div style="padding:0 20px;text-align:left" >
+                <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" >新增</button>
+                <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" >删除</button>
+                </div>
+                <tree-grid 
+                :items='data' 
+                :columns='columns'
+                @on-row-click='rowClick'
+                @on-selection-change='selectionClick'
+                @on-sort-change='sortClick'
+            ></tree-grid> -->
             </Tab-pane>
         </Tabs>
         <div id="personbox">
@@ -227,11 +240,11 @@
     </div>
 </template>
 <script>
-// import TreeGrid from '@/components/TreeGrid'
+import TreeGrid from '@/components/treeGrid2.0'
   export default {
     name: 'system',
     components: {
-        // TreeGrid
+        TreeGrid
     },
     data () {
         const pwdCheckValidate = (rule, value, callback) => {
@@ -244,6 +257,87 @@
             }
         };
       return {
+          columns: [{
+                    type: 'selection',
+                    width: '50',
+                }, {
+                    title: '标题',
+                    key: 'title',
+                    sortable: true,
+                    width: '100',
+                }, {
+                    title: '父节点',
+                    key: 'parentId',
+                    width: '100',
+                }, {
+                    title: '图标名称',
+                    key: 'icon',
+                    width: '80',
+                }, {
+                    title: '排序编号',
+                    key: 'id',
+                    width: '80',
+                }, {
+                    title: '描述',
+                    key: 'href',
+                    width: '100',
+                }, {
+                    title: '编码',
+                    key: 'code',
+                    width: '80',
+                }, {
+                    title: '路径',
+                    key: 'path',
+                    width: '80',
+                },{
+                    title: '操作',
+                    type: 'action',
+                    actions: [{
+                        type: 'primary',
+                        text: '编辑'
+                    }],
+                    width: '80',
+                }],
+                // data: [{
+                //     id: '1',
+                //     code: '0001',
+                //     name: '测试数据1',
+                //     status: '启用',
+                //     remark: '测试数据测试数据',
+                //     _checked: true
+                // }, {
+                //     id: '2',
+                //     code: '0002',
+                //     name: '测试数据2',
+                //     status: '启用',
+                //     remark: '测试数据测试数据',
+                //     children: [{
+                //         id: '01',
+                //         code: '00001',
+                //         name: '测试数据01',
+                //         status: '启用',
+                //         remark: '测试数据测试数据',
+                //     }, {
+                //         id: '02',
+                //         code: '00002',
+                //         name: '测试数据02',
+                //         status: '启用',
+                //         remark: '测试数据测试数据',
+                //     }]
+                // }, {
+                //     id: '3',
+                //     code: '0003',
+                //     name: '测试数据3',
+                //     status: '启用',
+                //     remark: '测试数据测试数据'
+                // }, {
+                //     id: '4',
+                //     code: '0004',
+                //     name: '测试数据4',
+                //     status: '启用',
+                //     remark: '测试数据测试数据'
+                // }],
+          data:[],  
           data1:[],
           columns1:[
               {type: 'selection',width: 60,align: 'center',},
@@ -490,11 +584,9 @@
     methods: {
       wordbook(name){
          if(name == '字典配置'){
-            this.$http.get("oauth/dict/select",{},res=>{
-             this.wordbookdata = res.data
-             this.showpage = false
-            },err=>{});
+            this.$router.push({path:'/system/book'})
          }else if(name == '人员配置'){
+             this.$router.push({path:'/system'})
              this.pages = 1
              this.$http.get("oauth/user/searchUser",{param:'',current: 1},res=>{
                  this.persondata = res[0].user
@@ -502,9 +594,15 @@
             //  console.log(res[0].user)
             },err=>{});
          }else if(name == '角色管理'){
-             this.$http.get("oauth/group/all",{},res=>{
-              this.rolelist = res.data
-            },err=>{});
+             this.$router.push({path:'/system/role'})
+            //  this.$http.get("oauth/group/all",{},res=>{
+            //   this.rolelist = res.data
+            // },err=>{});
+         }else if(name == '菜单管理'){
+             this.$router.push({path:'/system/menu'})
+            //  this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
+            //       this.data = res.data      
+            //  },err=>{});
          }
       },
       checkbook(list){
@@ -913,7 +1011,19 @@
           this.treevalue = 1
           var list = val
           list.forEach (el=>{this.treelist.push(el.id)})
-      }
+      },
+      rowClick(data, index, event) {
+                console.log('当前行数据:' + data)
+                console.log('点击行号:' + index)
+                console.log('点击事件:' + event)
+            },
+            selectionClick(arr) {
+                console.log('选中数据id数组:' + arr)
+            },
+            sortClick(key, type) {
+                console.log('排序字段:' + key)
+                console.log('排序规则:' + type)
+            }
     }
   }
 </script>
@@ -964,5 +1074,8 @@
 .ivu-checkbox-wrapper + span, .ivu-checkbox + span{
     margin-right: 0px;
 }
-
+ivu-icon ivu-icon-plus-circled{
+    width: 12px;
+    height: 12px;
+}
 </style>

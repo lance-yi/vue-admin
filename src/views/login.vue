@@ -78,6 +78,7 @@ export default {
           }).then(res=>{
             localStorage.setItem('token',res.data.token);
             // this.$router.push({path: '/personmanage'})
+             
             this.$http.get("oauth/userfront/currentUser",{},response=>{
               // console.log(response.data)
               this.$store.commit("userSignin",response.data);

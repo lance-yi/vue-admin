@@ -82,6 +82,11 @@ export default {
           icon: require('../../public/img/sz.png'), 
           _show: true, 
           children:[
+            // {
+            //   title: "测试11",
+            //   icon: '',
+            //   _show: false
+            // }
           ]
         }
       ]
@@ -93,6 +98,12 @@ export default {
     })
   },
   mounted() {
+    if(localStorage.getItem('token')){
+       this.$http.get("oauth/menu/user/system",{},response=>{
+            
+            });
+    }
+    
     // this.asyncList(17)
   },
   methods: {
