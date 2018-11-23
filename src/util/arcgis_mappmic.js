@@ -3,7 +3,7 @@ import { loadScript, loadCss, loadModules } from 'esri-loader';
 import tileInfo from './tileInfo';
 
 export default {
-    name: 'ArcgisMaps',
+    name: 'ArcgisMap',
     props: {propsmap:{type:String},
     maptime:{type:String}
     },
@@ -14,6 +14,7 @@ export default {
             mapObj: {},
             point:[],
             centerlist:'',
+            oldtime:'',
         };
     },
     mounted() {
@@ -29,9 +30,10 @@ export default {
                 this.timers(30)
             }
         }else{
-            this.timers(2)
+            // this.timers(2)
         }
-        // console.log(this.propsmap)
+        // console.log(localStorage.getItem('breaktime'))
+        // console.log(this.maptime)
         
     },
     watch:{
@@ -39,7 +41,7 @@ export default {
           handler: function(val,odlval) {
               var that = this
               this.centerlist = val
-            this.$http.get("res/socGateway/getGatewayByInstallOrCrossVillage?",{param:this.centerlist},res=>{
+            this.$http.get("res/socElectrical/selectElectricByCondition?",{param:this.centerlist},res=>{
                     if(res.data.length>0){
                         var pt = new that.mapObj.Point(res.data[0].longitude, res.data[0].latitude); // 设置中心点
                         that.mapObj.map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
@@ -48,8 +50,6 @@ export default {
                     }
                 },err=>{
                 })
-            
-   
           },
           deep:true
         },
@@ -79,12 +79,14 @@ export default {
             // 加载js;
             // loadScript({
             //     // url: 'https://js.arcgis.com/3.22/',
-            //     dojoConfig: {
-            //         async: true
-            //     }
+            //     // url: '../arcgis_js_v322_api/arcgis_js_api/library/3.22/3.22/init.js',
+            //     // dojoConfig: {
+            //     //     async: true
+            //     // }
             // });
             // 加载css;
-            // loadCss('https://js.arcgis.com/3.22/esri/css/esri.css');
+            // loadCss('http://192.168.8.180:8770/arcgis_js_v322_api/arcgis_js_api/library/3.22/3.22/esri/css/esri.css');
+            // loadCss('./arcgis_js_v322_api/arcgis_js_api/library/3.22/3.22/esri/css/esri.css');
             // 加载模块
             loadModules([
                 'esri/map',
@@ -121,7 +123,6 @@ export default {
             ]
         ) {
             dojo.declare('TDT', TiledMapServiceLayer, {
-
                 constructor(maptype) {
                     this._maptype = maptype;
                     this.spatialReference = new SpatialReference({wkid: 4326});
@@ -158,7 +159,7 @@ export default {
         initMap(obj) {
             // obj.basemaps.delorme = {baseMapLayers: [{url: "http://100.16.3.40:6080/arcgis/rest/services/wuhann/MapServer"}]}
             this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
-            let map = new obj.Map('map', {logo: false,basemap: "streets-navigation-vector",});// 创建地图实例
+            let map = new obj.Map('map', {logo: false,basemap: "streets-navigation-vector",},);// 创建地图实例
             // let map = new obj.Map('map', {logo: false,basemap: "delorme",},);
             let pt = new obj.Point(114.420148, 30.474698); // 设置中心点
             map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
@@ -168,19 +169,16 @@ export default {
             map.addLayer(cia);
             this.mapObj.map = map;
             
-            this.$http.get("gis/gis/getLalontude",{requestModular:2},res=>{
+            this.$http.get("res/socElectrical/selectElectricByCondition",{},res=>{
                 // console.log(res.data)
                 this.point = res.data
                 var that = this
                 this.point.forEach (el=>{ 
-                    if(el.isAlert == 1){
+                    if(el.alertStatus == 0){
                         that.createCircle(el)
-                    }else if(el.isAlert == 2){
-                        that.createCircless(el)
-                    }else if(el.isAlert == 0){
+                    }else if(el.alertStatus == 1){
                         that.createCircles(el)
                     }
-                    // that.createCircle(el)
                 })
               },err=>{
               })
@@ -188,15 +186,15 @@ export default {
         },
         createCircle(el) {
             var that = this
-            let gl = new this.mapObj.GraphicsLayer({id:el.gatewayId});
+            let gl = new this.mapObj.GraphicsLayer({id:el.id});
             this.mapObj.map.addLayer(gl);
             var labelPoint=new esri.geometry.Point(el.longitude,el.latitude);
             var labelSymbol =  new esri.symbol.PictureMarkerSymbol({
-                url:require('../../public/img/bbb.png'),
-                "height":20,
-                "width":20,
+                url:require('../../public/img/erro.png'),
+                "height":17,
+                "width":44,
                 "type":"esriPMS",
-                "angle": -30,
+                "angle": 0,
               });
             // var labelSymbol=new esri.symbol.SimpleMarkerSymbol();
             var labelGraphic=new this.mapObj.Graphic(labelPoint,labelSymbol);
@@ -212,15 +210,15 @@ export default {
         },
         createCircles(el) {
             var that = this
-            let gl = new this.mapObj.GraphicsLayer({id:el.gatewayId});
+            let gl = new this.mapObj.GraphicsLayer({id:el.id});
             this.mapObj.map.addLayer(gl);
             var labelPoint=new esri.geometry.Point(el.longitude,el.latitude);
             var labelSymbol =  new esri.symbol.PictureMarkerSymbol({
-                url:require('../../public/img/ccc.png'),
-                "height":20,
-                "width":20,
+                url:require('../../public/img/zc.png'),
+                "height":17,
+                "width":44,
                 "type":"esriPMS",
-                "angle": -30,
+                "angle": 0,
               });
             // var labelSymbol=new esri.symbol.SimpleMarkerSymbol();
             var labelGraphic=new this.mapObj.Graphic(labelPoint,labelSymbol);
@@ -230,27 +228,6 @@ export default {
             gl.onClick = function(evt){
                 that.$emit('ip',el.gatewayId)
                 }
-        },
-        createCircless(el) {
-            var that = this
-            let gl = new this.mapObj.GraphicsLayer({id:el.gatewayId});
-            this.mapObj.map.addLayer(gl);
-            var labelPoint=new esri.geometry.Point(el.longitude,el.latitude);
-            var labelSymbol =  new esri.symbol.PictureMarkerSymbol({
-                url:require('../../public/img/aaa.png'),
-                "height":20,
-                "width":20,
-                "type":"esriPMS",
-                "angle": -30,
-              });
-            // var labelSymbol=new esri.symbol.SimpleMarkerSymbol();
-            var labelGraphic=new this.mapObj.Graphic(labelPoint,labelSymbol);
-
-            //添加到地图 
-            gl.add(labelGraphic);
-            gl.onClick = function(evt){
-            that.$emit('ip',el.gatewayId)
-            }
         },
         
     }

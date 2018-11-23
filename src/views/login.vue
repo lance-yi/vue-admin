@@ -82,7 +82,13 @@ export default {
             this.$http.get("oauth/userfront/currentUser",{},response=>{
               // console.log(response.data)
               this.$store.commit("userSignin",response.data);
-              this.$router.push({path: '/safemanage'})
+              // this.$router.push({path: '/safemanage'})
+              this.$http.get("oauth/menu/user/system",{},response=>{
+                // console.log(response.data)
+                 localStorage.setItem('navlist',JSON.stringify(response.data))
+                this.$router.push({path:response.data[0].path})
+               });
+
             });
           })
         } else {

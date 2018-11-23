@@ -1,12 +1,20 @@
 <template>
   <div @click="showno">
-
-    <div style="position:absolute;top:90px;left:50%;z-index:99">
+          <div style="position:absolute;top:90px;left:30%;z-index:99">
+                <i-button type="primary" class="sure" @click.stop="breaktime" style="border-radius:4px" v-if="hadtime">刷新</i-button>
+                <div @click.stop="breaktime">
+                <Select v-model="model1" style="width:100px" v-if="!hadtime">
+                    <Option v-for="item in timeList" :value="item.value" :key="item.value" >{{ item.label }}</Option>
+                </Select>
+                </div>
+            </div>
+            <div style="position:absolute;top:90px;left:50%;z-index:99">
                 <i-input  v-model="serachvalue" placeholder="安装地址、路口名称" style="width: 200px" class="sousuo"></i-input>
                 <i-button type="primary" class="sure" @click="serachroad">搜索</i-button>
             </div>
-        <ArcgisMap  @ip="ip" :propsmap='serachvalues' />
-        <div class="rightdialog">
+        <ArcgisMap  @ip="ip" :propsmap='serachvalues' :maptime='model1'/>
+        <img src="../../public/img/bigobj.png" :class="rightdialogshow?'iconobj':'iconobjs'" @click.stop="showrightdialog()"/>
+        <div class="rightdialog" v-if="rightdialogshow">
             <div @click.stop="statusclick(0)">
               <img src="../../public/img/xx.png"/>
               <span>运行严重故障：</span>
@@ -148,15 +156,15 @@
                   <div class="detail-textbox" v-if="rightlist">
                       <p>安装地址：<span style="color:#1D60FE">{{rightlist.installAddress}}</span></p>
                       <div>
-                        <span style="min-width:200px;width:50%">设备IP：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkdevicelist(rightlist.poleNo)">{{rightlist.gatewayIp}}</span></span>
+                        <span style="min-width:180px;width:50%">设备IP：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkdevicelist(rightlist.poleNo)">{{rightlist.gatewayIp}}</span></span>
                         <span style="margin-right:0">立杆号：<span style="color:#1D60FE">{{rightlist.poleNo}}</span></span>
                       </div>
                       <div>
-                        <span style="min-width:200px;width:50%">经度：<span style="color:#1D60FE">{{rightlist.longitude}}</span></span>
+                        <span style="min-width:180px;width:50%">经度：<span style="color:#1D60FE">{{rightlist.longitude}}</span></span>
                         <span style="margin-right:0">纬度：<span style="color:#1D60FE">{{rightlist.latitude}}</span></span>
                       </div>
                       <div>
-                        <span style="min-width:197px;width:50%;margin-right:0">mac地址：<span style="color:#1D60FE">{{rightlist.mac}}</span></span>
+                        <span style="min-width:197px;width:50%;margin-right:0">MAC地址：<span style="color:#1D60FE">{{rightlist.mac}}</span></span>
                         <span style="margin-right:0">责任人：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkperson(rightlist.maintenanceUserId)">{{rightlist.maintenanceUser}}</span></span>
                       </div>
                       <div>
@@ -179,7 +187,7 @@
                   <p>终端模式：<span style="color:#1D60FE">{{type}}</span></p>
                   <div>
                         <span style="min-width:430px">已使用端口：<span style="color:#1D60FE">{{typelist.usedPort}}</span></span>
-                        <span>未使用端口：<span style="color:#1D60FE">{{typelist.notUsedPort}}</span></span>
+                        <!-- <span>未使用端口：<span style="color:#1D60FE">{{typelist.notUsedPort}}</span></span> -->
                         <button   class="zhuanyixuke typechange" @click="typeswitch">模式切换</button>
                   </div>
                 </div>
@@ -1039,6 +1047,24 @@ export default {
   },
   data() {
     return {
+      timer:null,
+      mintime:60000,
+      hadtime:true,
+      model1:'两分钟',
+      timeList:[{
+                  value: '两分钟',
+                  label: '两分钟'
+              },{
+                  value: '五分钟',
+                  label: '五分钟'
+              },{
+                  value: '十分钟',
+                  label: '十分钟'
+              },{
+                  value: '半小时',
+                  label: '半小时'
+              },],
+      rightdialogshow:true,
       checcklabel:false,
       datades:{},
       collegeIndex:'1',
@@ -1131,11 +1157,15 @@ export default {
       data2: []
     };
   },
-
+beforeDestroy() {
+    if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
+        clearInterval(this.timer); //关闭
+    }
+},
   mounted() {
     // this.drawLine();
-    this.drawLines();
-    this.$http.get(
+    // this.drawLines();
+         this.$http.get(
       "alert/warning/getAlertStatistics",
       {workType:'安全事件',requestModular:1},
       res => {
@@ -1143,6 +1173,24 @@ export default {
       },
       err => {}
     );
+    if(localStorage.getItem('breaktime')){
+      this.model1 = localStorage.getItem('breaktime')
+      if(localStorage.getItem('breaktime') == '两分钟'){
+         this.timers(2)
+      }else if(localStorage.getItem('breaktime') == '五分钟'){
+         this.timers(5)
+      }else if(localStorage.getItem('breaktime') == '十分钟'){
+         this.timers(10)
+      }else if(localStorage.getItem('breaktime') == '半小时'){
+        this.timers(30)
+      }
+       
+    }else{
+      this.model1 = '两分钟'
+      this.timers(2)
+    }
+    
+    
     document.getElementsByClassName('detail-box')[0].addEventListener('scroll', this.handleScroll)
   },
   methods: {
@@ -1420,8 +1468,35 @@ export default {
       }
       
     },
-    
+    timers(i){
+      clearInterval(this.timer)
+      this.timer =  setInterval(() => { 
+            this.$http.get(
+              "alert/warning/getAlertStatistics",
+              {workType:'安全事件',requestModular:1},
+              res => {
+                this.statuslist = res.data;
+              },
+              err => {}
+            );
+        }, this.mintime*i)
+    },
     showno(){
+      this.hadtime = true
+      if(localStorage.getItem('breaktime') != this.model1){
+          localStorage.setItem('breaktime',this.model1);
+          if(this.model1 == '两分钟'){
+            this.timers(2)
+          }else if(this.model1 == '五分钟'){
+            this.timers(5)
+          }else if(this.model1 == '十分钟'){
+            this.timers(10)
+          }else if(this.model1 == '半小时'){
+            this.timers(30)
+          }
+      }else{
+        localStorage.setItem('breaktime',this.model1);
+      }
       this.statusdata = false
       if(this.bigrightshow == true){
         this.bigrightshow = false
@@ -2440,7 +2515,17 @@ export default {
         var zz=document.getElementsByClassName("statusbox")[0];
         zz.style.cssText="z-index:140";
       }
-    }
+    },
+    showrightdialog(){
+       if(this.rightdialogshow == true){
+         this.rightdialogshow = false
+       }else{
+         this.rightdialogshow = true
+       }
+    },
+    breaktime(){
+       this.hadtime = false
+    },
   }
 };
 </script>
@@ -2857,5 +2942,18 @@ export default {
   color:#F82A2A;
   font-size:16px;
 }
-
+.iconobj{
+  position: absolute;
+  top: 55px;
+  right: 260px;
+  z-index: 20;
+  cursor: pointer;
+}
+.iconobjs{
+  position: absolute;
+  top: 55px;
+  right: 0px;
+  z-index: 20;
+  cursor: pointer;
+}
 </style>

@@ -4,67 +4,27 @@
                   <p>配置服务</p>
          </div>
          <Tabs active-key="key1" @on-click="wordbook">
-            <Tab-pane label="人员配置" key="key1" name="人员配置">
-                <div style="padding:0 20px;text-align:left" >
-                      <!-- <button   class="zhuanyixuke" >修改</button> -->
+            <Tab-pane :label="list.title" key="key1" :name="list.title" v-for="(list,index) in navlist" :key="index">
+                <div style="padding:0 20px;text-align:left" v-if="list.path == '/system/userdeploy'">
                       <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" @click="addperson">新增</button>
                       <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" @click="detelepersons">删除</button>
                       <i-input  v-model="serachvalue" placeholder="" style="width: 200px;margin-left:30%" class="sousuo"></i-input>
                       <i-button type="primary" class="sure" @click="serachroad">搜索</i-button>
                  <i-table border stripe :columns="persondatahead" :data="persondata" id="wordbook" @on-selection-change="checkpersonchange"></i-table>
                 </div>
-                <Page :total='total' show-total style="margin-top:10px" :current.sync="pages" @on-change="changeliebiaopage" v-if="showpage"></Page>
+                <Page :total='total' show-total style="margin-top:10px" :current.sync="pages" @on-change="changeliebiaopage" v-if="list.path == '/system/userdeploy'"></Page>
+                <router-view v-if="bookname == list.title"></router-view>
             </Tab-pane>
-            <Tab-pane label="字典配置" key="key2" name="字典配置">
-                 
-                 <!-- <div style="padding:0 20px;text-align:left" >
-                      <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" @click="addbook">新增</button>
-                      <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" @click="detele">删除</button>
-                 <i-table border stripe :columns="wordbookhead" :data="wordbookdata" id="wordbook" @on-selection-change="checkbookchange"></i-table>
-                 </div> -->
-                 <router-view></router-view>
+            <!-- <Tab-pane label="字典配置" key="key2" name="字典配置">
+
+                 <router-view v-if="bookname == '字典配置'"></router-view>
             </Tab-pane>
              <Tab-pane label="角色管理" key="key3" name="角色管理">
-                 <router-view></router-view>
-                 <!-- <div style="padding:0 20px;text-align:left" >
-                  
-                  <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" @click="addrole">新增</button>
-                  <button   class="zhuanyixuke" @click="changerole">修改</button>
-                  <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" @click="detelerole">删除</button>
-                   <button   class="zhuanyixukes" @click="power">分配权限</button>
-                  <button   class="zhuanyixukes" @click="allotuser">分配用户</button>
-                      <Row>
-                       <Col span="7" style="margin-right: 20px;">
-                           <div class="head-left">角色管理</div>
-                            <CheckboxGroup v-model="roledata">
-                                <div  v-for="(list,index) in rolelist" :key="index">
-                                <Checkbox :label="list.id" class="pointbox">
-                                    <span > </span>
-                                </Checkbox>
-                                <span :class="index == colornum?'rolespans':'rolespan'" @click="checkrole(list,index)">{{list.name}}</span>
-                                </div>
-                            </CheckboxGroup>
-                       </Col>
-                        <Col span="16">
-                           <i-table border  :columns="roletablehead" :data="roletabledata" id="wordbook" @on-selection-change="checkbookchange"></i-table>
-                       </Col>
-                      </Row>
-                 </div> -->
+                 <router-view v-if="bookname == '角色管理'"></router-view>
             </Tab-pane>
             <Tab-pane label="菜单管理" key="key4" name="菜单管理">
-                <router-view></router-view>
-                <!-- <div style="padding:0 20px;text-align:left" >
-                <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" >新增</button>
-                <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" >删除</button>
-                </div>
-                <tree-grid 
-                :items='data' 
-                :columns='columns'
-                @on-row-click='rowClick'
-                @on-selection-change='selectionClick'
-                @on-sort-change='sortClick'
-            ></tree-grid> -->
-            </Tab-pane>
+                <router-view v-if="bookname == '菜单管理'"></router-view>
+            </Tab-pane> -->
         </Tabs>
         <div id="personbox">
         <Modal
@@ -569,20 +529,28 @@ import TreeGrid from '@/components/treeGrid2.0'
           personolddata:[],
           chenckname:'人员配置',
           passid:'',
+          bookname:'',
+          navlist:[],
       }
     },
     created(){
     },
     mounted(){
-       this.personolddata = this.formpersondate
-       this.$http.get("oauth/user/searchUser",{param:'',current: 1},res=>{
-                 this.persondata = res[0].user
-                 this.total = res[0].total
-            //  console.log(res[0].user)
+    //    this.personolddata = this.formpersondate
+    //    this.$http.get("oauth/user/searchUser",{param:'',current: 1},res=>{
+    //              this.persondata = res[0].user
+    //              this.total = res[0].total
+    //         //  console.log(res[0].user)
+    //         },err=>{});
+    this.$http.get("oauth/menu/menuTreeByPath?path=/system",{},res=>{
+                this.navlist = res.data
+                this.$router.push({path:res.data[0].path})
+                this.bookname = res.data[0].title
             },err=>{});
     },
     methods: {
       wordbook(name){
+         this.bookname = name
          if(name == '字典配置'){
             this.$router.push({path:'/system/book'})
          }else if(name == '人员配置'){

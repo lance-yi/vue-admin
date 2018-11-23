@@ -1,12 +1,20 @@
 <template>
   <div @click="showno">
-
+    <div style="position:absolute;top:90px;left:30%;z-index:99">
+        <i-button type="primary" class="sure" @click.stop="breaktime" style="border-radius:4px" v-if="hadtime">刷新</i-button>
+        <div @click.stop="breaktime">
+        <Select v-model="model1" style="width:100px" v-if="!hadtime">
+            <Option v-for="item in timeList" :value="item.value" :key="item.value" >{{ item.label }}</Option>
+        </Select>
+        </div>
+    </div>
     <div style="position:absolute;top:90px;left:50%;z-index:99">
                 <i-input  v-model="serachvalue" placeholder="安装地址、路口名称" style="width: 200px" class="sousuo"></i-input>
                 <i-button type="primary" class="sure" @click="serachroad">搜索</i-button>
             </div>
-        <ArcgisMaps  @ip="ip" :propsmap='serachvalues' />
-        <div class="rightdialog">
+        <ArcgisMaps  @ip="ip" :propsmap='serachvalues' :maptime='model1'/>
+        <img src="../../public/img/bigobj.png" :class="rightdialogshow?'iconobj':'iconobjs'" @click.stop="showrightdialog()"/>
+        <div class="rightdialog" v-if="rightdialogshow">
             <div @click.stop="statusclick(0)">
               <img src="../../public/img/xx.png"/>
               <span>运行严重故障：</span>
@@ -371,7 +379,9 @@
                       <p style="margin-top:10px">项目名称：<span style="color:#1D60FE">{{rightlist.projectName}}</span></p>
                       <div>
                         <span style="min-width:180px;width:50%">立杆号：<span style="color:#1D60FE">{{rightlist.poleNo}}</span></span>
-                        <span style="margin-right:0">WIFI状态：<span style="color:#1D60FE">{{rightlist2.wifiState}}</span></span>
+                        <span style="margin-right:0">WIFI状态：<span style="color:#1D60FE" v-if="rightlist2.wifiState == 1">关闭</span>
+                        <span style="color:#1D60FE" v-if="rightlist2.wifiState == 0">打开</span>
+                        </span>
                         
                       </div>
                       <div>
@@ -393,7 +403,7 @@
                         <span style="margin-right:0">纬度：<span style="color:#1D60FE">{{rightlist.latitude}}</span></span>
                       </div>
                       <div>
-                        <span style="min-width:200px;width:50%">mac地址：<span style="color:#1D60FE">{{rightlist.mac}}</span></span>
+                        <span style="min-width:200px;width:50%">MAC地址：<span style="color:#1D60FE">{{rightlist.mac}}</span></span>
                         <span style="margin-right:0">责任人：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkperson(rightlist.maintenanceUserId)">{{rightlist.maintenanceUser}}</span></span>
                       </div>
                       <div style="width:100%">
@@ -1102,6 +1112,7 @@ export default {
   },
   data() {
     return {
+      rightdialogshow:true,
       checcklabel:false,
       timelinelists:[],
       rightlist2:[],
@@ -1308,10 +1319,31 @@ export default {
                     }
                   }
                 ],
-      data1: []
+      data1: [],
+      model1:'两分钟',
+      hadtime:true,
+      mintime:60000,
+      timer:null,
+       timeList:[{
+                  value: '两分钟',
+                  label: '两分钟'
+              },{
+                  value: '五分钟',
+                  label: '五分钟'
+              },{
+                  value: '十分钟',
+                  label: '十分钟'
+              },{
+                  value: '半小时',
+                  label: '半小时'
+              },],
     };
   },
-
+  beforeDestroy() {
+    if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
+        clearInterval(this.timer); //关闭
+    }
+},
   mounted() {
     // this.drawLine();
     // this.drawLines();
@@ -1320,6 +1352,23 @@ export default {
       },
       err => {}
     );
+
+    if(localStorage.getItem('breaktime')){
+      this.model1 = localStorage.getItem('breaktime')
+      if(localStorage.getItem('breaktime') == '两分钟'){
+         this.timers(2)
+      }else if(localStorage.getItem('breaktime') == '五分钟'){
+         this.timers(5)
+      }else if(localStorage.getItem('breaktime') == '十分钟'){
+         this.timers(10)
+      }else if(localStorage.getItem('breaktime') == '半小时'){
+        this.timers(30)
+      }
+       
+    }else{
+      this.model1 = '两分钟'
+      this.timers(2)
+    }
     
   },
   methods: {
@@ -1384,69 +1433,69 @@ export default {
 			    	name:'时间',
 			    	type:'time',
             data: [],
-    },
-    title: {
-        subtext: "网络状况"
-    },
-    tooltip: {
-        trigger: "axis",
-        showDelay: 0,
-        axisPointer: {
-            type: "cross",
-            lineStyle: {
-                type: "dashed",
-                width: 1
+        },
+        title: {
+            subtext: "网络状况"
+        },
+        tooltip: {
+            trigger: "axis",
+            showDelay: 0,
+            axisPointer: {
+                type: "cross",
+                lineStyle: {
+                    type: "dashed",
+                    width: 1
+                }
             }
-        }
-    },
-    grid:{
-      left:55
-    },
-    yAxis: {
-        type: 'value',
-          scale: false,
-            min: 0,
-            max: 1,
-            splitNumber: 1,
-            margin: 20,
-            axisTick: {
-                length: 0,
-                inside: true,
-                interval: 0,
-                show: false
-            },
-            
-            axisLabel: {
-                formatter: function (value) {
-                  var texts = [];
-                  if(value==0){
-                  texts.push('在线');
-                  }
-                  else if (value ==1) {
-                  texts.push('离线');
-                  }
-                  return texts;
-                  },
-                textStyle: {
-                    color: "#333"
+        },
+        grid:{
+          left:55
+        },
+        yAxis: {
+            type: 'value',
+              scale: false,
+                min: 0,
+                max: 1,
+                splitNumber: 1,
+                margin: 20,
+                axisTick: {
+                    length: 0,
+                    inside: true,
+                    interval: 0,
+                    show: false
                 },
-                margin: 5
-            }
-    },
-    series: [{
-        data: data,
-        symbolSize: 4,
-        type: 'scatter',
-        itemStyle:{
-					normal:{color:function(value){
-						if(value.data[1]=="0")
-							return "#8CC152";
-						else if(value.data[1]=="1")
-              return "#ED5565";
-          }}
-    },
-    }]
-        });
+                
+                axisLabel: {
+                    formatter: function (value) {
+                      var texts = [];
+                      if(value==0){
+                      texts.push('在线');
+                      }
+                      else if (value ==1) {
+                      texts.push('离线');
+                      }
+                      return texts;
+                      },
+                    textStyle: {
+                        color: "#333"
+                    },
+                    margin: 5
+                }
+        },
+        series: [{
+            data: data,
+            symbolSize: 4,
+            type: 'scatter',
+            itemStyle:{
+              normal:{color:function(value){
+                if(value.data[1]=="0")
+                  return "#8CC152";
+                else if(value.data[1]=="1")
+                  return "#ED5565";
+              }}
+        },
+        }]
+            });
     },
     statusclick(index) {
       this.statusdata = true;
@@ -1691,8 +1740,33 @@ export default {
       }
       
     },
-    
+    timers(i){
+      clearInterval(this.timer)
+      this.timer =  setInterval(() => { 
+             this.$http.get("alert/warning/getAlertStatistics",{requestModular:2,workType:'运维事件'},res => {
+                this.statuslist = res.data;
+              },
+              err => {}
+            );
+        }, this.mintime*i)
+    },
     showno(){
+      this.hadtime = true
+      if(localStorage.getItem('breaktime') != this.model1){
+          localStorage.setItem('breaktime',this.model1);
+          if(this.model1 == '两分钟'){
+            console.log(123)
+            this.timers(2)
+          }else if(this.model1 == '五分钟'){
+            this.timers(5)
+          }else if(this.model1 == '十分钟'){
+            this.timers(10)
+          }else if(this.model1 == '半小时'){
+            this.timers(30)
+          }
+      }else{
+        localStorage.setItem('breaktime',this.model1);
+      }
       this.statusdata = false
       this.statustable = false
       if(this.bigrightshow == true){
@@ -2974,7 +3048,17 @@ export default {
         var zz=document.getElementsByClassName("statusbox")[0];
         zz.style.cssText="z-index:140";
       }
-    }
+    },
+    showrightdialog(){
+       if(this.rightdialogshow == true){
+         this.rightdialogshow = false
+       }else{
+         this.rightdialogshow = true
+       }
+    },
+    breaktime(){
+       this.hadtime = false
+    },
   }
 };
 </script>
@@ -3454,5 +3538,19 @@ export default {
 .content div  #desrcspan{
   color:#F82A2A;
   font-size:16px;
+}
+.iconobj{
+  position: absolute;
+  top: 55px;
+  right: 260px;
+  z-index: 20;
+  cursor: pointer;
+}
+.iconobjs{
+  position: absolute;
+  top: 55px;
+  right: 0px;
+  z-index: 20;
+  cursor: pointer;
 }
 </style>

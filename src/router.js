@@ -9,6 +9,7 @@ import book from '@/subpage/book.vue'
 import role from '@/subpage/role.vue'
 import menu from '@/subpage/menu.vue'
 import log from '@/views/log.vue'
+import pmic from '@/views/pmic.vue'
 import system from '@/views/system.vue'
 import iView from 'iview'
 
@@ -40,13 +41,19 @@ const router = new Router({
     },
     {
       path: '/personmanagedetail',
-      name: 'personmanagedetail',
+      name: 'personmanage',
       component: personmanagedetail
     },
     {
       path: '/log',
       name: 'log',
       component: log
+    },
+    {
+      path: '/pmic',
+      name: 'pmic',
+      component: pmic
+
     },
     {
       path: '/system',

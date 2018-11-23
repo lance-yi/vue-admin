@@ -11,8 +11,8 @@
     </div>
     <div class="menu" :class="{ noSide: noSide }">
       <ul class="item">
-        <router-link tag="li" :to="x.url" v-for="(x,index) in lists" class="clearfix main-item" :key="index" :class="x.url == '/'+$route.name ? 'on' : ''"   @click.native="gotopage(x.url)">
-          <img :src="x.icon" class="icon">
+        <router-link tag="li" :to="x.path" v-for="(x,index) in lists" class="clearfix main-item" :key="index" :class="x.path == '/'+$route.name ? 'on' : ''"   @click.native="gotopage(x.path)">
+          <img :src="require('../../public/img/'+x.icon+'.png')" class="icon">
           <div class="inner">
             <a class="title" @click.stop="x._show = !x._show">
               {{ x.title }}
@@ -41,55 +41,57 @@ export default {
   },
   data(){
     return {
-      lists: [
-        {
-          url: '/safemanage',
-          title: "安全管理", 
-          icon: require('../../public/img/1.png'), 
-          _show: false, 
-          children:[
-            // {
-            //   title: "测试11",
-            //   icon: '',
-            //   _show: false
-            // }
-          ]
-        },{
-          url: '/operation',
-          title: "运维管理", 
-          icon: require('../../public/img/2.png'), 
-          _show: false, 
-          children:[]
-        },
-        {
-          url: '/personmanage',
-          title: "人员管理", 
-          icon: require('../../public/img/gl.png'), 
-          _show: false, 
-          children:[]
-        },
-        {
-          url: '/log',
-          title: "日志管理", 
-          icon: require('../../public/img/gz.png'), 
-          _show: true, 
-          children:[
-          ]
-        },
-        {
-          url: '/system',
-          title: "系统管理", 
-          icon: require('../../public/img/sz.png'), 
-          _show: true, 
-          children:[
-            // {
-            //   title: "测试11",
-            //   icon: '',
-            //   _show: false
-            // }
-          ]
-        }
-      ]
+      lists:JSON.parse(localStorage.getItem('navlist')),
+
+      // lists: [
+      //   {
+      //     url: '/safemanage',
+      //     title: "安全管理", 
+      //     icon: require('../../public/img/1.png'), 
+      //     _show: false, 
+      //     children:[
+      //       // {
+      //       //   title: "测试11",
+      //       //   icon: '',
+      //       //   _show: false
+      //       // }
+      //     ]
+      //   },{
+      //     url: '/operation',
+      //     title: "运维管理", 
+      //     icon: require('../../public/img/2.png'), 
+      //     _show: false, 
+      //     children:[]
+      //   },
+      //   {
+      //     url: '/personmanage',
+      //     title: "人员管理", 
+      //     icon: require('../../public/img/gl.png'), 
+      //     _show: false, 
+      //     children:[]
+      //   },
+      //   {
+      //     url: '/log',
+      //     title: "日志管理", 
+      //     icon: require('../../public/img/gz.png'), 
+      //     _show: true, 
+      //     children:[
+      //     ]
+      //   },
+      //   {
+      //     url: '/system',
+      //     title: "系统管理", 
+      //     icon: require('../../public/img/sz.png'), 
+      //     _show: true, 
+      //     children:[
+      //       // {
+      //       //   title: "测试11",
+      //       //   icon: '',
+      //       //   _show: false
+      //       // }
+      //     ]
+      //   }
+      // ]
     }
   },
   computed:{
@@ -98,13 +100,8 @@ export default {
     })
   },
   mounted() {
-    if(localStorage.getItem('token')){
-       this.$http.get("oauth/menu/user/system",{},response=>{
-            
-            });
-    }
-    
-    // this.asyncList(17)
+    // console.log(this.$route.name)
+
   },
   methods: {
     changeSide(bl){

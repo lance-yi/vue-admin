@@ -4,9 +4,13 @@ import tileInfo from './tileInfo';
 
 export default {
     name: 'ArcgisMap',
-    props: {propsmap:{type:String}},
+    props: {propsmap:{type:String},
+    maptime:{type:String}
+    },
     data() {
         return {
+            timer:null,
+            mintime:60000,
             mapObj: {},
             point:[],
             centerlist:'',
@@ -15,7 +19,21 @@ export default {
     },
     mounted() {
         this.init();
-        // console.log(this.propsmap)
+        if(localStorage.getItem('breaktime')){
+            if(localStorage.getItem('breaktime') == '两分钟'){
+               this.timers(2)
+            }else if(localStorage.getItem('breaktime') == '五分钟'){
+                this.timers(5)
+            }else if(localStorage.getItem('breaktime') == '十分钟'){
+                this.timers(10)
+            }else if(localStorage.getItem('breaktime') == '半小时'){
+                this.timers(30)
+            }
+        }else{
+            this.timers(2)
+        }
+        // console.log(localStorage.getItem('breaktime'))
+        // console.log(this.maptime)
         
     },
     watch:{
@@ -26,19 +44,37 @@ export default {
             this.$http.get("res/socGateway/getGatewayByInstallOrCrossVillage?",{param:this.centerlist},res=>{
                     if(res.data.length>0){
                         var pt = new that.mapObj.Point(res.data[0].longitude, res.data[0].latitude); // 设置中心点
-                        that.mapObj.map.centerAndZoom(pt,8); // 设置中心点和缩放级别;
+                        that.mapObj.map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
                     }else{
                         this.$Message.info('没有找到您要搜索的东西');
                     }
                 },err=>{
                 })
-            
-   
           },
           deep:true
+        },
+        maptime:{
+             handler: function(val,odlval) {
+                //  console.log(val)
+                 if(val == '两分钟'){
+                    this.timers(2)
+                    }else if(val == '五分钟'){
+                        this.timers(5)
+                    }else if(val == '十分钟'){
+                        this.timers(10)
+                    }else if(val == '半小时'){
+                        this.timers(30)
+                    }
+             }
         }
       },
     methods: {
+        timers(i){
+            clearInterval(this.timer)
+            this.timer =  setInterval(() => { 
+                    this.init();
+                }, this.mintime*i)
+        },
         init() {
             // 加载js;
             // loadScript({

@@ -2,7 +2,7 @@
     <div >
        <div style="padding:0 20px;text-align:left" >
             <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" @click="addmenu">新增</button>
-            <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" >删除</button>
+            <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" @click="deletemenu">删除</button>
         </div>
         <tree-grid 
             :items='data' 
@@ -11,6 +11,7 @@
             @on-selection-change='selectionClick'
             @on-sort-change='sortClick'
         ></tree-grid> 
+        <div style="height:20px"></div>
        
        <Modal
         v-model="modal1"
@@ -65,7 +66,7 @@ import TreeGrid from '@/components/treeGrid2.0'
                     icon:'',
                     sort:'',
                     description:'',
-                    code:'',
+                    id:'',
                     href:'',
           },
           ruleValidate: {
@@ -75,12 +76,12 @@ import TreeGrid from '@/components/treeGrid2.0'
                 parentId: [
                     { required: true, message: '父节点不能为空', trigger: 'blur' }
                 ],
-                icon: [
-                    { required: true, message: '图标不能为空', trigger: 'blur' }
-                ],
-                sort: [
-                    { required: true, message: '排序不能为空', trigger: 'blur' }
-                ],
+                // icon: [
+                //     { required: true, message: '图标不能为空', trigger: 'blur' }
+                // ],
+                // sort: [
+                //     { required: true, message: '排序不能为空', trigger: 'blur' }
+                // ],
                 description: [
                     { required: true, message: '描述不能为空', trigger: 'blur' }
                 ],
@@ -96,24 +97,24 @@ import TreeGrid from '@/components/treeGrid2.0'
                     width: '50',
                 }, {
                     title: '标题',
-                    key: 'code',
+                    key: 'text',
                     sortable: true,
                     width: '100',
                 }, {
                     title: '父节点',
-                    key: 'code',
+                    key: 'parentId',
                     width: '100',
                 }, {
                     title: '图标名称',
-                    key: 'code',
+                    key: 'icon',
                     width: '80',
                 }, {
                     title: '排序编号',
-                    key: 'code',
+                    key: 'sort',
                     width: '80',
                 }, {
                     title: '描述',
-                    key: 'code',
+                    key: 'description',
                     width: '100',
                 }, {
                     title: '编码',
@@ -121,7 +122,7 @@ import TreeGrid from '@/components/treeGrid2.0'
                     width: '80',
                 }, {
                     title: '路径',
-                    key: 'code',
+                    key: 'path',
                     width: '80',
                 },{
                     title: '操作',
@@ -206,6 +207,8 @@ import TreeGrid from '@/components/treeGrid2.0'
           personolddata:[],
           chenckname:'人员配置',
           passid:'',
+          selectlist:[],
+          selectnum:0,
       }
     },
     created(){
@@ -217,30 +220,74 @@ import TreeGrid from '@/components/treeGrid2.0'
     },
     methods: {
         rowClick(data, index, event) {
-                console.log('当前行数据:' + data)
-                console.log('点击行号:' + index)
-                console.log('点击事件:' + event)
+                // console.log('当前行数据:' + data)
+                // console.log('点击行号:' + index)
+                // console.log('点击事件:' + event)
+                this.selectnum = 2
+                this.formValidate.title = data.text
+                this.formValidate.description = data.description
+                this.formValidate.parentId= data.parentId
+                this.formValidate.icon = data.icon
+                this.formValidate.sort = data.sort
+                this.formValidate.href = data.path
+                this.formValidate.id = data.id
+                this.formValidate.code = data.code
+                this.modal1 = true
             },
         selectionClick(arr) {
-            console.log('选中数据id数组:' + arr)
+            this.selectlist = arr
         },
         sortClick(key, type) {
             console.log('排序字段:' + key)
             console.log('排序规则:' + type)
         },
         addmenu(){
-          this.modal1 = true
+            this.selectnum = 1
+            this.formValidate.title = ''
+            this.formValidate.parentId= ''
+            this.formValidate.icon= ''
+            this.formValidate.sort= ''
+            this.formValidate.description= ''
+            this.formValidate.code= ''
+            this.formValidate.href= ''
+            this.formValidate.id= ''
+            this.modal1 = true
         },
         ok(name){
              this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.$http.post("oauth/menu/add",this.formValidate,res=>{
-                       
-                        },err=>{});
+                        if(this.selectnum == 1){
+                            this.$http.post("oauth/menu/add",this.formValidate,res=>{
+                               this.$Message.info(res.message);
+                                this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
+                                this.data = res.data      
+                                },err=>{});
+                            },err=>{});
+                        }else if(this.selectnum == 2){
+                            this.$http.put("oauth/menu/update",this.formValidate,res=>{
+                                 this.$Message.info(res.message);
+                                 this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
+                                this.data = res.data      
+                                },err=>{});
+                            },err=>{});
+                        }
+                        
                     } else {
                         this.$Message.error('请填写完整');
                     }
                 })
+        },
+        deletemenu(){
+             if(this.selectlist.length == 0){
+                 this.$Message.error('请选择需要删除的条目！');
+             }else{
+                 this.$http.delete("oauth/menu/deleteByIds",this.selectlist,res=>{
+
+                        this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
+                                this.data = res.data      
+                            },err=>{});
+                        },err=>{});
+             }
         }
     }
   }
