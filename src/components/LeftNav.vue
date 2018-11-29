@@ -14,7 +14,10 @@
         <router-link tag="li" :to="x.path" v-for="(x,index) in lists" class="clearfix main-item" :key="index" :class="x.path == '/'+$route.name ? 'on' : ''"   @click.native="gotopage(x.path)">
           <img :src="require('../../public/img/'+x.icon+'.png')" class="icon">
           <div class="inner">
-            <a class="title" @click.stop="x._show = !x._show">
+            <!-- <a :class="x.path == '/'+$route.name?'titles':'title'" @click.stop="x._show = !x._show" >
+              {{ x.title }}
+            </a> -->
+            <a class="title" @click.stop="x._show = !x._show" >
               {{ x.title }}
             </a>
             <ul class="item" v-if="x._show && x.children.length">
@@ -217,6 +220,15 @@ export default {
       cursor: pointer;
       font-size: 17px;
       margin-top: 0;
+    }
+    .titles{
+      display: block;
+      padding-left: 50px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 17px;
+      margin-top: 0;
+      color: #1D60FE;
     }
   }
 }

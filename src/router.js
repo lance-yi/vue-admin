@@ -9,6 +9,7 @@ import book from '@/subpage/book.vue'
 import role from '@/subpage/role.vue'
 import menu from '@/subpage/menu.vue'
 import log from '@/views/log.vue'
+import update from '@/views/update.vue'
 import pmic from '@/views/pmic.vue'
 import system from '@/views/system.vue'
 import iView from 'iview'
@@ -56,23 +57,28 @@ const router = new Router({
 
     },
     {
+      path: '/update',
+      name: 'update',
+      component: update
+    },
+    {
       path: '/system',
       name: 'system',
       component: system,
       children: [  //这里就是二级路由的配置
         {
           path: '/system/book',
-          name: 'book',
+          name: 'system',
           component: book
         },
         {
           path: '/system/role',
-          name: 'role',
+          name: 'system',
           component: role
         },
         {
           path: '/system/menu',
-          name: 'menus',
+          name: 'system',
           component: menu
         }
       ]

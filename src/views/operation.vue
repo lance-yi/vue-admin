@@ -1,4 +1,5 @@
 <template>
+<div>
   <div @click="showno">
     <div style="position:absolute;top:90px;left:30%;z-index:99">
         <i-button type="primary" class="sure" @click.stop="breaktime" style="border-radius:4px" v-if="hadtime">刷新</i-button>
@@ -44,7 +45,7 @@
 
 
       <!-- 运维表格弹窗 -->
-      <div class="statusbox" style="width:95%;top:24%;z-index:2000;height:70%" v-if="statustable" @click.stop="statustable = true,bigrightshow = false,getwayip=''">
+      <div class="statusbox" style="width:95%;top:24%;z-index:2000;min-height:70%;padding-bottom:20px" v-if="statustable" @click.stop="statustable = true,bigrightshow = false,getwayip=''">
         <p class="detailpage">工单管理 <img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px"/></p>
             <div class="remindsbox" v-if="sendremindshow">
               <div class="remindstitle">
@@ -158,11 +159,11 @@
             </div>
             <p v-if="timelinelist.length == 0&&this.levels == 2" style="padding:10px 0px;font-size:15px;color:#FE0302">暂无运行严重故障设备</p>
             <p v-if="timelinelist.length == 0&&this.levels == 1" style="padding:10px 0px;font-size:15px;color:#F4A750">暂无运行一般故障设备</p>
-            <div class="timelinebox" v-if="timelinelist.length != 0">
+            <div class="timelinebox" v-if="timelinelist.length != 0" style="padding-left: 30px;">
               <Timeline>
               <Timeline-item v-for="(list,index) in timelinelist" :key="index">
-                <p class="time" style="top:-4px">{{list.occurTimeHead}}</p>
-                <p class="hour" style="top:20px">{{list.occurTimeRoot}}</p>
+                <!-- <p class="time" style="top:-4px">{{list.occurTimeHead}}</p>
+                <p class="hour" style="top:20px">{{list.occurTimeRoot}}</p> -->
                   <img src="../../public/img/16.png" slot="dot" v-if="list.isAlert == 2" />
                   <img src="../../public/img/17.png" slot="dot" v-if="list.isAlert == 0"/>
                   <img src="../../public/img/nono.png" slot="dot" v-if="list.nono"  @click="checknono(list.gatewayIp)"/>
@@ -176,17 +177,43 @@
                    </div>
                    <div class="timelinecont" style="margin-top:10px">
                       <p style="min-width:160px">路口名称：<span>{{list.crossVillage}}</span></p>
-                      <p style="min-width:140px">设备IP：<span>{{list.gatewayIp}}</span></p>
+                      <p style="min-width:140px">设备IP：<span @click.stop="checkdevicelist(list.poleNo)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{list.gatewayIp}}</span></p>
                       <div style="display: flex;min-width:200px;">
                           <p>项目名称：</p>
                           <span style="text-align:left;flex: 1">{{list.projectName}}</span>
                         </div>
                       <p style="min-width:150px;margin-left: 5px">线杆编号：<span>{{list.poleNo}}</span></p>
                    </div>
-                  <p class="hadpro" @click.stop="ips(list.id)" style="margin-bottom:20px;width:100%" >故障描述：<a v-for="aa in list.description" class="brspans">{{aa}}<br /></a></p>
-                  <div class="timelinecont" style="margin-bottom:40px">
-                    <p style="min-width:180px;">是否开始处置：<span>{{list.onDeal}}</span></p>
+                  <div class="hadpro"  style="width:100%;display:flex;margin-top:0;" >
+                     <p  v-if="list.description.length == 0">故障描述：
+                                 <a  class="brspans" @click.stop="ips(list.id)" >无故障</a>
+                        </p>
+                    <div v-if="list.description.length > 0">
+                      <div v-for="(aa,index) in list.description" :key="index" style="margin-top: 15px;">
+                          <div class="timelinecont" >
+                            <p style="min-width:230px">告警类型：<span>{{aa.alertName}}</span></p>
+                            <p style="min-width:230px">发生时间：<span>{{aa.occurTime}}</span></p>
+                            <p style="min-width:150px">告警状态：<span v-if="aa.state == 0">待处理</span>
+                            <span v-if="aa.state == 1">正在处理</span>
+                            <span v-if="aa.state == 2">处理完成</span>
+                            </p>
+                            <p style="min-width:230px">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
+                        </div>
+                        <div class="timelinecont" style="justify-content:left;margin-top:5px">
+                        <p >故障描述：
+                                 <a  class="brspans" @click.stop="ips(list.id)">{{aa.description}}</a>&nbsp;&nbsp;&nbsp;
+                                 <a  class="brspans"  style="color:#1D60FE;display:inline-block;margin-left:0;" @click.stop="tracing(aa.id)">事件追溯</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        </p>
+                        <p>责任人：<span style="border-bottom:1px solid #1D60FE;cursor:pointer;" @click="checkperson(list.maintenanceUserId)">{{aa.userName}}</span></p>
+                        </div>
+                      </div>
+                    </div>
+        
                   </div>
+
+                  <!-- <div class="timelinecont" style="margin-bottom:40px">
+                    <p style="min-width:180px;">是否开始处置：<span>{{list.onDeal}}</span></p>
+                  </div> -->
               </Timeline-item>
               <TimelineItem >
                 <img slot="dot" src="../../public/img/ending.png" />
@@ -196,126 +223,7 @@
           </div>
         </div>
 
-         <!-- 点击工单详情弹窗 -->
-            <div class="workdetail" v-if="workdetail">
-                <div class="detail-title" style="margin-top:10px;">
-                  <p>工单详情</p>
-                </div>
-
-                <div class="workdetail-top">
-                  <div class="workdetail-head" v-if="this.remindlist">
-                    <img src="../../public/img/ct.png" style="margin-right:5px"/>
-                    <p v-if="this.remindlist">催单时间：<span style="color:#1D60FE">{{remindlist.remindTime}}</span></p>
-                  </div>
-                  <div class="workdetail-head">
-                    <p v-if="this.remindlist">催单内容：<span style="color:#1D60FE">{{remindlist.content}}</span></p>
-                  </div>
-                </div>
-                 <p class="workdetailtitle">工单状态：<span style="color:#1D60FE">{{formlists.processStatus}}</span></p>
-
-                 <div class="sendbox" >
-                   <img src="../../public/img/num.png"/>
-                    派单信息
-                 </div>
-                 <div class="content" style="border:none;" v-for="(lists,index) in devicelist" :key="index">
-                    <div style="min-width:100%">
-                      <div style="display:block" >
-                      <span style="font-size:16px">故障描述：</span>
-                      <span v-for="(cc,indexs) in lists.detail"  :key="indexs" id="desrcspan" :style="indexs==0?'margin-left:0px':'margin-left:80px'">{{cc.descr}}<br /></span>
-                      </div>
-                    </div>
-                    <div style="min-width:30%">
-                      <p>端口号：</p>
-                      <span style="color:#F82A2A">{{lists.devicePort}}</span>
-                    </div>
-                    <div style="min-width:30%">
-                      <p>设备类型：</p>
-                      <span>{{lists.deviceType}}</span>
-                    </div>
-                    <div style="min-width:30%">
-                      <p>安装地址：</p>
-                      <span>{{lists.deviceInstallAddress}}</span>
-                    </div>
-                    <div style="min-width:30%">
-                      <p>故障MAC地址：</p>
-                      <span>{{lists.deviceMac}}</span>
-                    </div>
-                    <div style="min-width:30%">
-                      <p>设备IP地址：</p>
-                      <span>{{lists.deviceIp}}</span>
-                    </div>
-                    <div style="min-width:100%">
-                      <p>附件：</p>
-                      <span style="border-bottom:1px solid #1D60FE;cursor:pointer;margin-right:20px" @click="download(down)" v-for="(down,index) in lists.attachment" :key="index">{{down}}</span>
-                    </div>
-                  </div>
-
-                  <div class="content" style="border:none;">
-                    <div style="min-width:30%">
-                        <p>工单编号：</p>
-                        <span>{{formlists.formId}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>线杆编号：</p>
-                        <span>{{formlists.poleNo}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>紧急程度：</p>
-                        <span>{{formlists.priority}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>运维负责人：</p>
-                        <span>{{formlists.principals}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>手机号：</p>
-                        <span>{{formlists.principalsPhone}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>项目名称：</p>
-                        <span>{{formlists.projectName}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>运维负责单位名称：</p>
-                        <span>{{formlists.principalsCompany}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>派单时间：</p>
-                        <span>{{formlists.createTime}}</span>
-                      </div>
-                      <div style="min-width:100%" v-if="formlists.processStatus == '待确认'">
-                        <p>说明：</p>
-                         <i-input type="textarea" :rows="4" v-model="closetext"></i-input>
-                      </div>
-                      <input type="file" multiple name="file"  style="margin:10px 30px" ref="closefile" @change="flieupload" v-if="formlists.processStatus == '待确认'"/> 
-                  </div>
-
-                 <div class="sendbox"  v-if="feebacklist.length>0">
-                   <img src="../../public/img/fg.png"/>
-                    反馈信息
-                 </div>
-                 <div class="content" style="border:none;" v-for="(list,index) in feebacklist" :key="index">
-                  <div style="min-width:20%">
-                    <p>反馈人：</p>
-                    <span>{{list.person}}</span>
-                  </div>
-                  <div style="min-width:40%">
-                    <p>反馈时间：</p>
-                    <span>{{list.feedbackTime}}</span>
-                  </div>
-                  <div style="min-width:30%">
-                    <p>承诺解决时长：</p>
-                    <span>{{list.promiseResolveTime}}</span>
-                  </div>
-                  <div style="min-width:30%">
-                    <p>反馈具体内容：</p>
-                    <span>{{list.content}}</span>
-                  </div>
-                 </div>
-                 <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="closetowork(formlists)">确认关闭工单</button>
-                 <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="backtowork(formlists)">退回</button>
-                <button   class="zhuanyixukes closebtn" @click.stop="closedetail">关闭</button>
-            </div>
+         
 
 
 <transition name="fade">
@@ -371,7 +279,8 @@
                     <img src="../../public/img/1.gif" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 2" @click="checklanone"/>
                     <img src="../../public/img/2.gif" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 1" @click="checklanone"/>
                     <img src="../../public/img/gg2.png" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 0" @click="checklanone"/>
-                   
+                    <img src="../../public/img/gg2.png" style="left:515px;" class="fixedimg"  v-if="devicetype.Wan == 1"/>
+                    <img src="../../public/img/1.gif" style="left:515px;" class="fixedimg"  v-if="devicetype.Wan == 0"/>
                    
                   <img src="../../public/img/wg.png"/>
                   <div class="detail-textbox" v-if="rightlist">
@@ -740,7 +649,119 @@
                  <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
             </div>
  
-             <!-- 点击ip弹窗 -->
+            
+
+
+
+
+            <div class="reportbox" v-if="repoetshow">
+                  <p class="detailpage">分析报告 <img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px"/></p>
+                  <div style="width: 450px;height: 250px;margin-left:65px" id="myCharts" ></div>
+                  <div id="myChart" style="width: 450px;height: 250px;margin-left:65px" ></div>
+                  <div  class="tablechangebox" v-if="this.dataone != []">
+                  <i-table border :columns="columns1" :data="dataone" width="447"></i-table>
+                  <p v-if="this.dataone.length > 0">分析建议：<span>{{dataone[0].description}}</span></p>
+                  </div>
+            </div>
+
+
+            <div class="reportbox" style="width:800px;left:10%" v-if="repoetmapshow">
+                  <p class="detailpage">分析报告 <img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px"/></p>
+                  <div class="content" style="border:none">
+                      <div  style="min-width:150px">
+                        <p>立杆号：</p>
+                        <span style="color: #696C6F;">{{rightlist.poleNo}}</span>
+                      </div>
+                      <div  style="min-width:150px">
+                        <p>IP：</p>
+                        <span style="color: #696C6F;">{{rightlist.gatewayIp}}</span>
+                      </div>
+                      <div style="min-width:380px">
+                        <p>安装地址：</p>
+                        <span style="color: #696C6F;">{{rightlist.installAddress}}</span>
+                      </div>
+                      <div  style="min-width:150px">
+                        <p>经度：</p>
+                        <span style="color: #696C6F;">{{rightlist.longitude}}</span>
+                      </div>
+                      <div style="min-width:172px">
+                        <p>纬度：</p>
+                        <span style="color: #696C6F;">{{rightlist.latitude}}</span>
+                      </div>
+                      <div style="min-width:160px">
+                        <p>维护人员：</p>
+                        <span style="color: #696C6F;">{{rightlist.maintenanceUser}}</span>
+                      </div>
+                     </div>
+                   <div class="detail-text" style="margin:20px">
+                     <div style="left:75px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN8'"></div>
+                        <img src="../../public/img/1.gif" style="left:59px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN8'"/>
+                        <img src="../../public/img/2.gif" style="left:59px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN8'"/>
+                        <p class="fixedtext" style="left:55px;bottom:20px" v-if="reportlist.lan =='LAN8'">摄像机</p>
+                        <img src="../../public/img/1.gif" style="left:92px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN7'"/>
+                        <img src="../../public/img/2.gif" style="left:92px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN7'"/>
+                      <div style="left:110px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN7'"></div>
+                        <p class="fixedtext" style="left:94px;bottom:20px" v-if="reportlist.lan =='LAN7'">摄像机</p>
+                        <img src="../../public/img/1.gif" style="left:125px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN6'"/>
+                        <img src="../../public/img/2.gif" style="left:125px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN6'"/>
+                        <div style="left:142px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN6'"></div>
+                        <p class="fixedtext" style="left:121px;bottom:20px" v-if="reportlist.lan =='LAN6'">摄像机</p>
+                        <img src="../../public/img/1.gif" style="left:157px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN5'"/>
+                        <img src="../../public/img/2.gif" style="left:157px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN5'"/>
+                        <div style="left:174px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN5'"></div>
+                        <p class="fixedtext" style="left:156px;bottom:20px" v-if="reportlist.lan =='LAN5'">摄像机</p>
+                        <img src="../../public/img/1.gif" style="left:200px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN4'"/>
+                        <img src="../../public/img/2.gif" style="left:200px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN4'"/>
+                        <div style="left:215px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN4'"></div>
+                        <p class="fixedtext" style="left:195px;bottom:20px" v-if="reportlist.lan =='LAN4'">摄像机</p>
+                        <img src="../../public/img/1.gif" style="left:233px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN3'"/>
+                        <img src="../../public/img/2.gif" style="left:233px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN3'"/>
+                        <div style="left:250px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN3'"></div>
+                        <p class="fixedtext" style="left:232px;bottom:20px" v-if="reportlist.lan =='LAN3'">摄像机</p>
+                        <img src="../../public/img/1.gif" style="left:267px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN2'"/>
+                        <img src="../../public/img/2.gif" style="left:267px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN2'"/>
+                        <div style="left:285px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN2'"></div>
+                        <p class="fixedtext" style="left:264px;bottom:20px" v-if="reportlist.lan =='LAN2'">摄像机</p>
+                        <img src="../../public/img/1.gif" style="left:300px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN1'"/>
+                        <img src="../../public/img/2.gif" style="left:300px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN1'"/>
+                        <div style="left:315px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN1'"></div>
+                        <p class="fixedtext" style="left:298px;bottom:20px" v-if="reportlist.lan =='LAN1'">摄像机</p>
+                      <img src="../../public/img/wg.png" style="width:400px;height:140px;margin-top: 25px;"/>
+  
+                       
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:10px 40px;">
+                    <div style="text-align:left;font-size:14px">
+                          <p>IP地址：<span>{{reportlist.ipAddr}}</span></p>
+                          <p style="margin-top:10px">设备名称：<span>摄像机</span></p>
+                          <p style="margin-top:10px">安装地址：<span>{{reportlist.installAddress}}</span></p>
+                    </div>
+                    <div style="position:relative">
+                    <ArcgisMapsmall :propsmap='datamap' v-if="datamap" style="position:static;height:150px;min-height:150px"/>
+                    <p class="discription">{{datamap.discription}}</p>
+                    </div>
+              </div>
+            </div>
+
+
+            </div>
+
+            
+        </div>
+        </transition>
+  </div>
+
+           <Modal
+              v-model="modal1"
+              title="事件追溯"
+              >
+              <p v-if="tracingdata.length == 0">无事件追溯</p>
+              <p v-for="(list,index) in tracingdata" v-if="tracingdata.length > 0" :key="index">检测时间：{{list.createTime}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;事件内容：{{list.descr}}</p>
+               <div slot="footer">
+               </div>
+          </Modal>
+
+            <!-- 点击ip弹窗 -->
             <div class="workdetail" v-if="workdetailshow">
               <Tabs active-key="0">
                 <Tab-pane :label="list.portName ?list.deviceType+'('+list.portName+')':list.deviceType" :key="index" v-for="(list,index) in workdetaillist">
@@ -997,107 +1018,217 @@
             <img src="../../public/img/xxx.png" style="position:absolute;right:20px;top:10px" @click="closecard"/>
             <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
             </div>
+           <!-- 点击责任人弹窗 -->
+            <div v-if="personshow" class="workdetail">
+              <div class="detail-title" style="margin-top:10px;">
+                  <p style="color:#1d60fe"><img src="../../public/img/sss.png" style="vertical-align: middle;margin-right:5px"/>人员信息</p>
+                </div>
 
-
-
-
-            <div class="reportbox" v-if="repoetshow">
-                  <p class="detailpage">分析报告 <img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px"/></p>
-                  <div style="width: 450px;height: 250px;margin-left:65px" id="myCharts" ></div>
-                  <div id="myChart" style="width: 450px;height: 250px;margin-left:65px" ></div>
-                  <div  class="tablechangebox" v-if="this.dataone != []">
-                  <i-table border :columns="columns1" :data="dataone" width="447"></i-table>
-                  <p v-if="this.dataone.length > 0">分析建议：<span>{{dataone[0].description}}</span></p>
-                  </div>
-            </div>
-
-
-            <div class="reportbox" style="width:800px;left:10%" v-if="repoetmapshow">
-                  <p class="detailpage">分析报告 <img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px"/></p>
-                  <div class="content" style="border:none">
-                      <div  style="min-width:150px">
-                        <p>立杆号：</p>
-                        <span style="color: #696C6F;">{{rightlist.poleNo}}</span>
-                      </div>
-                      <div  style="min-width:150px">
-                        <p>IP：</p>
-                        <span style="color: #696C6F;">{{rightlist.gatewayIp}}</span>
-                      </div>
-                      <div style="min-width:380px">
-                        <p>安装地址：</p>
-                        <span style="color: #696C6F;">{{rightlist.installAddress}}</span>
-                      </div>
-                      <div  style="min-width:150px">
-                        <p>经度：</p>
-                        <span style="color: #696C6F;">{{rightlist.longitude}}</span>
-                      </div>
-                      <div style="min-width:172px">
-                        <p>纬度：</p>
-                        <span style="color: #696C6F;">{{rightlist.latitude}}</span>
-                      </div>
-                      <div style="min-width:160px">
-                        <p>维护人员：</p>
-                        <span style="color: #696C6F;">{{rightlist.maintenanceUser}}</span>
-                      </div>
-                     </div>
-                   <div class="detail-text" style="margin:20px">
-                     <div style="left:75px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN8'"></div>
-                        <img src="../../public/img/1.gif" style="left:59px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN8'"/>
-                        <img src="../../public/img/2.gif" style="left:59px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN8'"/>
-                        <p class="fixedtext" style="left:55px;bottom:20px" v-if="reportlist.lan =='LAN8'">摄像机</p>
-                        <img src="../../public/img/1.gif" style="left:92px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN7'"/>
-                        <img src="../../public/img/2.gif" style="left:92px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN7'"/>
-                      <div style="left:110px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN7'"></div>
-                        <p class="fixedtext" style="left:94px;bottom:20px" v-if="reportlist.lan =='LAN7'">摄像机</p>
-                        <img src="../../public/img/1.gif" style="left:125px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN6'"/>
-                        <img src="../../public/img/2.gif" style="left:125px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN6'"/>
-                        <div style="left:142px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN6'"></div>
-                        <p class="fixedtext" style="left:121px;bottom:20px" v-if="reportlist.lan =='LAN6'">摄像机</p>
-                        <img src="../../public/img/1.gif" style="left:157px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN5'"/>
-                        <img src="../../public/img/2.gif" style="left:157px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN5'"/>
-                        <div style="left:174px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN5'"></div>
-                        <p class="fixedtext" style="left:156px;bottom:20px" v-if="reportlist.lan =='LAN5'">摄像机</p>
-                        <img src="../../public/img/1.gif" style="left:200px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN4'"/>
-                        <img src="../../public/img/2.gif" style="left:200px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN4'"/>
-                        <div style="left:215px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN4'"></div>
-                        <p class="fixedtext" style="left:195px;bottom:20px" v-if="reportlist.lan =='LAN4'">摄像机</p>
-                        <img src="../../public/img/1.gif" style="left:233px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN3'"/>
-                        <img src="../../public/img/2.gif" style="left:233px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN3'"/>
-                        <div style="left:250px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN3'"></div>
-                        <p class="fixedtext" style="left:232px;bottom:20px" v-if="reportlist.lan =='LAN3'">摄像机</p>
-                        <img src="../../public/img/1.gif" style="left:267px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN2'"/>
-                        <img src="../../public/img/2.gif" style="left:267px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN2'"/>
-                        <div style="left:285px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN2'"></div>
-                        <p class="fixedtext" style="left:264px;bottom:20px" v-if="reportlist.lan =='LAN2'">摄像机</p>
-                        <img src="../../public/img/1.gif" style="left:300px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN1'"/>
-                        <img src="../../public/img/2.gif" style="left:300px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN1'"/>
-                        <div style="left:315px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN1'"></div>
-                        <p class="fixedtext" style="left:298px;bottom:20px" v-if="reportlist.lan =='LAN1'">摄像机</p>
-                      <img src="../../public/img/wg.png" style="width:400px;height:140px;margin-top: 25px;"/>
-  
-                       
-                  </div>
-                  <div style="display:flex;justify-content:space-between;padding:10px 40px;">
-                    <div style="text-align:left;font-size:14px">
-                          <p>IP地址：<span>{{reportlist.ipAddr}}</span></p>
-                          <p style="margin-top:10px">设备名称：<span>摄像机</span></p>
-                          <p style="margin-top:10px">安装地址：<span>{{reportlist.installAddress}}</span></p>
-                    </div>
-                    <div style="position:relative">
-                    <ArcgisMapsmall :propsmap='datamap' v-if="datamap" style="position:static;height:150px;min-height:150px"/>
-                    <p class="discription">{{datamap.discription}}</p>
-                    </div>
+              <div class="content worksendbox" style="border:none">
+                <div style="min-width:30%">
+                  <p>姓名：</p>
+                  <span>{{usermsg.userName}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>APP ID：</p>
+                  <span>{{usermsg.appId}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>单位名称：</p>
+                  <span>{{usermsg.company}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>性别：</p>
+                  <span style="color: #696C6F" v-if="usermsg.sex == 0">男</span>
+                  <span style="color: #696C6F" v-if="usermsg.sex == 1">女</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>手机号：</p>
+                  <span>{{usermsg.mobile}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>单位地址：</p>
+                  <span>{{usermsg.companyAddress}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>年龄：</p>
+                  <span>{{usermsg.age}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>邮箱号码：</p>
+                  <span>{{usermsg.email}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>所属单位电话：</p>
+                  <span>{{usermsg.companyPhone}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>身份证号：</p>
+                  <span>{{usermsg.idCard}}</span>
+                </div>
               </div>
+
+                <div class="detail-title" style="margin-top:10px;">
+                  <p style="color:#1d60fe"><img src="../../public/img/mmm.png" style="vertical-align: middle;margin-right:5px"/>证书信息</p>
+                </div>
+
+                 <div>
+                    <div v-for="(certlist,index) in certmsg" class="content" style="position:relative" :key="index">
+                      <p style="font-size: 16px;width:100%;margin-top:20px">证书编号：
+                        <span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.certificateNo}}</span>
+                        <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.certificateNo}}</span>
+                        <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.certificateNo}}</span>
+                      </p>
+                      <div class="morecontent">
+                        <p style="min-width: 15%">发证类型：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.certificateType}}</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.certificateType}}</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.certificateType}}</span>
+                        </p>
+                        <p style="min-width: 30%">授权设备类型：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.installType}}</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.installType}}</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.installType}}</span>
+                        </p>
+                        <p style="min-width: 35%">发证日期：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.applyTime}}</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.applyTime}}</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.applyTime}}</span>
+                        </p>
+                        <p style="min-width: 35%">证书失效日期：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.endTime}}</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.endTime}}</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">{{certlist.endTime}}</span></p>
+                        <p style="min-width: 20%">证书状态：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">正常</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">过期</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">停用({{certlist.updateTime}})</span></p>
+                      </div>
+                      <img src="../../public/img/tingyong.png" class="timego" v-if="certlist.certificateStatus == 1" style="right:80px"/>
+                      <img src="../../public/img/timego.png" class="timego" v-if="certlist.certificateStatus == 2"/>
+                    </div>
+                 </div>
+                 <img src="../../public/img/xxx.png" style="position:absolute;right:20px;top:10px" @click="closecard"/>
+                 <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
             </div>
 
 
+            <!-- 点击工单详情弹窗 -->
+            <div class="workdetail" v-if="workdetail">
+                <div class="detail-title" style="margin-top:10px;">
+                  <p>工单详情</p>
+                </div>
+
+                <div class="workdetail-top">
+                  <div class="workdetail-head" v-if="this.remindlist">
+                    <img src="../../public/img/ct.png" style="margin-right:5px"/>
+                    <p v-if="this.remindlist">催单时间：<span style="color:#1D60FE">{{remindlist.remindTime}}</span></p>
+                  </div>
+                  <div class="workdetail-head">
+                    <p v-if="this.remindlist">催单内容：<span style="color:#1D60FE">{{remindlist.content}}</span></p>
+                  </div>
+                </div>
+                 <p class="workdetailtitle">工单状态：<span style="color:#1D60FE">{{formlists.processStatus}}</span></p>
+
+                 <div class="sendbox" >
+                   <img src="../../public/img/num.png"/>
+                    派单信息
+                 </div>
+                 <div class="content" style="border:none;" v-for="(lists,index) in devicelist" :key="index">
+                    <div style="min-width:100%">
+                      <div style="display:block" >
+                      <span style="font-size:16px">故障描述：</span>
+                      <span v-for="(cc,indexs) in lists.detail"  :key="indexs" id="desrcspan" :style="indexs==0?'margin-left:0px':'margin-left:80px'">{{cc.descr}}<br /></span>
+                      </div>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>端口号：</p>
+                      <span style="color:#F82A2A">{{lists.devicePort}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>设备类型：</p>
+                      <span>{{lists.deviceType}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>安装地址：</p>
+                      <span>{{lists.deviceInstallAddress}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>故障MAC地址：</p>
+                      <span>{{lists.deviceMac}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>设备IP地址：</p>
+                      <span>{{lists.deviceIp}}</span>
+                    </div>
+                    <div style="min-width:100%">
+                      <p>附件：</p>
+                      <span style="border-bottom:1px solid #1D60FE;cursor:pointer;margin-right:20px" @click="download(down)" v-for="(down,index) in lists.attachment" :key="index">{{down}}</span>
+                    </div>
+                  </div>
+
+                  <div class="content" style="border:none;">
+                    <div style="min-width:30%">
+                        <p>工单编号：</p>
+                        <span>{{formlists.formId}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>线杆编号：</p>
+                        <span>{{formlists.poleNo}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>紧急程度：</p>
+                        <span>{{formlists.priority}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>运维负责人：</p>
+                        <span>{{formlists.principals}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>手机号：</p>
+                        <span>{{formlists.principalsPhone}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>项目名称：</p>
+                        <span>{{formlists.projectName}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>运维负责单位名称：</p>
+                        <span>{{formlists.principalsCompany}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>派单时间：</p>
+                        <span>{{formlists.createTime}}</span>
+                      </div>
+                      <div style="min-width:100%" v-if="formlists.processStatus == '待确认'">
+                        <p>说明：</p>
+                         <i-input type="textarea" :rows="4" v-model="closetext"></i-input>
+                      </div>
+                      <input type="file" multiple name="file"  style="margin:10px 30px" ref="closefile" @change="flieupload" v-if="formlists.processStatus == '待确认'"/> 
+                  </div>
+
+                 <div class="sendbox"  v-if="feebacklist.length>0">
+                   <img src="../../public/img/fg.png"/>
+                    反馈信息
+                 </div>
+                 <div class="content" style="border:none;" v-for="(list,index) in feebacklist" :key="index">
+                  <div style="min-width:20%">
+                    <p>反馈人：</p>
+                    <span>{{list.person}}</span>
+                  </div>
+                  <div style="min-width:40%">
+                    <p>反馈时间：</p>
+                    <span>{{list.feedbackTime}}</span>
+                  </div>
+                  <div style="min-width:30%">
+                    <p>承诺解决时长：</p>
+                    <span>{{list.promiseResolveTime}}</span>
+                  </div>
+                  <div style="min-width:30%">
+                    <p>反馈具体内容：</p>
+                    <span>{{list.content}}</span>
+                  </div>
+                 </div>
+                 <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="closetowork(formlists)">确认关闭工单</button>
+                 <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="backtowork(formlists)">退回</button>
+                <button   class="zhuanyixukes closebtn" @click.stop="closedetail">关闭</button>
             </div>
-
-            
-        </div>
-        </transition>
-  </div>
-
+</div>
 </template>
 <script>
 import ArcgisMaps from "@/components/ArcgisMaps";
@@ -1112,6 +1243,8 @@ export default {
   },
   data() {
     return {
+      modal1:false,
+      tracingdata:[],
       rightdialogshow:true,
       checcklabel:false,
       timelinelists:[],
@@ -1340,10 +1473,10 @@ export default {
     };
   },
   beforeDestroy() {
-    if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
-        clearInterval(this.timer); //关闭
-    }
-},
+      if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
+          clearInterval(this.timer); //关闭
+      }
+  },
   mounted() {
     // this.drawLine();
     // this.drawLines();
@@ -3059,6 +3192,13 @@ export default {
     breaktime(){
        this.hadtime = false
     },
+    //事件追溯
+    tracing(id){
+      this.modal1 = true
+       this.$http.get("alert/warning/selectEventByAlertId",{alertId:id},res=>{
+               this.tracingdata = res.data
+          },err=>{});
+    }
   }
 };
 </script>
@@ -3097,7 +3237,7 @@ export default {
   min-width: 950px;
   width: 65%;
   background: #fff;
-  height: 65%;
+  min-height: 65%;
   position: absolute;
   top: 150px;
   left: 0;

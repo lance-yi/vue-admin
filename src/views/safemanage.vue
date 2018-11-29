@@ -1,4 +1,5 @@
 <template>
+ <div>
   <div @click="showno">
           <div style="position:absolute;top:90px;left:30%;z-index:99">
                 <i-button type="primary" class="sure" @click.stop="breaktime" style="border-radius:4px" v-if="hadtime">刷新</i-button>
@@ -60,8 +61,8 @@
             <div class="timelinebox" v-if="timelinelist.length != 0">
               <Timeline>
               <Timeline-item v-for="(list,index) in timelinelist" :key="index">
-                <p class="time">{{list.occurTimeHead}}</p>
-                <p class="hour">{{list.occurTimeRoot}}</p>
+                <!-- <p class="time">{{list.occurTimeHead}}</p>
+                <p class="hour">{{list.occurTimeRoot}}</p> -->
                   <img src="../../public/img/16.png" slot="dot" v-if="list.isAlert == 2" />
                   <img src="../../public/img/17.png" slot="dot" v-if="list.isAlert == 0"/>
                   <img src="../../public/img/nono.png" slot="dot" v-if="list.nono"  @click="checknono(list.gatewayIp)"/>
@@ -75,18 +76,42 @@
                    </div>
                    <div class="timelinecont" style="margin-top:10px">
                       <p style="min-width:160px">路口名称：<span>{{list.crossVillage}}</span></p>
-                      <p style="min-width:140px">设备IP：<span>{{list.gatewayIp}}</span></p>
+                      <p style="min-width:140px">设备IP：<span @click.stop="checkdevicelist(list.poleNo)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{list.gatewayIp}}</span></p>
                       <div style="display: flex;min-width:200px;">
                           <p>项目名称：</p>
                           <span style="text-align:left;flex: 1">{{list.projectName}}</span>
                         </div>
                       <p style="min-width:150px;margin-left: 5px">线杆编号：<span>{{list.poleNo}}</span></p>
                    </div>
-                  <p class="hadpro" @click.stop="ips(list.id)" style="width:100%" >故障描述：<a v-for="aa in list.description" class="brspans">{{aa}}<br /></a></p>
-                  <div class="timelinecont" style="margin-bottom:40px">
+                  <p class="hadpro" style="margin-bottom:0;margin-top:10px">责任人：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkperson(list.maintenanceUserId)">{{list.userName}}</span></p>
+                  <div class="hadpro"  style="width:100%;display:flex;margin-top:0" >
+                     <p  v-if="list.description.length == 0" style="margin-top:10px">故障描述：
+                                 <a  class="brspans" @click.stop="ips(list.id)" >无故障</a>
+                        </p>
+                    <div v-if="list.description.length > 0">
+                      <div v-for="(aa,index) in list.description" :key="index" style="margin-top: 15px;">
+                          <div class="timelinecont" >
+                            <p style="min-width:230px">告警类型：<span>{{aa.alertName}}</span></p>
+                            <p style="min-width:230px">发生时间：<span>{{aa.occurTime}}</span></p>
+                            <p style="min-width:150px">告警状态：<span v-if="aa.state == 0">待处理</span>
+                            <span v-if="aa.state == 1">正在处理</span>
+                            <span v-if="aa.state == 2">处理完成</span>
+                            </p>
+                            <p style="min-width:230px">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
+                        </div>
+                        <p style="margin-top: 2px;">故障描述：
+                                 <a  class="brspans" @click.stop="ips(list.id)">{{aa.description}}</a>&nbsp;&nbsp;&nbsp;
+                                 <a  class="brspans"  style="color:#1D60FE;margin-left:0;display:inline-block" @click.stop="tracing(aa.id)">事件追溯</a>
+                        </p>
+                        
+                      </div>
+                    </div>
+        
+                  </div>
+                  <!-- <div class="timelinecont" style="margin-bottom:40px">
                        
                     <p style="min-width:180px;">是否开始处置：<span>{{list.onDeal}}</span></p>
-                  </div>
+                  </div> -->
               </Timeline-item>
                 <TimelineItem >
                 <img slot="dot" src="../../public/img/ending.png" />
@@ -150,6 +175,8 @@
                     <img src="../../public/img/1.gif" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 2" @click="checklanone"/>
                     <img src="../../public/img/2.gif" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 1" @click="checklanone"/>
                     <img src="../../public/img/gg2.png" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 0" @click="checklanone"/>
+                    <img src="../../public/img/gg2.png" style="left:515px;" class="fixedimg"  v-if="devicetype.Wan == 1"/>
+                    <img src="../../public/img/1.gif" style="left:515px;" class="fixedimg"  v-if="devicetype.Wan == 0"/>
                    
                    
                   <img src="../../public/img/wg.png"/>
@@ -267,7 +294,7 @@
             </div>
             <div class="detail-title">
                   <img src="../../public/img/66.png"/>
-                  <p>安全事件</p>
+                  <p>信息栏</p>
             </div>
             <div class="controls msgbox" v-if="wangguanshow">
               <p style="min-width:180px">运行状态：
@@ -294,10 +321,14 @@
                 <span v-if="msglist.shockAbnormal==1" style="color:#1D60FE">正常</span>
                 <span v-if="msglist.shockAbnormal==0" style="color:#FF5E5E">异常({{msglist.shakeTimes}}次)</span>
               </p>
-               <p v-if="rightlist.description" >故障描述：
+               <!-- <p v-if="rightlist.description" >故障描述：
                 <span  class="brspan" v-for="aa in rightlist.description">{{aa}}<br /></span>
-              </p>
+              </p> -->
             </div>
+
+            
+
+           
 
             <div class="controls msgbox" v-if="!wangguanshow">
               <div v-if="msgtypelist.deviceName != '摄像机'">
@@ -328,7 +359,30 @@
                
               </div>
             </div>
+           
 
+           <div class="detail-title" v-if="wangguanshow">
+                  <img src="../../public/img/gx.png"/>
+                  <p>安全事件</p>
+            </div>
+            <div  class="hadpro"  style="margin-top:40px;padding-left:40px" v-if="wangguanshow">
+               <div v-for="(aa,index) in descriptiondata" :key="index" style="margin-top: 15px;">
+                  <div class="timelinecont" >
+                    <p style="min-width:230px">告警类型：<span>{{aa.alertName}}</span></p>
+                    <p style="min-width:230px">发生时间：<span>{{aa.occurTime}}</span></p>
+                    <p style="min-width:150px">告警状态：<span v-if="aa.state == 0">待处理</span>
+                    <span v-if="aa.state == 1">正在处理</span>
+                    <span v-if="aa.state == 2">处理完成</span>
+                    </p>
+                    <p style="min-width:230px">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
+                </div>
+                <p style="margin-top: 5px;margin-bottom:30px">故障描述：
+                          <span style="color:rgb(255, 94, 94)" >{{aa.description}}</span>&nbsp;&nbsp;&nbsp;
+                          <a  class="brspans"  style="color:#1D60FE;margin-left:0;display:inline-block" @click.stop="tracing(aa.id)">事件追溯</a>
+                </p>
+                
+              </div>
+            </div>
 
             <div v-if="msglist.gatewayState?msglist.gatewayState==1 && wangguanshow:'false'">
              <div class="detail-title" >
@@ -437,126 +491,7 @@
               <TimelineItem ><p slot="dot"></p></TimelineItem>
           </Timeline>
           </div>
-            <!-- 点击工单详情弹窗 -->
-            <div class="workdetail" v-if="workdetail">
-                <div class="detail-title" style="margin-top:10px;">
-                  <p>工单详情</p>
-                </div>
-
-                <div class="workdetail-top">
-                  <div class="workdetail-head" v-if="this.remindlist">
-                    <img src="../../public/img/ct.png" style="margin-right:5px"/>
-                    <p v-if="this.remindlist">催单时间：<span style="color:#1D60FE">{{remindlist.remindTime}}</span></p>
-                  </div>
-                  <div class="workdetail-head">
-                    <p v-if="this.remindlist">催单内容：<span style="color:#1D60FE">{{remindlist.content}}</span></p>
-                  </div>
-                </div>
-                 <p class="workdetailtitle">工单状态：<span style="color:#1D60FE">{{formlists.processStatus}}</span></p>
-
-                 <div class="sendbox" >
-                   <img src="../../public/img/num.png"/>
-                    派单信息
-                 </div>
-                 <div class="content" style="border:none;" v-for="(lists,index) in devicelist" :key="index">
-                    <div style="min-width:100%">
-                      <div style="display:block" >
-                      <span style="font-size:16px">故障描述：</span>
-                      <span v-for="(cc,indexs) in lists.detail"  :key="indexs" id="desrcspan" :style="indexs==0?'margin-left:0px':'margin-left:80px'">{{cc.descr}}<br /></span>
-                      </div>
-                    </div>
-                    <div style="min-width:30%">
-                      <p>端口号：</p>
-                      <span  style="color:#F82A2A">{{lists.devicePort}}</span>
-                    </div>
-                    <div style="min-width:30%">
-                      <p>设备类型：</p>
-                      <span>{{lists.deviceType}}</span>
-                    </div>
-                    <div style="min-width:30%">
-                      <p>安装地址：</p>
-                      <span>{{lists.deviceInstallAddress}}</span>
-                    </div>
-                    <div style="min-width:30%">
-                      <p>故障MAC地址：</p>
-                      <span>{{lists.deviceMac}}</span>
-                    </div>
-                    <div style="min-width:30%">
-                      <p>设备IP地址：</p>
-                      <span>{{lists.deviceIp}}</span>
-                    </div>
-                    <div style="min-width:100%">
-                      <p>附件：</p>
-                      <span style="border-bottom:1px solid #1D60FE;cursor:pointer;margin-right:20px" @click="download(down)" v-for="(down,index) in lists.attachment" :key="index">{{down}}</span>
-                    </div>
-                  </div>
-
-                  <div class="content" style="border:none;">
-                    <div style="min-width:30%">
-                        <p>工单编号：</p>
-                        <span>{{formlists.formId}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>线杆编号：</p>
-                        <span>{{formlists.poleNo}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>紧急程度：</p>
-                        <span>{{formlists.priority}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>安全负责人：</p>
-                        <span>{{formlists.principals}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>手机号：</p>
-                        <span>{{formlists.principalsPhone}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>项目名称：</p>
-                        <span>{{formlists.projectName}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>安全负责单位名称：</p>
-                        <span>{{formlists.principalsCompany}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>派单时间：</p>
-                        <span>{{formlists.createTime}}</span>
-                      </div>
-                      <div style="min-width:100%" v-if="formlists.processStatus == '待确认'">
-                        <p>说明：</p>
-                         <i-input type="textarea" :rows="4" v-model="closetext"></i-input>
-                      </div>
-                      <input type="file" multiple name="file"  style="margin:10px 30px" ref="closefile" @change="flieupload" v-if="formlists.processStatus == '待确认'"/> 
-                  </div>
-
-                 <div class="sendbox"  v-if="feebacklist.length>0">
-                   <img src="../../public/img/fg.png"/>
-                    反馈信息
-                 </div>
-                 <div class="content" style="border:none;" v-for="(list,index) in feebacklist" :key="index">
-                  <div style="min-width:20%">
-                    <p>反馈人：</p>
-                    <span>{{list.person}}</span>
-                  </div>
-                  <div style="min-width:40%">
-                    <p>反馈时间：</p>
-                    <span>{{list.feedbackTime}}</span>
-                  </div>
-                  <div style="min-width:30%">
-                    <p>承诺解决时长：</p>
-                    <span>{{list.promiseResolveTime}}</span>
-                  </div>
-                  <div style="min-width:30%">
-                    <p>反馈具体内容：</p>
-                    <span>{{list.content}}</span>
-                  </div>
-                 </div>
-                 <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="closetowork(formlists)">确认关闭工单</button>
-                 <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="backtowork(formlists)">退回</button>
-                <button   class="zhuanyixukes closebtn" @click="closedetail">关闭</button>
-            </div>
+            
 
 
           <!-- 发送工单弹窗 -->
@@ -671,97 +606,35 @@
 
 
 
-              <!-- 点击责任人弹窗 -->
-            <div v-if="personshow" class="workdetail">
-              <div class="detail-title" style="margin-top:10px;">
-                  <p style="color:#1d60fe"><img src="../../public/img/sss.png" style="vertical-align: middle;margin-right:5px"/>人员信息</p>
-                </div>
-
-              <div class="content worksendbox" style="border:none">
-                <div style="min-width:30%">
-                  <p>姓名：</p>
-                  <span>{{usermsg.userName}}</span>
-                </div>
-                <div style="min-width:30%">
-                  <p>APP ID：</p>
-                  <span>{{usermsg.appId}}</span>
-                </div>
-                <div style="min-width:30%">
-                  <p>单位名称：</p>
-                  <span>{{usermsg.company}}</span>
-                </div>
-                <div style="min-width:30%">
-                  <p>性别：</p>
-                  <span style="color: #696C6F" v-if="usermsg.sex == 0">男</span>
-                  <span style="color: #696C6F" v-if="usermsg.sex == 1">女</span>
-                </div>
-                <div style="min-width:30%">
-                  <p>手机号：</p>
-                  <span>{{usermsg.mobile}}</span>
-                </div>
-                <div style="min-width:30%">
-                  <p>单位地址：</p>
-                  <span>{{usermsg.companyAddress}}</span>
-                </div>
-                <div style="min-width:30%">
-                  <p>年龄：</p>
-                  <span>{{usermsg.age}}</span>
-                </div>
-                <div style="min-width:30%">
-                  <p>邮箱号码：</p>
-                  <span>{{usermsg.email}}</span>
-                </div>
-                <div style="min-width:30%">
-                  <p>所属单位电话：</p>
-                  <span>{{usermsg.companyPhone}}</span>
-                </div>
-                <div style="min-width:30%">
-                  <p>身份证号：</p>
-                  <span>{{usermsg.idCard}}</span>
-                </div>
-              </div>
-
-                <div class="detail-title" style="margin-top:10px;">
-                  <p style="color:#1d60fe"><img src="../../public/img/mmm.png" style="vertical-align: middle;margin-right:5px"/>证书信息</p>
-                </div>
-
-                 <div>
-                    <div v-for="(certlist,index) in certmsg" class="content" style="position:relative" :key="index">
-                      <p style="font-size: 16px;width:100%;margin-top:20px">证书编号：
-                        <span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.certificateNo}}</span>
-                        <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.certificateNo}}</span>
-                        <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.certificateNo}}</span>
-                      </p>
-                      <div class="morecontent">
-                        <p style="min-width: 15%">发证类型：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.certificateType}}</span>
-                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.certificateType}}</span>
-                          <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.certificateType}}</span>
-                        </p>
-                        <p style="min-width: 30%">授权设备类型：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.installType}}</span>
-                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.installType}}</span>
-                          <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.installType}}</span>
-                        </p>
-                        <p style="min-width: 35%">发证日期：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.applyTime}}</span>
-                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.applyTime}}</span>
-                          <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.applyTime}}</span>
-                        </p>
-                        <p style="min-width: 35%">证书失效日期：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.endTime}}</span>
-                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.endTime}}</span>
-                          <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">{{certlist.endTime}}</span></p>
-                        <p style="min-width: 20%">证书状态：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">正常</span>
-                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">过期</span>
-                          <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">停用({{certlist.updateTime}})</span></p>
-                      </div>
-                      <img src="../../public/img/tingyong.png" class="timego" v-if="certlist.certificateStatus == 1" style="right:80px"/>
-                      <img src="../../public/img/timego.png" class="timego" v-if="certlist.certificateStatus == 2"/>
-                    </div>
-                 </div>
-                 <img src="../../public/img/xxx.png" style="position:absolute;right:20px;top:10px" @click="closecard"/>
-                 <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
-            </div>
+             
  
              <!-- 点击ip弹窗 -->
-            <div class="workdetail" v-if="workdetailshow">
+            
+
+
+
+
+            <!-- <div style="height:400px;width:500px;"></div> -->
+
+
+            </div>
+
+            
+        </div>
+        </transition>
+
+             <Modal
+              v-model="modal1"
+              title="事件追溯"
+              >
+              <p v-if="tracingdata.length == 0">无事件追溯</p>
+              <p v-for="(list,index) in tracingdata" v-if="tracingdata.length > 0" :key="index">检测时间：{{list.createTime}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;事件内容：{{list.descr}}</p>
+               <div slot="footer">
+               </div>
+          </Modal>
+     </div>
+       
+       <div class="workdetail" v-if="workdetailshow">
               <Tabs active-key="0">
                 <Tab-pane :label="list.portName ?list.deviceType+'('+list.portName+')':list.deviceType" :key="index" v-for="(list,index) in workdetaillist">
                   <div class="detail-title" style="margin-top:10px;">
@@ -1019,20 +892,216 @@
             <img src="../../public/img/xxx.png" style="position:absolute;right:20px;top:10px" @click="closecard"/>
             <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
             </div>
+      <!-- 点击工单详情弹窗 -->
+            <div class="workdetail" v-if="workdetail">
+                <div class="detail-title" style="margin-top:10px;">
+                  <p>工单详情</p>
+                </div>
 
+                <div class="workdetail-top">
+                  <div class="workdetail-head" v-if="this.remindlist">
+                    <img src="../../public/img/ct.png" style="margin-right:5px"/>
+                    <p v-if="this.remindlist">催单时间：<span style="color:#1D60FE">{{remindlist.remindTime}}</span></p>
+                  </div>
+                  <div class="workdetail-head">
+                    <p v-if="this.remindlist">催单内容：<span style="color:#1D60FE">{{remindlist.content}}</span></p>
+                  </div>
+                </div>
+                 <p class="workdetailtitle">工单状态：<span style="color:#1D60FE">{{formlists.processStatus}}</span></p>
 
+                 <div class="sendbox" >
+                   <img src="../../public/img/num.png"/>
+                    派单信息
+                 </div>
+                 <div class="content" style="border:none;" v-for="(lists,index) in devicelist" :key="index">
+                    <div style="min-width:100%">
+                      <div style="display:block" >
+                      <span style="font-size:16px">故障描述：</span>
+                      <span v-for="(cc,indexs) in lists.detail"  :key="indexs" id="desrcspan" :style="indexs==0?'margin-left:0px':'margin-left:80px'">{{cc.descr}}<br /></span>
+                      </div>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>端口号：</p>
+                      <span  style="color:#F82A2A">{{lists.devicePort}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>设备类型：</p>
+                      <span>{{lists.deviceType}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>安装地址：</p>
+                      <span>{{lists.deviceInstallAddress}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>故障MAC地址：</p>
+                      <span>{{lists.deviceMac}}</span>
+                    </div>
+                    <div style="min-width:30%">
+                      <p>设备IP地址：</p>
+                      <span>{{lists.deviceIp}}</span>
+                    </div>
+                    <div style="min-width:100%">
+                      <p>附件：</p>
+                      <span style="border-bottom:1px solid #1D60FE;cursor:pointer;margin-right:20px" @click="download(down)" v-for="(down,index) in lists.attachment" :key="index">{{down}}</span>
+                    </div>
+                  </div>
 
+                  <div class="content" style="border:none;">
+                    <div style="min-width:30%">
+                        <p>工单编号：</p>
+                        <span>{{formlists.formId}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>线杆编号：</p>
+                        <span>{{formlists.poleNo}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>紧急程度：</p>
+                        <span>{{formlists.priority}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安全负责人：</p>
+                        <span>{{formlists.principals}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>手机号：</p>
+                        <span>{{formlists.principalsPhone}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>项目名称：</p>
+                        <span>{{formlists.projectName}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安全负责单位名称：</p>
+                        <span>{{formlists.principalsCompany}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>派单时间：</p>
+                        <span>{{formlists.createTime}}</span>
+                      </div>
+                      <div style="min-width:100%" v-if="formlists.processStatus == '待确认'">
+                        <p>说明：</p>
+                         <i-input type="textarea" :rows="4" v-model="closetext"></i-input>
+                      </div>
+                      <input type="file" multiple name="file"  style="margin:10px 30px" ref="closefile" @change="flieupload" v-if="formlists.processStatus == '待确认'"/> 
+                  </div>
 
-            <!-- <div style="height:400px;width:500px;"></div> -->
-
-
+                 <div class="sendbox"  v-if="feebacklist.length>0">
+                   <img src="../../public/img/fg.png"/>
+                    反馈信息
+                 </div>
+                 <div class="content" style="border:none;" v-for="(list,index) in feebacklist" :key="index">
+                  <div style="min-width:20%">
+                    <p>反馈人：</p>
+                    <span>{{list.person}}</span>
+                  </div>
+                  <div style="min-width:40%">
+                    <p>反馈时间：</p>
+                    <span>{{list.feedbackTime}}</span>
+                  </div>
+                  <div style="min-width:30%">
+                    <p>承诺解决时长：</p>
+                    <span>{{list.promiseResolveTime}}</span>
+                  </div>
+                  <div style="min-width:30%">
+                    <p>反馈具体内容：</p>
+                    <span>{{list.content}}</span>
+                  </div>
+                 </div>
+                 <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="closetowork(formlists)">确认关闭工单</button>
+                 <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="backtowork(formlists)">退回</button>
+                <button   class="zhuanyixukes closebtn" @click="closedetail">关闭</button>
             </div>
 
-            
-        </div>
-        </transition>
-  </div>
+            <!-- 点击责任人弹窗 -->
+            <div v-if="personshow" class="workdetail">
+              <div class="detail-title" style="margin-top:10px;">
+                  <p style="color:#1d60fe"><img src="../../public/img/sss.png" style="vertical-align: middle;margin-right:5px"/>人员信息</p>
+                </div>
 
+              <div class="content worksendbox" style="border:none">
+                <div style="min-width:30%">
+                  <p>姓名：</p>
+                  <span>{{usermsg.userName}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>APP ID：</p>
+                  <span>{{usermsg.appId}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>单位名称：</p>
+                  <span>{{usermsg.company}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>性别：</p>
+                  <span style="color: #696C6F" v-if="usermsg.sex == 0">男</span>
+                  <span style="color: #696C6F" v-if="usermsg.sex == 1">女</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>手机号：</p>
+                  <span>{{usermsg.mobile}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>单位地址：</p>
+                  <span>{{usermsg.companyAddress}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>年龄：</p>
+                  <span>{{usermsg.age}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>邮箱号码：</p>
+                  <span>{{usermsg.email}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>所属单位电话：</p>
+                  <span>{{usermsg.companyPhone}}</span>
+                </div>
+                <div style="min-width:30%">
+                  <p>身份证号：</p>
+                  <span>{{usermsg.idCard}}</span>
+                </div>
+              </div>
+
+                <div class="detail-title" style="margin-top:10px;">
+                  <p style="color:#1d60fe"><img src="../../public/img/mmm.png" style="vertical-align: middle;margin-right:5px"/>证书信息</p>
+                </div>
+
+                 <div>
+                    <div v-for="(certlist,index) in certmsg" class="content" style="position:relative" :key="index">
+                      <p style="font-size: 16px;width:100%;margin-top:20px">证书编号：
+                        <span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.certificateNo}}</span>
+                        <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.certificateNo}}</span>
+                        <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.certificateNo}}</span>
+                      </p>
+                      <div class="morecontent">
+                        <p style="min-width: 15%">发证类型：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.certificateType}}</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.certificateType}}</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.certificateType}}</span>
+                        </p>
+                        <p style="min-width: 30%">授权设备类型：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.installType}}</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.installType}}</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.installType}}</span>
+                        </p>
+                        <p style="min-width: 35%">发证日期：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.applyTime}}</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.applyTime}}</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color:#F15F69;">{{certlist.applyTime}}</span>
+                        </p>
+                        <p style="min-width: 35%">证书失效日期：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">{{certlist.endTime}}</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">{{certlist.endTime}}</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">{{certlist.endTime}}</span></p>
+                        <p style="min-width: 20%">证书状态：<span v-if="certlist.certificateStatus == 0" style="color: #3C7FEE;">正常</span>
+                          <span v-if="certlist.certificateStatus == 2" style="color: #ccc;">过期</span>
+                          <span v-if="certlist.certificateStatus == 1" style="color: #F15F69;">停用({{certlist.updateTime}})</span></p>
+                      </div>
+                      <img src="../../public/img/tingyong.png" class="timego" v-if="certlist.certificateStatus == 1" style="right:80px"/>
+                      <img src="../../public/img/timego.png" class="timego" v-if="certlist.certificateStatus == 2"/>
+                    </div>
+                 </div>
+                 <img src="../../public/img/xxx.png" style="position:absolute;right:20px;top:10px" @click.stop="closecard"/>
+                 <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
+            </div>
+   </div>
 </template>
 <script>
 import ArcgisMap from "@/components/ArcgisMap";
@@ -1047,6 +1116,8 @@ export default {
   },
   data() {
     return {
+      tracingdata:[],
+      modal1:false,
       timer:null,
       mintime:60000,
       hadtime:true,
@@ -1130,6 +1201,7 @@ export default {
       rightlist:[],
       type:'',
       typelist:[],
+      descriptiondata:[],
       columns1: [{title: '采样时间',key: 'creatTime', width:155,},
                 {title: '网络延时',key: 'status',width:95,},
                 {title: '丢包率',key: 'packetLoss',width:80,},
@@ -1157,11 +1229,11 @@ export default {
       data2: []
     };
   },
-beforeDestroy() {
-    if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
-        clearInterval(this.timer); //关闭
-    }
-},
+  beforeDestroy() {
+      if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
+          clearInterval(this.timer); //关闭
+      }
+  },
   mounted() {
     // this.drawLine();
     // this.drawLines();
@@ -1539,7 +1611,10 @@ beforeDestroy() {
                 this.boolsend = false
             }
           },err=>{});
-
+          //安全事件信息
+          this.$http.get("alert/warning/getDeviceInfo",{gateId:data,level:3,requestModular:1},res=>{
+              this.descriptiondata = res.data[0].description
+          },err=>{});
 
           // 信息栏信息
           this.$http.get("gis/gis/getGatewayIndexAlert?",{gatewayIp:this.rightlist.gatewayIp},res=>{
@@ -1628,7 +1703,10 @@ beforeDestroy() {
              this.devicetype = res.data
           },err=>{});
 
-
+         //安全事件信息
+          this.$http.get("alert/warning/getDeviceInfo",{gateId:data,level:3,requestModular:1},res=>{
+              this.descriptiondata = res.data[0].description
+          },err=>{});
          //发送工单按钮显示隐藏
           this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:data,workType:'安全事件',requestModular:1},res=>{
             if(res.data.alertId.length > 0){
@@ -2526,6 +2604,13 @@ beforeDestroy() {
     breaktime(){
        this.hadtime = false
     },
+    //事件追溯
+    tracing(id){
+      this.modal1 = true
+       this.$http.get("alert/warning/selectEventByAlertId",{alertId:id},res=>{
+               this.tracingdata = res.data
+          },err=>{});
+    }
   }
 };
 </script>
@@ -2594,7 +2679,7 @@ beforeDestroy() {
   padding: 20px;
   height: calc(100% - 74px);
   overflow: auto;
-  padding-left: 150px;
+  padding-left: 30px;
 }
 .timelinecont {
   display: flex;
@@ -2709,7 +2794,7 @@ beforeDestroy() {
   text-align: left;
   font-size: 14px;
   margin-left: 30px;
-  width: calc(100% - 620px)
+  width: calc(100% - 620px);
 }
 .detail-textbox div{
   margin-top: 15px;
