@@ -567,14 +567,14 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
             this.$http.get("res/socElectrical/selectElectricDetailList?",{isAlert:1,current:1,pageSize:10,param:this.valuetable},res=>{
                 this.data1 = res.data.list
                 this.totals = res.data.total
-                this.isalert = 0
+                this.isalert = 1
               },err=>{});
             
           }else if(this.isalert == 2){
             this.$http.get("res/socElectrical/selectElectricDetailList?",{isAlert:'all',current:1,pageSize:10,param:this.valuetable},res=>{
                 this.data1 = res.data.list
                 this.totals = res.data.total
-                this.isalert = 0
+                this.isalert = 2
               },err=>{});
           
            }
