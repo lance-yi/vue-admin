@@ -74,6 +74,10 @@
                         <span style="text-align:left;flex: 1">{{list.installAddress}}</span>
                       </div>
                    </div>
+                   <div style="position:absolute;right:20px;top:0;cursor:pointer" @click.stop="ips(list.id)">
+                     <img src="../../public/img/20.png" style="vertical-align:middle"/>
+                     <span>查看详情</span>
+                   </div>
                    <div class="timelinecont" style="margin-top:10px">
                       <p style="min-width:160px">路口名称：<span>{{list.crossVillage}}</span></p>
                       <p style="min-width:140px">设备IP：<span @click.stop="checkdevicelist(list.poleNo)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{list.gatewayIp}}</span></p>
@@ -85,9 +89,9 @@
                    </div>
                   <p class="hadpro" style="margin-bottom:0;margin-top:10px">责任人：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkperson(list.maintenanceUserId)">{{list.userName}}</span></p>
                   <div class="hadpro"  style="width:100%;display:flex;margin-top:0" >
-                     <p  v-if="list.description.length == 0" style="margin-top:10px">故障描述：
+                     <!-- <p  v-if="list.description.length == 0" style="margin-top:10px">故障描述：
                                  <a  class="brspans" @click.stop="ips(list.id)" >无故障</a>
-                        </p>
+                        </p> -->
                     <div v-if="list.description.length > 0">
                       <div v-for="(aa,index) in list.description" :key="index" style="margin-top: 15px;">
                           <div class="timelinecont" >
@@ -100,7 +104,7 @@
                             <p style="min-width:230px">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
                         </div>
                         <p style="margin-top: 2px;">故障描述：
-                                 <a  class="brspans" @click.stop="ips(list.id)">{{aa.description}}</a>&nbsp;&nbsp;&nbsp;
+                                 <a style="border:none" >{{aa.description}}</a>&nbsp;&nbsp;&nbsp;
                                  <a  class="brspans"  style="color:#1D60FE;margin-left:0;display:inline-block" @click.stop="tracing(aa.id)">事件追溯</a>
                         </p>
                         
@@ -122,9 +126,190 @@
         </div>
 
 
+        <!-- 小屏幕秀 -->
+        <transition name="fade">
+          <div class="bigright2" v-show="bigrightshow2" transiton="fade">
+            <div >
+              <p class="detailpage" ><span @click.stop="bigtable">详情页面</span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#1D60FE">小屏秀</span></p>
+              <img src="../../public/img/xxx.png" style="position:absolute;right:30px;top:20px"  @click.stop="closebright"/> 
+            </div>
+
+            <div class="smalltextbox">
+              <button   class="zhuanyixukes" @click="sendwork" v-if="boolsend" style="position: absolute;right: 50px;top: 90px;">发送工单</button>
+              <div >
+                <span>安装地址：{{rightlist.installAddress}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>IP地址：{{rightlist.gatewayIp}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>路口/小区：{{rightlist.crossVillage}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>责任人：{{rightlist.maintenanceUser}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>联系方式：{{rightlist2.mobile}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>项目名称：{{rightlist.projectName}}</span>
+              </div>
+              <div v-for="(list,index) in rightlist2.safeEvent" :key="index" style="color:red">
+                <span v-if="index == 0" style="min-width:70px">事件信息：</span>
+                <span v-if="index != 0" style="min-width:70px;display: inline-block;"></span>
+                <span>事件类型：安全事件</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>发生时间：{{list.occurTime}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>事件描述：{{list.description}}</span>
+              </div>
+              <div v-for="lists in rightlist2.operationEvent" :key="lists.lan" style="color:red">
+                <span  style="min-width:70px;display: inline-block;"></span>
+                <span>端口号：{{lists.lan}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>终端IP：{{lists.ipAddr}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>终端类型：{{lists.deviceType}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>事件类型：安全事件</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>发生时间：{{lists.occurTime}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>事件描述：{{lists.description}}</span>
+              </div>
+            </div>
+            <div style="margin:10px 20px 40px 20px;box-sizing: border-box">
+                <Row :gutter="16">
+                  <Col span="12" >
+                      <div class="chartone" style="height:250px">
+                        <p style="text-align:left;border-left:4px solid #00FFFC;padding-left:10px">近一天在线状态</p>
+                        <div style="height:95%;width:100%" id="myChartonline"></div>
+                      </div>
+                  </Col>
+                  <Col span="6" >
+                      <div class="chartone" style="height:250px">
+                        <p style="text-align:left;border-left:4px solid #0048FF;padding-left:10px">近一天温度状态</p>
+                        <div style="height:95%;width:100%" id="myCharttemperature"></div>
+                      </div>
+                  </Col>
+                  <Col span="6" >
+                        <div class="chartone" style="height:250px">
+                          <p style="text-align:left;border-left:4px solid #9C00FF;padding-left:10px">近一天湿度状态</p>
+                          <div style="height:95%;width:100%" id="myCharthumidity"></div>
+                        </div>
+                  </Col>
+              </Row>
+
+              <Row :gutter="16">
+                  <Col span="12" style="margin-top:10px;display:flex;justify-content:space-between">
+                    <div style="width:45%">
+                      <div class="chartone" style="height:200px;">
+                          <p style="text-align:left;border-left:4px solid #FF7E00;padding-left:10px">震动指标数</p>
+                          <div style="height:95%;width:100%" id="myChartshake"></div>
+                        </div>
+                        <div class="chartone" style="height:230px;margin-top:10px" v-if="timeslist.runningTimes">
+                          <p style="text-align:left;border-left:4px solid #0048FF;padding-left:10px" v-if="timeslist.line == 1">连续运行时长</p>
+                          <p style="text-align:left;border-left:4px solid #0048FF;padding-left:10px" v-if="timeslist.line == 0">离线时长</p>
+                          <div class="callinbox">
+                            <span>{{timeslist.runningTimes.days}}</span>天
+                            <span>{{timeslist.runningTimes.hours}}</span>小时
+                            <span>{{timeslist.runningTimes.minutes}}</span>分钟
+                            <span>{{timeslist.runningTimes.second}}</span>秒
+                          </div>
+                          <p style="text-align:left;border-left:4px solid #FF0000;padding-left:10px;margin-top:20px" v-if="timeslist.line == 1">上线时刻</p>
+                          <p style="text-align:left;border-left:4px solid #FF0000;padding-left:10px;margin-top:20px" v-if="timeslist.line == 0">离线时刻</p>
+                          <div class="callinboxs">
+                            <span>{{timeslist.lineTimes.year}}</span>年
+                            <span>{{timeslist.lineTimes.month}}</span>月
+                            <span>{{timeslist.lineTimes.day}}</span>日
+                          </div>
+                          <div class="callinboxs" style="padding:0">
+                            <span>{{timeslist.lineTimes.hours}}</span>时
+                            <span>{{timeslist.lineTimes.minute}}</span>分
+                            <span>{{timeslist.lineTimes.second}}</span>秒
+                          </div>
+                        </div>
+                    </div>
+                     <div style="width:52%;">
+                      <div class="chartone" style="height:280px;">
+                          <p style="text-align:left;border-left:4px solid #FF7E00;padding-left:10px">一周安全事件态势</p>
+                          <div style="height:95%;width:100%" id="myCharrendWeek"></div>
+                        </div>
+                        <div class="chartone" style="height:150px;margin-top:10px">
+                          <p style="text-align:left;border-left:4px solid #9C00FF;padding-left:10px">端口使用状况</p>
+                          <div style="display:flex;padding:5px 20px;justify-content:space-between">
+                              <div style="width:60px">
+                                <img src="../../public/img/91.png" v-if="devicestate.LAN1 == '摄像机'"/>
+                                <img src="../../public/img/92.png" v-if="devicestate.LAN1 == '电子围栏'"/>
+                                <img src="../../public/img/93.png" v-if="devicestate.LAN1 == '交通卡口'"/>
+                                <img src="../../public/img/94.png" v-if="devicestate.LAN1 == 'wifi嗅探'"/>
+                                <p v-if="devicestate.LAN1 == '未使用'" style="color:#BEBEBE;line-height:28px">未使用</p>
+                                <p>1<span v-if="devicestate.LAN1 != '未使用'">.{{devicestate.LAN1}}</span></p>
+                              </div>
+                              <div style="width:60px">
+                                <img src="../../public/img/91.png" v-if="devicestate.LAN2 == '摄像机'"/>
+                                <img src="../../public/img/92.png" v-if="devicestate.LAN2 == '电子围栏'"/>
+                                <img src="../../public/img/93.png" v-if="devicestate.LAN2 == '交通卡口'"/>
+                                <img src="../../public/img/94.png" v-if="devicestate.LAN2 == 'wifi嗅探'"/>
+                                <p v-if="devicestate.LAN2 == '未使用'" style="color:#BEBEBE;line-height:28px">未使用</p>
+                                <p>2<span v-if="devicestate.LAN2 != '未使用'">.{{devicestate.LAN2}}</span></p>
+                              </div>
+                              <div style="width:60px">
+                                <img src="../../public/img/91.png" v-if="devicestate.LAN3 == '摄像机'"/>
+                                <img src="../../public/img/92.png" v-if="devicestate.LAN3 == '电子围栏'"/>
+                                <img src="../../public/img/93.png" v-if="devicestate.LAN3 == '交通卡口'"/>
+                                <img src="../../public/img/94.png" v-if="devicestate.LAN3 == 'wifi嗅探'"/>
+                                <p v-if="devicestate.LAN3 == '未使用'" style="color:#BEBEBE;line-height:28px">未使用</p>
+                                <p>3<span v-if="devicestate.LAN3 != '未使用'">.{{devicestate.LAN3}}</span></p>
+                              </div>
+                              <div style="width:60px">
+                                <img src="../../public/img/91.png" v-if="devicestate.LAN4 == '摄像机'"/>
+                                <img src="../../public/img/92.png" v-if="devicestate.LAN4 == '电子围栏'"/>
+                                <img src="../../public/img/93.png" v-if="devicestate.LAN4 == '交通卡口'"/>
+                                <img src="../../public/img/94.png" v-if="devicestate.LAN4 == 'wifi嗅探'"/>
+                                <p v-if="devicestate.LAN4 == '未使用'" style="color:#BEBEBE;line-height:28px">未使用</p>
+                                <p>4<span v-if="devicestate.LAN4 != '未使用'">.{{devicestate.LAN4}}</span></p>
+                              </div>
+                          </div>
+                          <div style="display:flex;padding:5px 20px;justify-content:space-between">
+                              <div style="width:60px">
+                                <img src="../../public/img/91.png" v-if="devicestate.LAN5 == '摄像机'"/>
+                                <img src="../../public/img/92.png" v-if="devicestate.LAN5 == '电子围栏'"/>
+                                <img src="../../public/img/93.png" v-if="devicestate.LAN5 == '交通卡口'"/>
+                                <img src="../../public/img/94.png" v-if="devicestate.LAN5 == 'wifi嗅探'"/>
+                                <p v-if="devicestate.LAN5 == '未使用'" style="color:#BEBEBE;line-height:28px">未使用</p>
+                                <p>5<span v-if="devicestate.LAN5 != '未使用'">.{{devicestate.LAN5}}</span></p>
+                              </div>
+                              <div style="width:60px">
+                                <img src="../../public/img/91.png" v-if="devicestate.LAN6 == '摄像机'"/>
+                                <img src="../../public/img/92.png" v-if="devicestate.LAN6 == '电子围栏'"/>
+                                <img src="../../public/img/93.png" v-if="devicestate.LAN6 == '交通卡口'"/>
+                                <img src="../../public/img/94.png" v-if="devicestate.LAN6 == 'wifi嗅探'"/>
+                                <p v-if="devicestate.LAN6 == '未使用'" style="color:#BEBEBE;line-height:28px">未使用</p>
+                                <p>6<span v-if="devicestate.LAN6 != '未使用'">.{{devicestate.LAN6}}</span></p>
+                              </div>
+                              <div style="width:60px">
+                                <img src="../../public/img/91.png" v-if="devicestate.LAN7 == '摄像机'"/>
+                                <img src="../../public/img/92.png" v-if="devicestate.LAN7 == '电子围栏'"/>
+                                <img src="../../public/img/93.png" v-if="devicestate.LAN7 == '交通卡口'"/>
+                                <img src="../../public/img/94.png" v-if="devicestate.LAN7 == 'wifi嗅探'"/>
+                                <p v-if="devicestate.LAN7 == '未使用'" style="color:#BEBEBE;line-height:28px">未使用</p>
+                                <p>7<span v-if="devicestate.LAN7 != '未使用'">.{{devicestate.LAN7}}</span></p>
+                              </div>
+                              <div style="width:60px">
+                                <img src="../../public/img/91.png" v-if="devicestate.LAN8 == '摄像机'"/>
+                                <img src="../../public/img/92.png" v-if="devicestate.LAN8 == '电子围栏'"/>
+                                <img src="../../public/img/93.png" v-if="devicestate.LAN8 == '交通卡口'"/>
+                                <img src="../../public/img/94.png" v-if="devicestate.LAN8 == 'wifi嗅探'"/>
+                                <p v-if="devicestate.LAN8 == '未使用'" style="color:#BEBEBE;line-height:28px">未使用</p>
+                                <p>8<span v-if="devicestate.LAN8 != '未使用'">.{{devicestate.LAN8}}</span></p>
+                              </div>
+                          </div>
+                        </div>
+                    </div> 
+                  </Col>
+                  <Col span="12" style="margin-top:10px;">
+                      <div class="chartone" style="height:440px">
+                          <p style="text-align:left;border-left:4px solid #FF0084;padding-left:10px">各端口流量统计</p>
+                          <div style="height:95%;width:100%" id="myChartkb"></div>
+                        </div>
+                  </Col>
+              </Row>
+            </div>
+           <div style="width:200px;height:40px"></div>
+          </div>
+        </transition>
+
+
+
+
+
 <transition name="fade">
         <div class="bigright" v-show="bigrightshow" transiton="fade"  @click.stop="fun()">
-           <p class="detailpage">详情页面</p>
+           <p class="detailpage" ><span style="color:#1D60FE">详情页面</span>&nbsp;&nbsp;&nbsp;&nbsp;<span  @click.stop="smalltable">小屏秀</span></p>
            <img src="../../public/img/xxx.png" style="position:absolute;right:30px;top:20px"  @click.stop="closebright"/>
             <div class="detail-box" ref="bright">
                 <div class="detail-title">
@@ -191,7 +376,7 @@
                         <span style="margin-right:0">纬度：<span style="color:#1D60FE">{{rightlist.latitude}}</span></span>
                       </div>
                       <div>
-                        <span style="min-width:197px;width:50%;margin-right:0">MAC地址：<span style="color:#1D60FE">{{rightlist.mac}}</span></span>
+                        <span style="min-width:198px;width:50%;margin-right:0">MAC地址：<span style="color:#1D60FE">{{rightlist.mac}}</span></span>
                         <span style="margin-right:0">责任人：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkperson(rightlist.maintenanceUserId)">{{rightlist.maintenanceUser}}</span></span>
                       </div>
                       <div>
@@ -298,8 +483,8 @@
             </div>
             <div class="controls msgbox" v-if="wangguanshow">
               <p style="min-width:180px">运行状态：
-                <span v-if="msglist.gatewayState==1" style="color:#FF5E5E">离线</span>
-                <span v-if="msglist.gatewayState==0" style="color:#1D60FE">在线</span>
+                <span v-if="msglist.gatewayState==0" style="color:#FF5E5E">离线</span>
+                <span v-if="msglist.gatewayState==1" style="color:#1D60FE">在线</span>
                 </p>
               <p style="min-width:250px">终端连续运行时长：
                 <span style="color:#1D60FE">{{msglist.runningTimes}}</span>
@@ -384,7 +569,7 @@
               </div>
             </div>
 
-            <div v-if="msglist.gatewayState?msglist.gatewayState==1 && wangguanshow:'false'">
+            <div v-if="msglist.gatewayState?msglist.gatewayState==0 && wangguanshow:'false'">
              <div class="detail-title" >
                   <img src="../../public/img/23.png"/>
                   <p>事件分析</p>
@@ -571,11 +756,11 @@
                       <span style="color:#696C6F">{{aa.deviceInstallAddress}}</span>
                     </div>
                     <div style="min-width:90%;margin-left:10%;align-items:flex-start" >
-                        <p >故障描述：</p>
+                        <p >故障信息：</p>
                         <div style="display:block;width:100%;margin-top:0">
                         <div v-for="(list,num) in aa.detail" :key="num" style="margin-top:0">
                             <!-- <i-input type="textarea" :rows="4" :placeholder="list.alertDescription" style="width:50%;margin-right:10px" ></i-input><span style="margin-top:20px">检测时间：2018-11-05 09:40:58</span> -->
-                            <span style="color:#ff3636">{{list.descr}}</span><span style="margin-left:10px">检测时间：{{list.monitorTime}}</span>
+                            <span style="color:#ff3636">检测时间：{{list.monitorTime}}</span><span style="margin-left:15px">故障描述：{{list.descr}}</span>
                         </div>
                         </div>
                     </div>
@@ -626,6 +811,7 @@
              <Modal
               v-model="modal1"
               title="事件追溯"
+              width="550"
               >
               <p v-if="tracingdata.length == 0">无事件追溯</p>
               <p v-for="(list,index) in tracingdata" v-if="tracingdata.length > 0" :key="index">检测时间：{{list.createTime}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;事件内容：{{list.descr}}</p>
@@ -916,8 +1102,8 @@
                  <div class="content" style="border:none;" v-for="(lists,index) in devicelist" :key="index">
                     <div style="min-width:100%">
                       <div style="display:block" >
-                      <span style="font-size:16px">故障描述：</span>
-                      <span v-for="(cc,indexs) in lists.detail"  :key="indexs" id="desrcspan" :style="indexs==0?'margin-left:0px':'margin-left:80px'">{{cc.descr}}<br /></span>
+                      <span style="font-size:16px">故障信息：</span>
+                      <span v-for="(cc,indexs) in lists.detail"  :key="indexs" id="desrcspan" :style="indexs==0?'margin-left:0px':'margin-left:80px'">检测时间：{{cc.monitorTime}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;故障描述：{{cc.descr}}<br /></span>
                       </div>
                     </div>
                     <div style="min-width:30%">
@@ -1112,13 +1298,17 @@ export default {
   name: "safemanage",
   components: {
     ArcgisMap,
-    ArcgisMapsmall
+    ArcgisMapsmall,
   },
   data() {
     return {
+      devicestate:{},
+      timeslist:{},
+      bigrightshow2:false,
       tracingdata:[],
       modal1:false,
       timer:null,
+      runtimer:null,
       mintime:60000,
       hadtime:true,
       model1:'两分钟',
@@ -1162,7 +1352,7 @@ export default {
       feebacklist:[],
       remindlist:[],
       workdetail:false,
-      olddata:[],
+      olddata:'',
       hisworklist:[],
       nowworklist:[],
       device:[],
@@ -1226,13 +1416,15 @@ export default {
                 {title: '在线状态',key: 'isOnline',width:90,},
                 {title: '检测时间',key: 'gatewayStateUpdateTime',width:155,className:'updatetime'}
                 ],
-      data2: []
+      data2: [],
+      rightlist2:[],
     };
   },
   beforeDestroy() {
       if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
           clearInterval(this.timer); //关闭
       }
+      
   },
   mounted() {
     // this.drawLine();
@@ -1362,10 +1554,10 @@ export default {
             axisLabel: {
                 formatter: function (value) {
                   var texts = [];
-                  if(value==0){
+                  if(value==1){
                   texts.push('在线');
                   }
-                  else if (value ==1) {
+                  else if (value ==0) {
                   texts.push('离线');
                   }
                   return texts;
@@ -1382,9 +1574,9 @@ export default {
         type: 'scatter',
         itemStyle:{
 					normal:{color:function(value){
-						if(value.data[1]=="0")
+						if(value.data[1]=="1")
 							return "#8CC152";
-						else if(value.data[1]=="1")
+						else if(value.data[1]=="0")
               return "#ED5565";
           }}
     },
@@ -1570,9 +1762,11 @@ export default {
         localStorage.setItem('breaktime',this.model1);
       }
       this.statusdata = false
+      // this.bigrightshow2 = false
       if(this.bigrightshow == true){
         this.bigrightshow = false
-         this.getwayip = ''
+        this.getwayip = ''
+         clearInterval(this.runtimer)
       }else if(this.bigrightshow == false && this.getwayip !== ''){
         this.bigrightshow = true
       }
@@ -1631,7 +1825,7 @@ export default {
           this.$http.get("gis/gis/getCrossGatewayByIp?",{gatewayIp:this.rightlist.gatewayIp},res=>{
               this.data2 = res.data.gateMapList
               this.datades = res.data
-              this.data2.forEach (el=>{ if(el.isOnline == 0) { el.isOnline = '在线' }else{el.isOnline = '离线'}})
+              this.data2.forEach (el=>{ if(el.isOnline == 1) { el.isOnline = '在线' }else{el.isOnline = '离线'}})
               // console.log(this.data2)
           },err=>{});
 
@@ -1733,7 +1927,7 @@ export default {
           this.$http.get("gis/gis/getCrossGatewayByIp?",{gatewayIp:this.rightlist.gatewayIp},res=>{
               this.data2 = res.data.gateMapList
               this.datades =  res.data
-              this.data2.forEach (el=>{ if(el.isOnline == 0) { el.isOnline = '在线' }else{el.isOnline = '离线'}})
+              this.data2.forEach (el=>{ if(el.isOnline == 1) { el.isOnline = '在线' }else{el.isOnline = '离线'}})
               // console.log(this.data2)
           },err=>{});
 
@@ -2579,6 +2773,8 @@ export default {
     closebright(){
       this.getwayip = ''
       this.bigrightshow = false
+      this.bigrightshow2 = false
+      clearInterval(this.runtimer)
     },
     fun(){
       var cc=document.getElementsByClassName("bigright")[0];
@@ -2610,6 +2806,674 @@ export default {
        this.$http.get("alert/warning/selectEventByAlertId",{alertId:id},res=>{
                this.tracingdata = res.data
           },err=>{});
+    },
+    bigtable(){
+      this.bigrightshow2 = false
+      this.bigrightshow = true
+      clearInterval(this.runtimer)
+    },
+    smalltable(){
+      this.getwayip = ''
+      this.bigrightshow = false
+      this.bigrightshow2 = true
+      this.$http.get("res/fullScreen/gatewayAlert",{gateId:this.olddata},res=>{
+               this.rightlist2 = res.data[0]
+                this.$http.get("res/fullScreen/alertTrendWeek?",{gatewayIp:this.rightlist2.gatewayIp},res=>{
+                      this.rendWeek(res.data)
+                },err=>{});
+
+          },err=>{});
+
+        this.$http.get("res/fullScreen/gatewayStatus?",{gatewayId:this.olddata},res=>{
+                this.online(res.data.gatewayState)
+            },err=>{});
+        this.$http.get("res/fullScreen/gatewayTemphum?",{gatewayId:this.olddata,perfType:'temperature'},res=>{
+                this.temperature(res.data.temperature,res.data.threshold)
+            },err=>{});
+        this.$http.get("res/fullScreen/gatewayTemphum?",{gatewayId:this.olddata,perfType:'humidity'},res=>{
+                this.humidity(res.data.humidity,res.data.threshold)
+            },err=>{});
+        this.$http.get("res/fullScreen/gatewayShake?",{gatewayId:this.olddata,perf:'shake'},res=>{
+               this.shake(res.data)
+            },err=>{});
+        this.$http.get("res/fullScreen/gatewayShake?",{gatewayId:this.olddata,perf:'running_times'},res=>{
+               this.timeslist = res.data
+               var that = this
+               this.runtimer = setInterval(function () {
+                 if (that.timeslist.runningTimes.second >= 0) {
+                      that.timeslist.runningTimes.second = that.timeslist.runningTimes.second + 1
+                    }
+                    if (that.timeslist.runningTimes.second >= 60) {
+                      that.timeslist.runningTimes.second = 0
+                      that.timeslist.runningTimes.minutes = that.timeslist.runningTimes.minutes + 1
+                    }
+                    if (that.timeslist.runningTimes.minutes >= 60) {
+                      that.timeslist.runningTimes.minutes = 0
+                      that.timeslist.runningTimes.hours = that.timeslist.runningTimes.hours + 1
+                    }
+                    if (that.timeslist.runningTimes.hours >= 24) {
+                      that.timeslist.runningTimes.hours = 0
+                      that.timeslist.runningTimes.days = that.timeslist.runningTimes.days + 1
+                    }
+               },1000)
+            },err=>{});
+        this.$http.get("res/fullScreen/gatewayLanflow?",{gatewayId:this.olddata},res=>{
+               this.devicekb(res.data)
+            },err=>{});
+        this.$http.get("res/fullScreen/gatewayPortDevice?",{gatewayId:this.olddata},res=>{
+               this.devicestate = res.data
+            },err=>{});
+    },
+    online(data){
+        // 基于准备好的dom，初始化echarts实例
+        let myCharts = this.$echarts.init(document.getElementById('myChartonline'))
+        window.addEventListener("resize", function () {
+          myCharts.resize();
+        });
+              // 绘制图表
+              myCharts.setOption({
+                  xAxis: {
+            splitLine:'false',
+                  name:'时间',
+                  type:'time',
+                  data: [],
+          },
+          tooltip: {
+              trigger: "axis",
+              showDelay: 0,
+              axisPointer: {
+                  type: "cross",
+                  lineStyle: {
+                      type: "dashed",
+                      width: 1
+                  }
+              }
+          },
+          grid:{
+            left:55
+          },
+          yAxis: {
+              type: 'value',
+                scale: false,
+                  min: 0,
+                  max: 1,
+                  splitNumber: 1,
+                  margin: 0,
+                  axisTick: {
+                      length: 0,
+                      inside: true,
+                      interval: 0,
+                      show: false
+                  },
+                  
+                  axisLabel: {
+                      formatter: function (value) {
+                        var texts = [];
+                        if(value==1){
+                        texts.push('在线');
+                        }
+                        else if (value ==0) {
+                        texts.push('离线');
+                        }
+                        return texts;
+                        },
+                      textStyle: {
+                          color: "#333"
+                      },
+                      margin: 5
+                  }
+          },
+          series: [{
+              data: data,
+              symbolSize: 4,
+              type: 'scatter',
+              itemStyle:{
+                normal:{color:function(value){
+                  if(value.data[1]=="1")
+                    return "#8CC152";
+                  else if(value.data[1]=="0")
+                    return "#ED5565";
+                }}
+          }
+          }, 
+          //  {
+          //       name: '',
+          //       type: 'line',
+          //       data: data,
+          //       symbol: 'none',
+          //       lineStyle: {
+          //           normal: {
+          //               color: '#59EE59',
+          //               width: 1,
+          //           }
+          //       }
+          //   }
+          ]
+              });
+    },
+    temperature(data,threshold){
+         // 基于准备好的dom，初始化echarts实例
+        let myChart = this.$echarts.init(document.getElementById('myCharttemperature'))
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+        var mytime24 = new Array();
+			var i=0;
+			var ttt=1533139200000;
+			for(;i<23;i++){
+				mytime24.push([ttt,'']);//传入value的值为‘’则该值点不会显示在图表中
+				ttt=ttt+3600000;
+ 
+			}//生成24小时的时间范围数组数据。
+        // 绘制图表
+        myChart.setOption({
+            xAxis: {
+            splitLine:'false',
+			    	type:'time',
+            data: [],
+            },
+            tooltip: {
+                trigger: "axis",
+                // showDelay: 0,
+                axisPointer: {
+                    // type: "cross",
+                    lineStyle: {
+                        type: "dashed",
+                        width: 1,
+                        color:'#B8F2E8'
+                    }
+                }
+            },
+            grid:{
+              left:30
+            },
+            yAxis: {
+              name: '℃',
+                // type: 'value',
+                max: function(value) { //设置y轴最大值
+                    return 120;
+                },
+                min: function(value) {
+                    return -40;
+                },
+                splitLine:{//去掉网格线
+                    show:false
+                },
+                axisTick: {//去掉刻度
+                    show: false
+                }
+            },
+            series: [{
+                // symbolSize: 4,
+                name: '温度',
+                data: data,
+                type: 'line',
+                lineStyle:{
+                  color:'#6EDAB8',
+                  width: 1,
+                },
+                itemStyle:{
+                  color:'#6EDAB8',
+                },
+                markLine: {
+                        symbol: ['none', 'none'],//去掉箭头
+                        itemStyle: {
+                            normal: {
+                                lineStyle: { //全局的样式
+                                    type: 'dashed',
+                                    width: 2
+                                }
+                            }
+                        },
+                        data: [
+                        {       label: {normal:{position:'middle',formatter:threshold+'℃警戒线'}},
+                                yAxis: threshold, //平行于x轴且y轴值为6.5的标线
+                                itemStyle: {
+                                    normal: { color: '#F55959' } //线条颜色
+                                }
+                        }]
+
+                },
+                areaStyle: {color: {
+                      type: 'linear',
+                      x: 0,
+                      y: 0,
+                      x2: 0,
+                      y2: 1,
+                      colorStops: [{
+                          offset: 0, color: '#B8F2E8' // 0% 处的颜色
+                      }, {
+                          offset: 1, color: '#B8F2E8' // 100% 处的颜色
+                      }],
+                      globalCoord: false // 缺省为 false
+                  }}
+              }]
+            });
+              
+    },
+    humidity(data,threshold){
+         // 基于准备好的dom，初始化echarts实例
+        let myChart = this.$echarts.init(document.getElementById('myCharthumidity'))
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+        var mytime24 = new Array();
+			var i=0;
+			var ttt=1533139200000;
+			for(;i<23;i++){
+				mytime24.push([ttt,'']);//传入value的值为‘’则该值点不会显示在图表中
+				ttt=ttt+3600000;
+ 
+			}//生成24小时的时间范围数组数据。
+        // 绘制图表
+        myChart.setOption({
+            xAxis: {
+            splitLine:'false',
+			    	name:'',
+			    	type:'time',
+            data: [],
+        },
+        tooltip: {
+            trigger: "axis",
+            // showDelay: 0,
+            axisPointer: {
+                // type: "cross",
+                lineStyle: {
+                    type: "dashed",
+                    width: 1,
+                    color:'#B8F2E8'
+                }
+            }
+        },
+        grid:{
+          left:30
+        },
+        yAxis: {
+          name: 'RH',
+            type: 'value',
+            max: function(value) { //设置y轴最大值
+                return 120;
+            },
+            splitLine:{//去掉网格线
+                show:false
+            },
+            axisTick: {//去掉刻度
+                show: false
+            }
+        },
+        series: [{
+            // symbolSize: 4,
+            name: '湿度',
+            data: data,
+            type: 'line',
+            lineStyle:{
+              color:'#6EDAB8',
+              width: 1,
+            },
+            itemStyle:{
+              color:'#6EDAB8',
+            },
+            markLine: {
+                    symbol: ['none', 'none'],//去掉箭头
+                    itemStyle: {
+                        normal: {
+                            lineStyle: { //全局的样式
+                                type: 'dashed',
+                                width: 2
+                            }
+                        }
+                    },
+                    data: [
+                    {       label: {normal:{position:'middle',formatter:threshold+'RH警戒线'}},
+                            yAxis: threshold, //平行于x轴且y轴值为6.5的标线
+                            itemStyle: {
+                                normal: { color: '#F55959' } //线条颜色
+                            }
+                    }]
+
+            },
+            areaStyle: {color: {
+                  type: 'linear',
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [{
+                      offset: 0, color: '#B8F2E8' // 0% 处的颜色
+                  }, {
+                      offset: 1, color: '#B8F2E8' // 100% 处的颜色
+                  }],
+                  globalCoord: false // 缺省为 false
+              }}
+          }]
+        });
+              
+    },
+    shake(data){
+      var aaa = [];
+
+for (var i = 0; i <= 180; i++) {
+    var t = i / 180 * Math.PI;
+    var r = 10;
+    aaa.push([r, i]);
+}
+      let myChart = this.$echarts.init(document.getElementById('myChartshake'))
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+      myChart.setOption({
+            tooltip: {
+        formatter: '震动次数: '+data.shake
+          },
+          toolbox: {
+              show: true,
+              feature: {
+                  // mark: {
+                  //     show: true
+                  // },
+                  // restore: {
+                  //     show: true
+                  // },
+                  // saveAsImage: {
+                  //     show: true
+                  // }
+              }
+          },
+          polar: {
+        "center": ["50%", "70%"], //整体的位置设置
+              "radius": "120%",
+    },
+          angleAxis: {
+        type: 'value',
+        max: 360,
+        startAngle: 180,
+        axisLine: {
+            show: false
+        },
+        splitLine: {
+            show: false
+        },
+        axisLabel: {
+            show: false
+        },
+        axisTick: {
+            show: false
+        }
+    },
+    radiusAxis: {
+        min: 0,
+        axisLine: {
+            show: false
+        },
+        splitLine: {
+            show: false
+        },
+        axisLabel: {
+            show: false
+        },
+        axisTick: {
+            show: false
+        }
+    },
+        "series": [
+          {
+            "name": "指标",
+            "type": "gauge",
+            coordinateSystem: 'polar',
+            zlevel:2,
+            "startAngle": 180, //总的360，设置180就是半圆
+            "endAngle": 0,
+            min: 0,
+            max: 5000,
+            splitNumber: 1,
+            "center": ["50%", "70%"], //整体的位置设置
+            "radius": "120%",
+            "axisLine": {
+                "lineStyle": {
+                    "width": 20, //柱子的宽度
+                    "color": [[data.shakeFloat, "rgba(0,0,0,0.01)"], [1, "#dce3ec"]] //0.298是百分比的比例值（小数），还有对应两个颜色值
+                }
+            },
+            "axisTick": {
+                "show": false
+            },
+            axisLabel: { //刻度标签
+                              distance: -10,
+                              color: '#C8C9CA',
+                              fontSize: 12,
+                          },
+            "splitLine": {
+                "show": false
+            },
+            "pointer": {
+                "width": 5, //指针的宽度
+                "length": "90%", //指针长度，按照半圆半径的百分比
+                "color": "#000"
+            },
+            itemStyle: {
+                    color: '#000'
+                  },
+            "title": {
+                "show": true,
+                "offsetCenter": [0, "25%"], //标题位置设置
+                "textStyle": { //标题样式设置
+                    "color": "#F99536",
+                    "fontSize": 13,
+                    "fontFamily": "微软雅黑",
+                    "fontWeight": "bold"
+                }
+            },
+            "detail": {
+                "show": false
+            },
+            "data": [{ //显示数据
+                "value": data.shake,
+                "name": '震动次数:'+data.shake+'次'
+            }]
+        },
+        {
+        name: 'line',
+        type: 'line',
+        coordinateSystem: 'polar',
+        zlevel:1,
+        showSymbol: false,
+        lineStyle: {
+            normal: {
+                width: 40,
+                color: {
+                    type: 'linear',
+                    x: 0,
+                    y: 0,
+                    x2: 1,
+                    y2: 0,
+                    colorStops: [{
+                        offset: 0,
+                        color: '#37C78B' // 0% 处的颜色
+                    }, {
+                        offset: 0.5,
+                        color: '#F3E144' // 100% 处的颜色
+                    }, {
+                        offset: 1,
+                        color: '#F76249' // 100% 处的颜色
+                    }],
+                    globalCoord: false // 缺省为 false
+                }
+            }
+        },
+        data: aaa
+    }
+        ]
+        });
+    },
+    devicekb(data){
+      let myChart = this.$echarts.init(document.getElementById('myChartkb'))
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+         myChart.setOption({
+           symbol: 'Kb',
+           color: ['#F55959'],
+            tooltip : {
+                trigger: 'axis',
+                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                },
+                formatter: '{b}<br />{a}: {c}/kb'
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis : [
+                {
+                    type : 'category',
+                    data : data.lan,
+                    // data : ['刑事犯罪\n前科','刑事犯罪\n前科','LAN3\n电子围栏','LAN4\n电子围栏','LAN5\n电子围栏','LAN6\n电子围栏','LAN7\n电子围栏','LAN8\n电子围栏',],
+                    axisTick: {
+                        alignWithLabel: true
+                    }
+                }
+            ],
+            yAxis : [
+                {   name: 'Kb',
+                    type : 'value',
+                    scale: false,
+                    min: 0,
+                    max: function(value) { //设置y轴最大值
+                    return value.max+200;
+                    },
+                    splitNumber: 1,
+                    splitLine:{//去掉网格线
+                        show:false
+                    },
+                    axisTick: {//去掉刻度
+                        show: false
+                    }
+                }
+            ],
+            series : [
+                {
+                    name:'流量',
+                    type:'bar',
+                    barWidth: '60%',
+                    data:data.flows
+                }
+            ]
+         })
+    },
+    rendWeek(data){
+       let myChart = this.$echarts.init(document.getElementById('myCharrendWeek'))
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+         myChart.setOption({
+           tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                top:10,
+                data:['网关离线','端口插拔','流量异常','震动异常']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: data.day,
+                // splitLine: {
+                //         show: true,
+                //         lineStyle: {
+                //             // 使用深浅的间隔色
+                //             color: ['#aaa', '#ddd']
+                //         }
+                //     },
+            },
+            yAxis: {
+                type: 'value',
+                // name: 'kg',
+                min: 0,
+                max: function(value) { //设置y轴最大值
+                    return value.max+20;
+                    },
+                splitNumber: 1,
+                axisTick: {
+                        show: false
+                    },
+                axisLine: {
+                        lineStyle: {
+                            color: '#3f7fb2'
+                        }
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#000'
+                        }
+                    },
+                    splitLine:{//去掉网格线
+                        show:false
+                    },
+
+            },
+            series: [
+                {
+                    name:'网关离线',
+                    type:'line',
+                    // stack: '总量',
+                    data:data.gatewayOfflineAlert,
+                    symbolSize:10,
+                    itemStyle: {
+                        normal: {
+                            color: '#F04D4D',
+                        }
+                    }
+                },
+                {
+                    name:'端口插拔',
+                    type:'line',
+                    // stack: '总量',
+                    data:data.portFlowAlert,
+                    symbol:'rect',
+                    symbolSize:10,
+                    itemStyle: {
+                        normal: {
+                            color: '#00B7EE',
+                        }
+                    }
+                },
+                {
+                    name:'流量异常',
+                    type:'line',
+                    // stack: '总量',
+                    data:data.illegalInvasionAlert,
+                    symbol:'triangle',
+                    symbolSize:10,
+                    itemStyle: {
+                        normal: {
+                            color: '#ADE15F',
+                        }
+                    }
+                },
+                {
+                    name:'震动异常',
+                    type:'line',
+                    // stack: '总量',
+                    data:data.shockAbnormalAlert,
+                    symbol:'diamond',
+                    symbolSize:10,
+                    itemStyle: {
+                        normal: {
+                            color: '#F7A945',
+                        }
+                    }
+                },
+            ]
+         })
     }
   }
 };
@@ -2726,6 +3590,18 @@ export default {
   z-index: 200;
   transition: all 300ms;
 }
+.bigright2{
+  min-width: 1200px;
+  width: 90%;
+  height: 100%;
+  background:#fff;
+  position: fixed;
+  right: 0;
+  top:60px;
+  z-index: 200;
+  transition: all 300ms;
+  overflow: auto;
+}
 .fade-enter-active, .fade-leave-active {
   /* transition: opacity .5s */
 }
@@ -2740,6 +3616,7 @@ export default {
   font-size:16px;
   text-align: left;
   padding: 10px 0;
+  cursor: pointer;
 }
 .detail-box{
   margin:0 0px 0 40px; 
@@ -3041,4 +3918,5 @@ export default {
   z-index: 20;
   cursor: pointer;
 }
+
 </style>

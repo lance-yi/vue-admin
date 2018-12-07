@@ -57,8 +57,10 @@
                   <p>基本信息</p>
                 </div>
            
-                <div class="detail-text" v-if="lampdata.length > 0">
+                <div class="detail-text" >
+                  
                   <img src="../../public/img/dy.png" class="detail-textimg"/>
+                  <div v-if="lampdata.length > 0">
                   <img src="../../public/img/g.png" class="fixedimg" style="bottom:85px;left:12px" v-if="msgdata.res_state==1"/>
                   <img src="../../public/img/r.png" class="fixedimg" style="bottom:85px;left:12px" v-if="msgdata.res_state==0"/>
 
@@ -73,7 +75,7 @@
 
                   <img src="../../public/img/g.png" class="fixedimg" style="left:58px" v-if="lampdata[3].state==1"/>
                   <img src="../../public/img/r.png" class="fixedimg" style="left:58px" v-if="lampdata[3].state==0"/>
-
+                  </div>
                   <div style="left:26px;" class="fixedborder" ></div>
                     <div class="detail-textbox">
                       <p>安装地址：<span style="color:#1D60FE">{{rtopdata.install_address}}</span></p>
@@ -99,7 +101,7 @@
                 </div>
                
                <div class="control" v-if="typeone">
-                  <div>
+                  <div v-if="usedlist.inUsed">
                         <span style="min-width:330px">已使用端口：<span style="color:#1D60FE">{{usedlist.inUsed}}</span></span>
                         <span>未使用端口：<span style="color:#1D60FE">{{usedlist.unUsed}}</span></span>
                         <button   class="zhuanyixuke typechange" @click="typeswitch">端口控制</button>
@@ -596,6 +598,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
                     },err=>{});
               //电源灯
               this.$http.get("res/socElectrical/getPowerLampStatus?",{ip:this.rtopdata.electric_ip,electricId:data},res=>{
+
                     this.lampdata = res.data
                     },err=>{});
               },err=>{});

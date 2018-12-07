@@ -73,3 +73,44 @@ outline: none;
   .brspans:first-child{
      margin-left:0;
   }
+  /* 小屏幕秀 */
+  .smalltextbox{
+      padding: 10px;
+      margin: 10px 20px;
+      box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+      height: 100px;
+      overflow-y: auto;
+  }
+  .smalltextbox div{
+      text-align: left;
+      font-size: 14px;
+      padding: 5px 0;
+  }
+  .chartone{
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+  }
+  .callinbox{
+    padding: 10px 0 ;
+  }
+  .callinbox span{
+    display:inline-block;
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
+    color: #00B7EE;
+    padding: 3px 5px;
+    margin: 5px;
+    border-radius:4px;
+  }
+  .callinboxs{
+    padding: 10px 0 0 0;
+  }
+  .callinboxs span{
+    display:inline-block;
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
+    color:#FF0000;
+    padding: 3px 5px;
+    margin: 5px;
+    border-radius:4px;
+  }

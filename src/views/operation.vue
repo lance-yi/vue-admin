@@ -175,6 +175,10 @@
                         <span style="text-align:left;flex: 1">{{list.installAddress}}</span>
                       </div>
                    </div>
+                   <div style="position:absolute;right:20px;top:0;cursor:pointer" @click.stop="ips(list.id)">
+                     <img src="../../public/img/20.png" style="vertical-align:middle"/>
+                     <span>查看详情</span>
+                   </div>
                    <div class="timelinecont" style="margin-top:10px">
                       <p style="min-width:160px">路口名称：<span>{{list.crossVillage}}</span></p>
                       <p style="min-width:140px">设备IP：<span @click.stop="checkdevicelist(list.poleNo)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{list.gatewayIp}}</span></p>
@@ -185,9 +189,9 @@
                       <p style="min-width:150px;margin-left: 5px">线杆编号：<span>{{list.poleNo}}</span></p>
                    </div>
                   <div class="hadpro"  style="width:100%;display:flex;margin-top:0;" >
-                     <p  v-if="list.description.length == 0">故障描述：
+                     <!-- <p  v-if="list.description.length == 0">故障描述：
                                  <a  class="brspans" @click.stop="ips(list.id)" >无故障</a>
-                        </p>
+                        </p> -->
                     <div v-if="list.description.length > 0">
                       <div v-for="(aa,index) in list.description" :key="index" style="margin-top: 15px;">
                           <div class="timelinecont" >
@@ -201,7 +205,7 @@
                         </div>
                         <div class="timelinecont" style="justify-content:left;margin-top:5px">
                         <p >故障描述：
-                                 <a  class="brspans" @click.stop="ips(list.id)">{{aa.description}}</a>&nbsp;&nbsp;&nbsp;
+                                 <a  style="border:none" >{{aa.description}}</a>&nbsp;&nbsp;&nbsp;
                                  <a  class="brspans"  style="color:#1D60FE;display:inline-block;margin-left:0;" @click.stop="tracing(aa.id)">事件追溯</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         </p>
                         <p>责任人：<span style="border-bottom:1px solid #1D60FE;cursor:pointer;" @click="checkperson(list.maintenanceUserId)">{{aa.userName}}</span></p>
@@ -529,11 +533,11 @@
                       <span style="color:#696C6F">{{aa.deviceInstallAddress}}</span>
                     </div>
                     <div style="min-width:90%;margin-left:10%;align-items:flex-start" >
-                        <p >故障描述：</p>
+                        <p >故障信息：</p>
                         <div style="display:block;width:100%;margin-top:0">
                         <div v-for="(list,num) in aa.detail" :key="num" style="margin-top:0">
                             <!-- <i-input type="textarea" :rows="4" :placeholder="list.alertDescription" style="width:50%;margin-right:10px" ></i-input><span style="margin-top:20px">检测时间：2018-11-05 09:40:58</span> -->
-                            <span style="color:#ff3636">{{list.descr}}</span><span style="margin-left:10px">检测时间：{{list.monitorTime}}</span>
+                            <span style="color:#ff3636">检测时间：{{list.monitorTime}}</span><span style="margin-left:15px">故障描述：{{list.descr}}</span>
                         </div>
                         </div>
                     </div>
@@ -754,6 +758,7 @@
            <Modal
               v-model="modal1"
               title="事件追溯"
+              width="550"
               >
               <p v-if="tracingdata.length == 0">无事件追溯</p>
               <p v-for="(list,index) in tracingdata" v-if="tracingdata.length > 0" :key="index">检测时间：{{list.createTime}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;事件内容：{{list.descr}}</p>
@@ -1132,8 +1137,8 @@
                  <div class="content" style="border:none;" v-for="(lists,index) in devicelist" :key="index">
                     <div style="min-width:100%">
                       <div style="display:block" >
-                      <span style="font-size:16px">故障描述：</span>
-                      <span v-for="(cc,indexs) in lists.detail"  :key="indexs" id="desrcspan" :style="indexs==0?'margin-left:0px':'margin-left:80px'">{{cc.descr}}<br /></span>
+                      <span style="font-size:16px">故障信息：</span>
+                      <span v-for="(cc,indexs) in lists.detail"  :key="indexs" id="desrcspan" :style="indexs==0?'margin-left:0px':'margin-left:80px'">检测时间：{{cc.monitorTime}}&nbsp;&nbsp;&nbsp;&nbsp;故障描述{{cc.descr}}<br /></span>
                       </div>
                     </div>
                     <div style="min-width:30%">
@@ -1601,10 +1606,10 @@ export default {
                 axisLabel: {
                     formatter: function (value) {
                       var texts = [];
-                      if(value==0){
+                      if(value==1){
                       texts.push('在线');
                       }
-                      else if (value ==1) {
+                      else if (value ==0) {
                       texts.push('离线');
                       }
                       return texts;
@@ -1621,9 +1626,9 @@ export default {
             type: 'scatter',
             itemStyle:{
               normal:{color:function(value){
-                if(value.data[1]=="0")
+                if(value.data[1]=="1")
                   return "#8CC152";
-                else if(value.data[1]=="1")
+                else if(value.data[1]=="0")
                   return "#ED5565";
               }}
         },
@@ -2057,7 +2062,7 @@ export default {
           //表格2
           this.$http.get("gis/gis/getCrossGatewayByIp?",{gatewayIp:this.rightlist.gatewayIp},res=>{
               this.data2 = res.data
-              this.data2.forEach (el=>{ if(el.isOnline == 0) { el.isOnline = '在线' }else{el.isOnline = '离线'}})
+              this.data2.forEach (el=>{ if(el.isOnline == 1) { el.isOnline = '在线' }else{el.isOnline = '离线'}})
               // console.log(this.data2)
           },err=>{});
 
