@@ -11,6 +11,7 @@ import menu from '@/subpage/menu.vue'
 import log from '@/views/log.vue'
 import update from '@/views/update.vue'
 import pmic from '@/views/pmic.vue'
+import address from '@/views/address.vue'
 import system from '@/views/system.vue'
 import iView from 'iview'
 
@@ -55,6 +56,10 @@ const router = new Router({
       name: 'pmic',
       component: pmic
 
+    },{
+      path: '/address',
+      name: 'address',
+      component: address
     },
     {
       path: '/update',

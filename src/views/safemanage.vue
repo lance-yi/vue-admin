@@ -2880,14 +2880,19 @@ export default {
           },
           tooltip: {
               trigger: "axis",
-              showDelay: 0,
-              axisPointer: {
-                  type: "cross",
-                  lineStyle: {
-                      type: "dashed",
-                      width: 1
-                  }
-              }
+              formatter: function (params) {
+                let date= new Date(params[0].data[0]).toLocaleString().replace(/:\d{1,2}$/,' '); //此为时间戳
+                var res='<div><p>'+date+'</p></div>'
+                for(var i=0;i<params.length;i++){
+                    if(params[i].data[1] == 1){
+                        params[i].data = '在线'
+                    }else{
+                        params[i].data = '离线'
+                    }
+                res+='<p>状态:'+params[i].data+'</p>'
+                }
+                return res;
+                },
           },
           grid:{
             left:55
@@ -2990,12 +2995,9 @@ export default {
             yAxis: {
               name: '℃',
                 // type: 'value',
-                max: function(value) { //设置y轴最大值
-                    return 120;
-                },
-                min: function(value) {
-                    return -40;
-                },
+                max: threshold+10,
+                min:-40,
+                splitNumber: 1,
                 splitLine:{//去掉网格线
                     show:false
                 },
@@ -3021,13 +3023,18 @@ export default {
                             normal: {
                                 lineStyle: { //全局的样式
                                     type: 'dashed',
-                                    width: 2
+                                    width: 1
                                 }
                             }
                         },
                         data: [
                         {       label: {normal:{position:'middle',formatter:threshold+'℃警戒线'}},
                                 yAxis: threshold, //平行于x轴且y轴值为6.5的标线
+                                itemStyle: {
+                                    normal: { color: '#F55959' } //线条颜色
+                                }
+                        },{       label: {normal:{position:'start',formatter:'-20 '}},
+                                yAxis: -20, //平行于x轴且y轴值为6.5的标线
                                 itemStyle: {
                                     normal: { color: '#F55959' } //线条颜色
                                 }
@@ -3089,7 +3096,7 @@ export default {
           left:30
         },
         yAxis: {
-          name: 'RH',
+          name: '%',
             type: 'value',
             max: function(value) { //设置y轴最大值
                 return 120;
@@ -3119,12 +3126,12 @@ export default {
                         normal: {
                             lineStyle: { //全局的样式
                                 type: 'dashed',
-                                width: 2
+                                width: 1
                             }
                         }
                     },
                     data: [
-                    {       label: {normal:{position:'middle',formatter:threshold+'RH警戒线'}},
+                    {       label: {normal:{position:'middle',formatter:threshold+'%警戒线'}},
                             yAxis: threshold, //平行于x轴且y轴值为6.5的标线
                             itemStyle: {
                                 normal: { color: '#F55959' } //线条颜色
@@ -3152,11 +3159,11 @@ export default {
     shake(data){
       var aaa = [];
 
-for (var i = 0; i <= 180; i++) {
-    var t = i / 180 * Math.PI;
-    var r = 10;
-    aaa.push([r, i]);
-}
+      for (var i = 0; i <= 180; i++) {
+          var t = i / 180 * Math.PI;
+          var r = 10;
+          aaa.push([r, i]);
+      }
       let myChart = this.$echarts.init(document.getElementById('myChartshake'))
         window.addEventListener("resize", function () {
           myChart.resize();
@@ -3182,7 +3189,7 @@ for (var i = 0; i <= 180; i++) {
           polar: {
         "center": ["50%", "70%"], //整体的位置设置
               "radius": "120%",
-    },
+      },
           angleAxis: {
         type: 'value',
         max: 360,
@@ -3199,8 +3206,8 @@ for (var i = 0; i <= 180; i++) {
         axisTick: {
             show: false
         }
-    },
-    radiusAxis: {
+     },
+     radiusAxis: {
         min: 0,
         axisLine: {
             show: false
@@ -3214,7 +3221,7 @@ for (var i = 0; i <= 180; i++) {
         axisTick: {
             show: false
         }
-    },
+     },
         "series": [
           {
             "name": "指标",
@@ -3301,8 +3308,8 @@ for (var i = 0; i <= 180; i++) {
             }
         },
         data: aaa
-    }
-        ]
+      }
+         ]
         });
     },
     devicekb(data){
@@ -3399,7 +3406,7 @@ for (var i = 0; i <= 180; i++) {
                 // name: 'kg',
                 min: 0,
                 max: function(value) { //设置y轴最大值
-                    return value.max+20;
+                    return value.max+2;
                     },
                 splitNumber: 1,
                 axisTick: {

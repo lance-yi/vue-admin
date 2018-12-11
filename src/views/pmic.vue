@@ -44,7 +44,7 @@
             </div>
       </div>
 
-        <ArcgisMapspmic  :propsmap='serachvalues' @ip="ip"/>
+        <ArcgisMapspmic  :propsmap='serachvalues' @ip="ip" :maptime='model1'/>
 
 
 <transition name="fade">
@@ -405,6 +405,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
         hadtime:true,
         bigrightshow:false,
         model1:'两分钟',
+        mintime:60000,
         timer:null,
         oldid:'',
         lampdata:[],
@@ -447,40 +448,53 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
       );
       if(localStorage.getItem('breaktime')){
         this.model1 = localStorage.getItem('breaktime')
-      //   if(localStorage.getItem('breaktime') == '两分钟'){
-      //      this.timers(2)
-      //   }else if(localStorage.getItem('breaktime') == '五分钟'){
-      //      this.timers(5)
-      //   }else if(localStorage.getItem('breaktime') == '十分钟'){
-      //      this.timers(10)
-      //   }else if(localStorage.getItem('breaktime') == '半小时'){
-      //     this.timers(30)
-      //   }
+        if(localStorage.getItem('breaktime') == '两分钟'){
+           this.timers(2)
+        }else if(localStorage.getItem('breaktime') == '五分钟'){
+           this.timers(5)
+        }else if(localStorage.getItem('breaktime') == '十分钟'){
+           this.timers(10)
+        }else if(localStorage.getItem('breaktime') == '半小时'){
+          this.timers(30)
+        }
         
-      // }else{
-      //   this.model1 = '两分钟'
-      //   this.timers(2)
+      }else{
+        this.model1 = '两分钟'
+        this.timers(2)
       }
       
     
       document.getElementsByClassName('detail-box')[0].addEventListener('scroll', this.handleScroll)
     },
     methods: {
+      timers(i){
+      clearInterval(this.timer)
+      this.timer =  setInterval(() => { 
+             this.$http.get(
+        "res/socElectrical/selectElectricCnt",
+        {},
+        res => {
+          this.statuslist = res.data;
+        },
+        err => {}
+      );
+        }, this.mintime*i)
+    },
        showno(){
         this.hadtime = true
         if(localStorage.getItem('breaktime') != this.model1){
-        //     localStorage.setItem('breaktime',this.model1);
-        //     if(this.model1 == '两分钟'){
-        //       this.timers(2)
-        //     }else if(this.model1 == '五分钟'){
-        //       this.timers(5)
-        //     }else if(this.model1 == '十分钟'){
-        //       this.timers(10)
-        //     }else if(this.model1 == '半小时'){
-        //       this.timers(30)
-        //     }
-        // }else{
-        //   localStorage.setItem('breaktime',this.model1);
+            localStorage.setItem('breaktime',this.model1);
+            if(this.model1 == '两分钟'){
+              this.timers(2)
+            }else if(this.model1 == '五分钟'){
+              this.timers(5)
+            }else if(this.model1 == '十分钟'){
+              this.timers(10)
+            }else if(this.model1 == '半小时'){
+              this.timers(30)
+            }
+        }else{
+          localStorage.setItem('breaktime',this.model1);
         }
         this.statustable = false
         if(this.bigrightshow == true){
@@ -598,8 +612,9 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
                     },err=>{});
               //电源灯
               this.$http.get("res/socElectrical/getPowerLampStatus?",{ip:this.rtopdata.electric_ip,electricId:data},res=>{
-
-                    this.lampdata = res.data
+                    if(res.rel == true){
+                        this.lampdata = res.data
+                    }
                     },err=>{});
               },err=>{});
         // 控制栏使用端口号
@@ -703,16 +718,22 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
                     },err=>{});
               //电源灯
               this.$http.get("res/socElectrical/getPowerLampStatus?",{ip:this.rtopdata.electric_ip,electricId:data},res=>{
-                    this.lampdata = res.data
+                    if(res.rel == true){
+                        this.lampdata = res.data
+                    }
                     },err=>{});
               },err=>{});
         // 控制栏使用端口号
          this.$http.get("res/socElectrical/selectControlbar?",{id:data},res=>{
+                    if(res.rel == true){
                     this.usedlist = res.data
+                  }  
                     },err=>{});
         //信息栏
         this.$http.get("res/socElectrical/selectInformationbar?",{id:data},res=>{
-                    this.msgdata = res.data
+                    if(res.rel == true){
+                   this.msgdata = res.data
+              }
                     },err=>{});
         
       }
