@@ -648,7 +648,6 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
         zz.style.cssText="z-index:20;min-height:70%";
       },
       funs(){
-        console.log(111)
           this.statustable = true
           if(this.bigrightshow == true){
           var cc=document.getElementsByClassName("bigright")[0];

@@ -17,162 +17,344 @@
             <div @click.stop="statusclick(0)">
               <img src="../../public/img/xx.png"/>
               <span>拆除点位：</span>
-              <span style="color:#FE0302;font-size:22px;">{{statuslist.errorCnt}}</span>
+              <span style="color:#FE0302;font-size:22px;">1</span>
             </div>
             <div @click.stop="statusclick(1)">
               <img src="../../public/img/101.png"/>
               <span>原址迁改：</span>
-              <span style="color:#1DE509;font-size:22px">{{statuslist.nomalCnt}}</span>
+              <span style="color:#1DE509;font-size:22px">1</span>
             </div>
             <div @click.stop="statusclick(2)">
               <img src="../../public/img/102.png"/>
               <span>异地迁改：</span>
-              <span style="color:#1DE509;font-size:22px">{{statuslist.nomalCnt}}</span>
+              <span style="color:#1DE509;font-size:22px">1</span>
             </div>
             <div @click.stop="statusclick(3)">
               <img src="../../public/img/103.png"/>
               <span>总点位数：</span>
-              <span style="color:#1D60FE;font-size:22px;">{{statuslist.total}}</span>
+              <span style="color:#1D60FE;font-size:22px;">1</span>
             </div>
         </div>
 
         <!-- 运维表格弹窗 -->
-      <div class="statusbox" style="width:60%;top:20%;z-index:2000;left:3%;min-width:1180px;padding-bottom:20px;min-height:70%" v-if="statustable" @click.stop="funs()">
-        <p class="detailpage"><img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px"/></p>
-              <div style="margin-bottom:20px;margin-top:10px">
-                <i-input  v-model="valuetable" placeholder="安装地址、路口名称" style="width: 200px" class="sousuo"></i-input>
-                <i-button type="primary" class="sure" @click="serachtable" >搜索</i-button>
-              </div>
-            <div style="padding:0 20px">
-             <i-table border stripe :columns="columns4" :data="data1"></i-table>
+      <div class="statusbox"  v-if="statustable" @click.stop="funs()">
+         
+        <p class="detailpage"><img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="position:absolute;right:20px;z-index: 2;top:20px"/></p>
+        <div style="padding-bottom:20px;border-bottom:1px solid #C3C3C3;margin:0 20px;display:flex">
+          <div :class="this.checknum == 'name1'?'checknos':'checkno'" @click="checknums('name1')" style="position:relative;">
+            <p>总点位数</p>
+            <p>{{totals}}</p>
+            <img src="../../public/img/107.png" style="width:128px;bottom:0;position:absolute;left:0" v-if="this.checknum == 'name1'"/>
+          </div>
+           <div :class="this.checknum == 'name2'?'checknos':'checkno'" @click="checknums('name2')" style="position:relative">
+            <p>拆除点位</p>
+            <p>20</p>
+            <img src="../../public/img/107.png" style="width:128px;bottom:0;position:absolute;left:0" v-if="this.checknum == 'name2'"/>
+          </div>
+           <div :class="this.checknum == 'name3'?'checknos':'checkno'" @click="checknums('name3')" style="position:relative">
+            <p>原址迁改</p>
+            <p>20</p>
+            <img src="../../public/img/107.png" style="width:128px;bottom:0;position:absolute;left:0" v-if="this.checknum == 'name3'"/>
+          </div>
+           <div :class="this.checknum == 'name4'?'checknos':'checkno'" @click="checknums('name4')" style="position:relative">
+            <p>异地迁改</p>
+            <p>20</p>
+            <img src="../../public/img/107.png" style="width:128px;bottom:0;position:absolute;left:0" v-if="this.checknum == 'name4'"/>
+          </div>
+        </div>
+        <div style="margin-top:10px;margin-bottom:10px">
+            <i-input  v-model="valuetable" placeholder="安装地址、路口名称" style="width: 200px" class="sousuo"></i-input>
+            <i-button type="primary" class="sure" @click="serachtable" >搜索</i-button>
+        </div>
+
+        <div style="padding:0 20px" v-if="this.checknum == 'name1'">
+              <i-table border stripe :columns="columns4" :data="data1"></i-table>
               <Page :total='totals' show-total class="fullpage" @on-change="changeliebiaopage" style="margin-top:20px" :current.sync="pages"></Page>
+        </div>
+
+
+        <div style="height:550px;overflow-y:auto;padding: 10px 20px 0px 20px" v-if="this.checknum != 'name1'">
+            <div class="addressbox" v-for="(list,index) in datalist" :key="index">
+              <p :class="index%2 ==0?'addp':'addps'">{{index+1}}</p>
+              <div class="addiv">
+                  <p style="top:135px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" :title="list.res[0].installAddress">安装地址：{{list.res[0].installAddress}}</p>
+                  <!-- <p style="top:130px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" title="撒旦风口浪尖是快乐的附件是快乐的房间里见识到了开发建设开绿灯飞机">安装地址：撒旦风口浪尖是快乐的附件是快乐的房间里见识到了开发建设开绿灯飞机</p> -->
+                  <p style="top:160px">立杆号：{{list.res[0].poleNo}}</p>
+                  <p style="top:185px">网关IP地址：{{list.res[0].poleNo}}</p>
+              </div>
+              <div style="position:relative;margin: 0 30px 0 20px">
+                   <p v-if="list.res[1].state == 1" style="top:-15px" class="linebox">类型：迁改</p>
+                   <p v-if="list.res[1].state == -1" style="top:-15px" class="linebox">类型：拆除</p>
+                   <p style="top:10px" class="linebox">施工单位：{{list.res[1].constructionUnit}}</p>
+                   <p style="top:30px" class="linebox">时间：{{list.res[1].createTime}}</p>
+                <img src="../../public/img/123.png"/>
+              </div>
+              <div class="addivs">
+                  <p style="top:127px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:200px">安装地址：{{list.res[1].installAddress}}</p>
+              </div>
+              <div style="position:relative;margin: 0 30px 0 20px" v-if="list.res[2]">
+                   <p v-if="list.res[2].state == 1" class="linebox" style="top:-15px">类型：迁改</p>
+                   <p v-if="list.res[2].state == -1" class="linebox" style="top:-15px">类型：拆除</p>
+                   <p class="linebox" style="top:10px">施工单位：{{list.res[2].constructionUnit}}</p>
+                   <p class="linebox" style="top:30px">时间：{{list.res[2].createTime}}</p>
+                <img src="../../public/img/123.png"/>
+              </div>
+              <div class="addiv" v-if="list.res[2]">
+                  <p style="top:135px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" :title="list.res[2].installAddress">放置地址：{{list.res[2].installAddress}}</p>
+                  <p style="top:160px">立杆号：{{list.res[2].poleNo}}</p>
+                  <p style="top:185px">网关IP地址：{{list.res[2].poleNo}}</p>
+              </div>
+              <div class="zhuanyixukes" style="margin-right:0;margin-left:35px" v-if="list.res[2]" @click="lookcontrail(list.res[1].resId)">查看轨迹</div>
+              <div>
+                <div class="zhuanyixukes" style="margin-right:0;margin-left:35px" v-if="!list.res[2]">点位迁移</div>
+                <div class="zhuanyixuke" style="margin-right:0;margin-left:35px;margin-top:20px" v-if="!list.res[2]" @click="lookcontrail(list.res[1].resId)">查看轨迹</div>
+              </div>
             </div>
+            </div>      
       </div>
 
         <ArcgisMapsaddress  :propsmap='serachvalues' @ip="ip" :maptime='model1'/>
 
 
+      <!-- 点位迁移 -->
+       <div class="deteleaddbox" v-if="detecheck">
+          <p style="font-size:14px;border-bottom:1px solid #C9C9C9;padding-bottom:10px;position:relative">点位迁移<img src="../../public/img/xxx.png" style="position:absolute;right:0;top:5px" @click.stop="detecheck = false"/></p>
+          <p style="text-align:left;font-size:14px;padding-top:10px;"><img src="../../public/img/101.png" style="width:17px;height:20px;vertical-align:middle"/> 原址</p>
+          <div class="content">
+            <div>
+              <p>原安装地址：</p>
+              <p>网关IP地址：</p>
+              <p>项目名称：</p>
+            </div>
+            <div>
+              <p>原经度：</p>
+              <p>原纬度：</p>
+            </div>
+          </div>
+          <p style="text-align:left;font-size:14px;padding-top:30px;"><img src="../../public/img/109.png" style="width:17px;height:20px;vertical-align:middle"/> 拆除放置地址</p>
+          <div class="content">
+            <div>
+              <p>放置地址：</p>
+            </div>
+            <div>
+              <p>拆除施工单位：</p>
+            </div>
+          </div>
+          <div class="content" style="border-bottom:1px dashed #1D60FE;padding-bottom:10px">
+            <div>
+              <p>拆除时间：</p>
+            </div>
+          </div>
+          <div style="position:relative">
+            <img src="../../public/img/108.png"/>
+            <span style="font-size:14px;position:absolute;top:20px;margin-left:10px;">迁改</span>
+          </div>
+          <p style="text-align:left;font-size:14px;padding-top:10px;"><img src="../../public/img/103.png" style="width:17px;height:20px;vertical-align:middle"/> 现址</p>
+          <div class="content">
+            <div>
+              <p>放置地址&nbsp;&nbsp;&nbsp;
+                <RadioGroup v-model="animal">
+                  <Radio label="异地迁改"></Radio>
+                  <Radio label="原地迁改"></Radio>
+                </RadioGroup>
+              </p>
+            </div>
+          </div>
+          <div class="content">
+            <div>
+              <span>安装地址</span>&nbsp;&nbsp;&nbsp;
+              <i-input  v-model="installadd" placeholder="" style="width: 300px" ></i-input>
+            </div>
+          </div>
+          <div class="content">
+            <div style="margin-left:20px;margin-bottom:40px">
+              <span style="font-size:14px;width:210px;display: inline-block">经度：12.1111111</span>
+              <span style="font-size:14px;">纬度：12.1111111</span>&nbsp;&nbsp;<img src="../../public/img/97.png" style="vertical-align: middle;padding-bottom: 1px;"/>
+              <div class="zhuanyixukes" style="width:50px;display:inline-block;margin-left:30px" >切换</div>
+            </div>
+          </div>
+           <div class="zhuanyixukes" style="width: 90px;margin: 0 auto;" >确认迁移</div>
+       </div>
 
+       <!-- 点位拆除 -->
+       <div class="deteleaddbox" v-if="removecheck" style="min-width:800px">
+          <p style="font-size:14px;border-bottom:1px solid #C9C9C9;padding-bottom:10px;position:relative"><img src="../../public/img/101.png" style="width:17px;height:20px;vertical-align:middle"/>点位拆除<img src="../../public/img/xxx.png" style="position:absolute;right:0;top:5px" @click.stop="removecheck = false"/></p>
+          <div style="display:flex;align-items:center;padding:40px 20px">
+            <div class="removebox">
+              <div style="display:flex;align-items:top">
+                  <p>原安装地址：</p><span style="flex:1;font-size:14px;line-height:30px">适得府君书考虑</span>
+              </div>
+              <p>网关IP地址：</p>
+              <p>项目名称：</p>
+              <p>经度：</p>
+              <p>纬度：</p>
+            </div>
+            <div style="margin-right:10px;margin-bottom:40px">
+              <img src="../../public/img/110.png"/>
+            </div>
+            <div>
+              <div>
+                <span>安装地址</span>&nbsp;&nbsp;&nbsp;
+              <i-input  v-model="installadd" placeholder="" style="width: 200px" ></i-input>
+              </div>
+              <div style="margin-top:20px">
+                <span>施工单位</span>&nbsp;&nbsp;&nbsp;
+                <i-input  v-model="installadd" placeholder="" style="width: 200px" ></i-input>
+              </div>
+            </div>
+          </div>
+           <div class="zhuanyixukes" style="width: 90px;margin: 0 auto;" >确认拆除</div>
+       </div>
 
-
-
-
-
+      <!-- 查看轨迹 -->
+      <div class="deteleaddbox"  style="min-width:1280px" v-if="contrail">
+        <p style="text-align:left;font-size:14px;border-bottom:1px solid #C9C9C9;padding-bottom:10px;position:relative">查看轨迹<img src="../../public/img/xxx.png" style="position:absolute;right:0;top:5px" @click.stop="contrail = false"/></p>
+        <ArcgisMapsaddressmall  :propsmap='serachvalues' @ip="ip" :maptime='model1'/>
+        <div style="height:365px;overflow-y:auto;padding: 30px 20px 0px 20px" >
+          <div class="addressbox" v-for="(list,index) in contraillist" :key="index" style="border-bottom:none">
+              <div class="addiv">
+                  <p style="top:135px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" :title="list.res[0].installAddress">安装地址：{{list.res[0].installAddress}}</p>
+                  <!-- <p style="top:130px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" title="撒旦风口浪尖是快乐的附件是快乐的房间里见识到了开发建设开绿灯飞机">安装地址：撒旦风口浪尖是快乐的附件是快乐的房间里见识到了开发建设开绿灯飞机</p> -->
+                  <p style="top:160px">立杆号：{{list.res[0].poleNo}}</p>
+                  <p style="top:185px">网关IP地址：{{list.res[0].poleNo}}</p>
+              </div>
+              <div style="position:relative;margin: 0 30px 0 20px">
+                   <p v-if="list.res[1].state == 1" style="top:-15px" class="linebox">类型：迁改</p>
+                   <p v-if="list.res[1].state == -1" style="top:-15px" class="linebox">类型：拆除</p>
+                   <p style="top:10px" class="linebox">施工单位：{{list.res[1].constructionUnit}}</p>
+                   <p style="top:30px" class="linebox">时间：{{list.res[1].createTime}}</p>
+                <img src="../../public/img/123.png"/>
+              </div>
+              <div class="addivs">
+                  <p style="top:127px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:200px">放置地址：{{list.res[1].installAddress}}</p>
+              </div>
+              <div style="position:relative;margin: 0 30px 0 20px" v-if="list.res[2]">
+                   <p v-if="list.res[2].state == 1" class="linebox" style="top:-15px">类型：迁改</p>
+                   <p v-if="list.res[2].state == -1" class="linebox" style="top:-15px">类型：拆除</p>
+                   <p class="linebox" style="top:10px">施工单位：{{list.res[2].constructionUnit}}</p>
+                   <p class="linebox" style="top:30px">时间：{{list.res[2].createTime}}</p>
+                <img src="../../public/img/123.png"/>
+              </div>
+              <div class="addiv" v-if="list.res[2]">
+                  <p style="top:135px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" :title="list.res[2].installAddress">安装地址：{{list.res[2].installAddress}}</p>
+                  <p style="top:160px">立杆号：{{list.res[2].poleNo}}</p>
+                  <p style="top:185px">网关IP地址：{{list.res[2].poleNo}}</p>
+              </div>
+            </div>
+          </div>      
+        </div>
+      
+      </div>
+      
 
     </div>
 </template>
 <script>
 import ArcgisMapsaddress from "@/components/ArcgisMapsaddress";
-// import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
+import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
   export default {
     name: 'address-v',
     components: {
         ArcgisMapsaddress,
-        // ArcgisMapspmicsmall
+        ArcgisMapsaddressmall
     },
     data () {
       return {
+        contraillist:[],
+        contrail:false,
+        removecheck:false,
+        installadd:'',
+        animal: '异地迁改',
+        datalist:[],
+        detecheck:false,
+        checknum:'name1',
         totals:0,
-        data2:[],
-        columns2: [
-                {title: '安装地址',key: 'install_address',width:150,className:'address'},
-                {title: 'IP',key: 'electric_ip',width:120,},
-                {title: '在线状态',key: 'res_state',width:90,
-                   render:(h,params)=>{
-                          let tmpStr = "";
-                          if(params.row.alertStatus=="1"){
-                            tmpStr='在线';
-                          }else{
-                            tmpStr="离线"
-                          }
-                          return h('span',{
-                          },tmpStr)
-                        }
-                },
-                {title: '检测时间',key: 'update_time',width:155,className:'updatetime'}
-                ],
-        timelinelists:[],
-        typelist:[],
-        typeone:true,
         getwayip:'',
-        columns4:[{title: '安装地址',key: 'install_address'},
-                  {title: 'IP地址',key: 'electric_ip',width: 110},
+        columns4:[{title: '安装地址',key: 'installAddress'},
+                  {title: 'IP地址',key: 'electricIp',width: 110},
                   {title: '责任人',key: 'userName',width: 85},
                   {title: '项目名称',key: 'projectName',width: 180},
                   {title: '经度',key: 'longitude',width: 90},
                   {title: '纬度',key: 'latitude',width: 90},
-                  //  {title: 'IP地址',key: 'deviceIp',width: 108,
-                  //  render:(h,params)=>{
-                  //         return h('span',{
-                  //             style:{
-                  //                padding:'0 10px',
-                  //                display:'inline-block'
-                  //             }
-                  //         },params.row.deviceIp)
-                  //       }
-                  // },
-                  {title: '故障发生时间',key: 'occurTime',width: 130},
-                  {title: '工单状态',key: 'alertStatus',width:120,
-                   render:(h,params)=>{
-                          let tmpStr = "";
-                          if(params.row.alertStatus=="0"){
-                            tmpStr=params.row.description;
-                          }else{
-                            tmpStr="正常"
-                          }
-                          return h('span',{
-                              style:{
-                                 background: (params.row.alertStatus=="0")?"#EC626B":"#9CD875",
-                                 color:'#fff',
-                                 padding:'4px 12px',
-                                 display:'inline-block',
-                              }
-                          },tmpStr)
-                        }
-                  },
-                  {title: '详情',key: 'action',width:70,
+                  {title: '线杆编号',key: 'poleNo'},
+                  {title: '详情',key: 'action',width:200,
                     render: (h, params) => {
                       return h('div', [
-                          h('div', {
-                              on: {
-                                  click: () => {
-                                    // console.log(params.row.formId)
-                                    this.gotodetal(params.row.id)
-                                  }
+                          // h('div', {
+                          //     on: {
+                          //         click: () => {
+                          //           // console.log(params.row.formId)
+                          //           this.gotodetal(params.row.id)
+                          //         }
+                          //     },
+                          //     style:{color:'#1d60fe',cursor:'pointer'}
+                          // }, '查看详情')
+                          h('img',{
+                              attrs: {
+                                    src: require('../../public/img/address.png')
+                                },
+                                style:{
+                                 'vertical-align':'middle'
+                                },
+                                on: {
+                                        click: () => {
+                                           this.gotodetal(params.row.id)
+                                        }
+                                    }
+                          },'img'),
+                          h('span',{
+                              style:{
+                                color:'#4ACC8A',
+                                'vertical-align':'middle',
+                                 display:'inline-block',
                               },
-                              style:{color:'#1d60fe',cursor:'pointer'}
-                          }, '查看详情')
+                              on: {
+                                        click: () => {
+                                           this.gotodetal(params.row.id)
+                                        }
+                                    }
+                          },'点位拆除'),
+                           h('img',{
+                              attrs: {
+                                    src: require('../../public/img/xq.png')
+                                },
+                                style:{
+                                 'vertical-align':'middle',
+                                 'margin-left':'20px'
+                                },
+                                on: {
+                                        click: () => {
+                                           this.contraillist(params.row.resId)
+                                        }
+                                    }
+                          },'img'),
+                          h('span',{
+                              style:{
+                                'vertical-align':'middle',
+                                 display:'inline-block',
+                              },
+                              on: {
+                                        click: () => {
+                                            this.contraillist(params.row.resId)
+                                        }
+                                    }
+                          },'历史迁改纪录'),
                       ]);
                     }
                   }],
-        isalert:'',
-        offlineDetaildata:[],
         pages:'',
         data1:[],
-        msgdata:[],
-        rtopdata:[],
         valuetable:'',
-        totalstype:'',
         statustable:false,
-        levels: "",
         value:'',
-        personshow:false,
         statuslist:[],
         rightdialogshow:true,
         serachvalue:'',
         serachvalues:'',
         hadtime:true,
-        bigrightshow:false,
         model1:'两分钟',
         timer:null,
         oldid:'',
-        lampdata:[],
-        usermsg:[],
-        certmsg:[],
-        usedlist:[],
-        changeobj:{},
-        typelist:[],
-        electro:[],
         timeList:[{
                 value: '两分钟',
                 label: '两分钟'
@@ -224,6 +406,9 @@ import ArcgisMapsaddress from "@/components/ArcgisMapsaddress";
     
     },
     methods: {
+      funs(){
+          this.statustable = true
+      },
        showno(){
         this.hadtime = true
         if(localStorage.getItem('breaktime') != this.model1){
@@ -241,12 +426,6 @@ import ArcgisMapsaddress from "@/components/ArcgisMapsaddress";
         //   localStorage.setItem('breaktime',this.model1);
         }
         this.statustable = false
-        if(this.bigrightshow == true){
-          this.bigrightshow = false
-          this.getwayip = ''
-        }else if(this.bigrightshow == false && this.getwayip !== ''){
-          this.bigrightshow = true
-        }
       },
       breaktime(){
        this.hadtime = false
@@ -270,82 +449,103 @@ import ArcgisMapsaddress from "@/components/ArcgisMapsaddress";
         this.statustable = true
         this.value = "";
         if (index == 0) {
-          this.$http.get("res/socElectrical/selectElectricDetailList?",{isAlert:0,current:1,pageSize:10},res=>{
-                this.data1 = res.data.list
-                this.totals = res.data.total
-                this.isalert = 0
+           this.checknum = 'name2'
+          this.$http.get("res/ponitMove/selectMoveRebuildList",{state:'-1'},res=>{
+              this.datalist = res.data
             },err=>{});
         } else if (index == 1) {
-          this.$http.get("res/socElectrical/selectElectricDetailList?",{isAlert:1,current:1,pageSize:10},res=>{
-                this.data1 = res.data.list
-                this.totals = res.data.total
-                this.isalert = 1
+          this.checknum = 'name3'
+           this.$http.get("res/ponitMove/selectMoveRebuildList",{state:'1',rebuildType:'0'},res=>{
+              this.datalist = res.data
             },err=>{});
-            
+          
         } else if (index == 2) {
-          this.$http.get("res/socElectrical/selectElectricDetailList?",{isAlert:'all',current:1,pageSize:10},res=>{
+          this.checknum = 'name4'
+          this.$http.get("res/ponitMove/selectMoveRebuildList",{state:'1',rebuildType:'1'},res=>{
+              this.datalist = res.data
+            },err=>{});
+          
+        } else if (index == 3) {
+          this.checknum = 'name1'
+          this.$http.get("res/ponitMove/selectAllPoint",{},res=>{
                 this.data1 = res.data.list
                 this.totals = res.data.total
-                this.isalert = 2
             },err=>{});
-        } 
+        }  
       },
       //表格分页
     changeliebiaopage(i){
-        if(this.isalert == 0){
-          this.$http.get("res/socElectrical/selectElectricDetailList?",{isAlert:0,current:i,pageSize:10},res=>{
-                this.data1 = res.data.list
-                this.totals = res.data.total
-                this.isalert = 0
-            },err=>{});
-         
-        }else if(this.isalert == 1){
-            this.$http.get("res/socElectrical/selectElectricDetailList?",{isAlert:1,current:i,pageSize:10},res=>{
-                this.data1 = res.data.list
-                this.totals = res.data.total
-                this.isalert = 1
-            },err=>{});
+        if(this.checknum = 'name2'){
           
-        }else if(this.isalert == 2){
-             this.$http.get("res/socElectrical/selectElectricDetailList?",{isAlert:'all',current:i,pageSize:10},res=>{
+         
+        }else if(this.checknum = 'name3'){
+            
+          
+        }else if(this.checknum = 'name4'){
+             
+        }else if(this.checknum = 'name1'){
+            this.$http.get("res/ponitMove/selectAllPoint",{current:i,pageSize:10},res=>{
                 this.data1 = res.data.list
                 this.totals = res.data.total
-                this.isalert = 2
             },err=>{});
-        } 
+        }  
+    },
+    checknums(name){
+      this.checknum = name
+      if(name == 'name1'){
+         this.$http.get("res/ponitMove/selectAllPoint",{current:1,pageSize:10},res=>{
+                this.data1 = res.data.list
+                this.totals = res.data.total
+            },err=>{});
+      }else if(name == 'name2'){
+          this.$http.get("res/ponitMove/selectMoveRebuildList",{state:'-1'},res=>{
+              this.datalist = res.data
+            },err=>{});
+      }else if(name == 'name3'){
+        this.$http.get("res/ponitMove/selectMoveRebuildList",{state:'1',rebuildType:'0'},res=>{
+              this.datalist = res.data
+            },err=>{});
+
+      }else if(name == 'name4'){
+        this.$http.get("res/ponitMove/selectMoveRebuildList",{state:'1',rebuildType:'1'},res=>{
+              this.datalist = res.data
+            },err=>{});
+
+      }
     },
     //表格上的搜索
       serachtable(){
         this.pages = 1
-        if(this.isalert == 0){
-             this.$http.get("res/socElectrical/selectElectricDetailList?",{isAlert:0,current:1,pageSize:10,param:this.valuetable},res=>{
-                this.data1 = res.data.list
-                this.totals = res.data.total
-                this.isalert = 0
-              },err=>{});
-          }else if(this.isalert == 1){
-            this.$http.get("res/socElectrical/selectElectricDetailList?",{isAlert:1,current:1,pageSize:10,param:this.valuetable},res=>{
-                this.data1 = res.data.list
-                this.totals = res.data.total
-                this.isalert = 1
-              },err=>{});
+        if(this.checknum = 'name2'){
             
-          }else if(this.isalert == 2){
-            this.$http.get("res/socElectrical/selectElectricDetailList?",{isAlert:'all',current:1,pageSize:10,param:this.valuetable},res=>{
+          }else if(this.checknum = 'name3'){
+            
+            
+          }else if(this.checknum = 'name4'){
+            
+          
+           }else if(this.checknum = 'name1'){
+             this.$http.get("res/ponitMove/selectAllPoint",{current:1,pageSize:10,param:this.valuetable},res=>{
                 this.data1 = res.data.list
                 this.totals = res.data.total
-                this.isalert = 2
-              },err=>{});
+            },err=>{});
           
            }
         },
       gotodetal(data){
+        this.removecheck = true
+      },
+      //查看轨迹
+      lookcontrail(id){
+        this.contrail = true
+        this.$http.get("res/ponitMove/selectTrajectoryList",{resId:id},res=>{
+                this.contraillist = res.data
+            },err=>{});
+      },
+      //点位拆除
+      deteleadd(){
         
       },
-
-
-   
-    
       ip(data){
         
         
@@ -407,17 +607,17 @@ import ArcgisMapsaddress from "@/components/ArcgisMapsaddress";
       text-shadow: #000 2px 2px 4px;
     }
     .statusbox {
-      min-width: 950px;
-      width: 65%;
+      width: 1350px;
       background: #fff;
-      /* height: 65%; */
       position: absolute;
-      top: 150px;
-      left: 0;
-      right: 0;
+      top: 15%;
+      left: 0%;
+      right: 0%;
       margin: 0 auto;
       box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
-      z-index: 20;
+      z-index: 30;
+      padding-bottom:20px;
+      min-height:70%
     }
     .detailpage{
       margin: 0px 20px;
@@ -425,259 +625,136 @@ import ArcgisMapsaddress from "@/components/ArcgisMapsaddress";
       text-align: left;
       padding: 10px 0;
     }
-    /* 详情 */
-    .detail-box{
-      margin:0 0px 0 40px; 
-      overflow-y:auto;
-      height: 1000px;
-      padding-bottom: 400px;
-    }
-    .detail-title{
+    /* 点位迁改 */
+    .addressbox{
       display: flex;
-      font-size: 15px;
-      border-bottom: 1px solid #E5E5E5;
-      height: 40px;
+      padding: 0px 10px 30px 10px;
       align-items: center;
-      margin-top: 20px;
-    }
-    .detail-title p{
-      margin-left: 10px;
-    }
-    .bigright{
-      min-width: 1000px;
-      width: 62%;
-      height: 100%;
-      background:#fff;
-      position: fixed;
-      right: 0;
-      top:60px;
-      z-index: 200;
-      transition: all 300ms;
-    }
-    .fade-enter-active, .fade-leave-active {
-      /* transition: opacity .5s */
-    }
-    .fade-enter, .fade-leave-active {
-      transform: translate(500px,0px);
-      /* opacity: 0 */
-    }
-    .detail-text{
-      display: flex;
-      align-items: center;
-      padding-top:20px;
-      border-bottom: 2px solid #1D60FE;
-      padding-bottom: 45px;
       margin-bottom: 20px;
       position: relative;
+      border-bottom: 1px solid #1d60fe;
     }
-    .detail-textimg{
-      width: 433px;
-      height: 165px;
-    }
-    .detail-textbox{
-      text-align: left;
-      font-size: 14px;
-      margin-left: 45px;
-      width:calc(100% - 453px);
-    }
-    .detail-textbox div{
-      margin-top: 15px;
-    }
-    .detail-textbox div span{
-      display: inline-block;
-    }
-    .detail-textbox div span:first-child{
-      margin-right: 10px;
-    }
-    /* 控制栏 */
-    .control{
-      margin:40px 40px 60px 40px;
-      text-align: left;
-      font-size: 14px;
-      position: relative;
-    }
-    .control div {
-      margin-top: 30px;
-    }
-    .control div span{
-      display: inline-block;
-    }
-    .typechange{
-      position: absolute;
-      right: 150px;
-      top:0;
-    }
-    .controls{
-      margin:40px;
-      text-align: left;
-      font-size: 14px;
-      position: relative;
-    }
-    .controls p {
-      font-size:14px;
-    }
-    .controls div span{
-      font-size:14px;
-    }
-    .switch{
-      margin-top:30px; 
-      display: flex;
-    }
-    .switch p {
-      font-size:14px;
-    }
-    .ivu-switch{
-      margin-right: 20px;
-      margin-left: 5px;
-    }
-    .buttonpos{
-      position: absolute;
-      left: 560px;
-      bottom:0;
-      min-width: 78px;
-    }
-    .buttonback{
-      position: absolute;
-      left: 660px;
-      bottom:0;
-      min-width: 78px;
-    }
-    .msgbox{
-      display: flex;
-      flex-wrap:wrap;
-    }
-    .msgbox p{
-      margin-bottom: 20px;
-    }
-    .timelinebox {
-      padding: 40px 140px 0px 110px;
-      /* height: calc(100% - 74px); */
-      overflow: auto;
-    }
-    .timelinecont {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-    }
-    .timelinecont p {
-      text-align: left;
-    }
-    .timelinecont p span {
-      color: #1d60fe;
-    }
-    .hadpro {
-      font-size: 14px;
-      text-align: left;
-      margin-top: 10px;
-      margin-bottom: 65px;
-    }
-    .hadpro a {
-      color: #ff3636;
-      /* border-bottom: 1px solid #1d60fe; */
-    }
-    .timelineimg {
-      position: absolute;
-      left: -82px;
-      top: -3px;
-      font-size: 14px;
-    }
-    .timelinetext {
-      position: absolute;
-      left: -76px;
-      top: -2px;
-      font-size: 14px;
-      color:#1d60fe;
-    }
-    .roadstatus{
-      color: #BDBDBD;
-      text-align: left;
-      margin-top: 60px;
-    }
-    .epilog{
+    .addp{
+      color:#10DAD7;
+      border:1px solid #10DAD7;
+      border-radius:50%;
       font-size: 16px;
-      text-align: left;
-      margin: 30px 0 10px 20%;
+      padding: 5px 7px;
+      line-height: 17px;
+      margin-right: 10px;
+      position:absolute;
+      top:0;
+      left: 0;
     }
-    .epilog span{
-      color: #ff3636;
+    .addps{
+      color:#1D60FE;
+      border:1px solid #1D60FE;
+      border-radius:50%;
+      font-size: 16px;
+      padding: 5px 7px;
+      line-height: 17px;
+      margin-right: 10px;
+      position:absolute;
+      top:0;
+      left: 0;
     }
-    .tablechangebox{
-      margin-left:30px;
-      margin-top:20px
+    .addiv{
+      /* border:2px dashed #10DAD7;
+      border-radius:4px; */
+      /* padding: 10px; */
+      /* text-align: left; */
+      width: 247px;
+      height: 247px;
+      background: url(../../public/img/bb.png) no-repeat;
+      position: relative;
     }
-    .tablechangebox p{
-      text-align: left;
+    .addivs{
+      width: 200px;
+      height: 200px;
+      background: url(../../public/img/b.png) no-repeat;
+      position: relative;
+    }
+    .addiv p{
       font-size: 13px;
-      margin-top: 20px;
-      font-weight: bold;
+      line-height: 30px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
     }
-    .tablechangebox p span{
-      font-weight: normal;
-      color: #1d60fe;
+    .addivs p{
+      font-size: 13px;
+      line-height: 30px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
     }
-    .workdetail{
-      position: fixed;
-      top:7%;
-      background: #fff;
-      width: 70%;
-      left: 20%;
-      padding: 0px 20px;
+    /* 点位拆除 */
+    .deteleaddbox{
+      position:absolute;
+      top:20%;
+      left:0;
+      right:0;
+      margin:0 auto;
+      min-width:700px;
+      background:#fff;
+      padding: 10px 20px 20px 20px;
+      width:50%;
+      z-index:31;
       box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
-      z-index: 9999999999;
-      height: 80%;
-      overflow-y: scroll;
-      min-height: 500px;
-    }
-    .workdetail-top{
-      padding: 20px;
-      display: flex;
-    }
-    .workdetail-head{
-      text-align: left;
-      display: flex;
-      font-size: 14px;
-      margin-right: 20px;
-    }
-    .workdetailtitle{
-      text-align: left;
-      font-size: 14px;
-      padding-left: 40px;
     }
     .content{
       display: flex;
+      justify-content: space-between;
       text-align: left;
-      flex-wrap:wrap;
-      padding: 0 40px;
-      border-bottom: 1px solid #E5E5E5;
-      padding-bottom: 20px;
-      min-width: 800px;
-    }
-    .content div{
-      margin-top: 25px;
-      display: flex;
-      align-items: center;
+      padding: 10px 20px 0px 20px;
     }
     .content div p{
       font-size: 14px;
-      min-width: 100px;
-      text-align: right;
+      line-height: 30px;
     }
-    .content div span{
-      color: #3C7FEE;
-      font-size: 14px;
-    }
-    .worksendbox div span{
-      color: #696C6F; 
-    }
-    .fixedborder{
-      height:30px;
-      border-right:2px solid #1D60FE;
-      position:absolute;
-      bottom:0;
-    }
-    .detail-text .fixedimg{
-      position:absolute;
-      bottom:67px;
-      cursor: pointer;
-    }
+  .linebox{
+    position:absolute;
+    font-size: 13px;
+    text-align:left;
+  }
+  .checkno{
+    border:1px solid #707477;
+    font-size: 14px;
+    padding: 10px 0;
+    border-radius: 4px;
+    width:130px;
+    margin-left:20px;
+    cursor: pointer;
+  }
+  .checkno p{
+    color: #696C6F;
+  }
+  .checkno span{
+    color: #696C6F;
+  }
+  .checknos{
+    border:1px solid #1D60FE;
+    font-size: 14px;
+    padding: 10px 0;
+    border-radius: 4px;
+    width:130px;
+    margin-left:20px;
+    cursor: pointer;
+  }
+  .checknos p{
+    color: #1D60FE;
+  }
+  .checknos span{
+    color: #1D60FE;
+  }
+  .removebox{
+    text-align: left;
+    width: 270px;
+  }
+  .removebox p {
+    font-size: 14px;
+    line-height: 30px;
+  }
 </style>
