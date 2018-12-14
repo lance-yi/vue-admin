@@ -9,6 +9,7 @@ import book from '@/subpage/book.vue'
 import role from '@/subpage/role.vue'
 import menu from '@/subpage/menu.vue'
 import log from '@/views/log.vue'
+import bigscreenshow from '@/views/bigscreenshow.vue'
 import update from '@/views/update.vue'
 import pmic from '@/views/pmic.vue'
 import address from '@/views/address.vue'
@@ -50,6 +51,11 @@ const router = new Router({
       path: '/log',
       name: 'log',
       component: log
+    },
+    {
+      path: '/bigscreenshow',
+      name: 'bigscreenshow',
+      component: bigscreenshow
     },
     {
       path: '/pmic',

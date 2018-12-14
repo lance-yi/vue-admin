@@ -4,8 +4,8 @@ import tileInfo from './tileInfo';
 
 export default {
     name: 'ArcgisMap',
-    props: {propsmap:{type:String},
-    maptime:{type:String}
+    props: {propsmaps:{type:String},
+    // maptime:{type:String}
     },
     data() {
         return {
@@ -37,36 +37,36 @@ export default {
         
     },
     watch:{
-        propsmap:{
-          handler: function(val,odlval) {
-              var that = this
-              this.centerlist = val
-            this.$http.get("res/socElectrical/selectElectricByCondition?",{param:this.centerlist},res=>{
-                    if(res.data.res.length>0){
-                        var pt = new that.mapObj.Point(res.data.res[0].longitude, res.data.res[0].latitude); // 设置中心点
-                        that.mapObj.map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
-                    }else{
-                        this.$Message.info('没有找到您要搜索的东西');
-                    }
-                },err=>{
-                })
-          },
-          deep:true
-        },
-        maptime:{
-             handler: function(val,odlval) {
-                //  console.log(val)
-                 if(val == '两分钟'){
-                    this.timers(2)
-                    }else if(val == '五分钟'){
-                        this.timers(5)
-                    }else if(val == '十分钟'){
-                        this.timers(10)
-                    }else if(val == '半小时'){
-                        this.timers(30)
-                    }
-             }
-        }
+        // propsmap:{
+        //   handler: function(val,odlval) {
+        //       var that = this
+        //       this.centerlist = val
+        //     this.$http.get("res/socElectrical/selectElectricByCondition?",{param:this.centerlist},res=>{
+        //             if(res.data.res.length>0){
+        //                 var pt = new that.mapObj.Point(res.data.res[0].longitude, res.data.res[0].latitude); // 设置中心点
+        //                 that.mapObj.map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
+        //             }else{
+        //                 this.$Message.info('没有找到您要搜索的东西');
+        //             }
+        //         },err=>{
+        //         })
+        //   },
+        //   deep:true
+        // },
+        // maptime:{
+        //      handler: function(val,odlval) {
+        //         //  console.log(val)
+        //          if(val == '两分钟'){
+        //             this.timers(2)
+        //             }else if(val == '五分钟'){
+        //                 this.timers(5)
+        //             }else if(val == '十分钟'){
+        //                 this.timers(10)
+        //             }else if(val == '半小时'){
+        //                 this.timers(30)
+        //             }
+        //      }
+        // }
       },
     methods: {
         timers(i){
@@ -170,26 +170,41 @@ export default {
             this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
             let map = new obj.Map('maps', {logo: false,basemap: "streets-navigation-vector",},);// 创建地图实例
             // let map = new obj.Map('map', {logo: false,basemap: "delorme",},);
-            let pt = new obj.Point(114.420148, 30.474698); // 设置中心点
-            map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
+            
             let img = new TDT('img'); // 影像
             let cia = new TDT('cia');//路网
             map.addLayer(img); // 将图层添加到map对象
             map.addLayer(cia);
             this.mapObj.map = map;
             
-            this.$http.get("res/socElectrical/selectElectricByCondition",{},res=>{
-                // console.log(res.data)
-                this.point = res.data.res
+            this.$http.get("res/ponitMove/selectMapLocusList",{resId:this.propsmaps},res=>{
+                let pt = new obj.Point(res.data.new[1][0], res.data.new[1][1]); // 设置中心点
+                map.centerAndZoom(pt,10); // 设置中心点和缩放级别;
+                this.point = res.data.all
                 var that = this
-                this.point.forEach (el=>{ 
-                        that.createCircle(el)
+                var ll = this.point.length-1
+                
+                this.point.forEach ((el,index)=>{
+                    if(index == ll){
+                        that.createCircles(el,index)
+                    }else{
+                        that.createCircle(el,index)
+                    }
+                        
                 })
-                // var polyline = new esri.geometry.Polyline([[114,30],[115,30]]);
-                // var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASHDOTDOT, new dojo.Color([29,96,254]), 2);
-                // var graphic = new esri.Graphic(polyline, symbol);
-                // setTimeout(function(){
-                //     map.graphics.add(graphic)},3000);
+                var polyline = new esri.geometry.Polyline(res.data.new);
+                var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([29,96,254]), 2);
+                var graphic = new esri.Graphic(polyline, symbol);
+
+                var polylineold = new esri.geometry.Polyline(res.data.old);
+                var symbolold = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASHDOTDOT, new dojo.Color([169,168,166]), 2);
+                var graphicold = new esri.Graphic(polylineold, symbolold);
+
+                setTimeout(function(){
+                    map.graphics.add(graphic)
+                    map.graphics.add(graphicold)
+                },3000);
+                    
               },err=>{
               })
 
@@ -197,13 +212,14 @@ export default {
             
              
         },
-        createCircle(el) {
+        createCircle(el,bb) {
             var that = this
-            let gl = new this.mapObj.GraphicsLayer({id:el.id});
+            var c = bb+'sdsjd'
+            let gl = new this.mapObj.GraphicsLayer({id:c});
             this.mapObj.map.addLayer(gl);
             var labelPoint=new esri.geometry.Point(el.longitude,el.latitude);
             var labelSymbol =  new esri.symbol.PictureMarkerSymbol({
-                url:require('../../public/img/96.png'),
+                url:require('../../public/img/x1.png'),
                 "height":28,
                 "width":22,
                 "type":"esriPMS",
@@ -214,9 +230,34 @@ export default {
 
             //添加到地图 
             gl.add(labelGraphic);
-            gl.onClick = function(evt){
-            that.$emit('ip',el.id)
-            }
+            // gl.onClick = function(evt){
+            // that.$emit('ip',el.id)
+            // }
+
+
+            
+        },
+        createCircles(el,aaa) {
+            var that = this
+            var x = aaa+'sdsjd'
+            let gl = new this.mapObj.GraphicsLayer({id:x});
+            this.mapObj.map.addLayer(gl);
+            var labelPoint=new esri.geometry.Point(el.longitude,30.666083);
+            var labelSymbol =  new esri.symbol.PictureMarkerSymbol({
+                url:require('../../public/img/x2.png'),
+                "height":28,
+                "width":22,
+                "type":"esriPMS",
+                "angle": 0,
+              });
+            // var labelSymbol=new esri.symbol.SimpleMarkerSymbol();
+            var labelGraphic=new this.mapObj.Graphic(labelPoint,labelSymbol);
+
+            //添加到地图 
+            gl.add(labelGraphic);
+            // gl.onClick = function(evt){
+            // that.$emit('ip',el.id)
+            // }
 
 
             

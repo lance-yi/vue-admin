@@ -5,7 +5,8 @@ import tileInfo from './tileInfo';
 export default {
     name: 'ArcgisMap',
     props: {propsmap:{type:String},
-    maptime:{type:String}
+    maptime:{type:String},
+    num:{type:Number}
     },
     data() {
         return {
@@ -41,9 +42,9 @@ export default {
           handler: function(val,odlval) {
               var that = this
               this.centerlist = val
-            this.$http.get("res/socElectrical/selectElectricByCondition?",{param:this.centerlist},res=>{
-                    if(res.data.res.length>0){
-                        var pt = new that.mapObj.Point(res.data.res[0].longitude, res.data.res[0].latitude); // 设置中心点
+            this.$http.get("res/ponitMove/selectPonintForMap?",{param:this.centerlist},res=>{
+                    if(res.data.length>0){
+                        var pt = new that.mapObj.Point(res.data[0].longitude, res.data[0].latitude); // 设置中心点
                         that.mapObj.map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
                     }else{
                         this.$Message.info('没有找到您要搜索的东西');
@@ -66,7 +67,12 @@ export default {
                         this.timers(30)
                     }
              }
-        }
+        },
+        num:{
+            handler: function(val,odlval) {
+                this.init() 
+            }
+       }
       },
     methods: {
         timers(i){
@@ -166,6 +172,7 @@ export default {
             };
         },
         initMap(obj) {
+            // graphicsLayer.clear();
             // obj.basemaps.delorme = {baseMapLayers: [{url: "http://100.16.3.40:6080/arcgis/rest/services/wuhann/MapServer"}]}
             this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
             let map = new obj.Map('map', {logo: false,basemap: "streets-navigation-vector",},);// 创建地图实例
@@ -178,9 +185,9 @@ export default {
             map.addLayer(cia);
             this.mapObj.map = map;
             
-            this.$http.get("res/socElectrical/selectElectricByCondition",{},res=>{
+            this.$http.get("res/ponitMove/selectPonintForMap",{},res=>{
                 // console.log(res.data)
-                this.point = res.data.res
+                this.point = res.data
                 var that = this
                 this.point.forEach (el=>{ 
                         that.createCircle(el)
@@ -213,6 +220,8 @@ export default {
             var labelGraphic=new this.mapObj.Graphic(labelPoint,labelSymbol);
 
             //添加到地图 
+            console.log(123)
+            gl.clear();
             gl.add(labelGraphic);
             gl.onClick = function(evt){
             that.$emit('ip',el.id)
