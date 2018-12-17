@@ -14,6 +14,10 @@ Vue.prototype.$http = api
 import echarts from 'echarts'
 Vue.prototype.$echarts = echarts 
 
+import echart from 'echarts-liquidfill'
+Vue.prototype.$echart = echart
+
+
 Vue.use(iView, {
   // locale,
   transfer: true, // 浮层组件是否在body内

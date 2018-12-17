@@ -178,8 +178,8 @@ export default {
             this.mapObj.map = map;
             
             this.$http.get("res/ponitMove/selectMapLocusList",{resId:this.propsmaps},res=>{
-                let pt = new obj.Point(res.data.new[1][0], res.data.new[1][1]); // 设置中心点
-                map.centerAndZoom(pt,10); // 设置中心点和缩放级别;
+                let pt = new obj.Point(res.data.new[0][0], res.data.new[0][1]); // 设置中心点
+                map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
                 this.point = res.data.all
                 var that = this
                 var ll = this.point.length-1
@@ -242,7 +242,7 @@ export default {
             var x = aaa+'sdsjd'
             let gl = new this.mapObj.GraphicsLayer({id:x});
             this.mapObj.map.addLayer(gl);
-            var labelPoint=new esri.geometry.Point(el.longitude,30.666083);
+            var labelPoint=new esri.geometry.Point(el.longitude,el.latitude);
             var labelSymbol =  new esri.symbol.PictureMarkerSymbol({
                 url:require('../../public/img/x2.png'),
                 "height":28,

@@ -80,7 +80,7 @@
                   <p style="top:135px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" :title="list.res[0].installAddress">安装地址：{{list.res[0].installAddress}}</p>
                   <!-- <p style="top:130px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" title="撒旦风口浪尖是快乐的附件是快乐的房间里见识到了开发建设开绿灯飞机">安装地址：撒旦风口浪尖是快乐的附件是快乐的房间里见识到了开发建设开绿灯飞机</p> -->
                   <p style="top:160px">立杆号：{{list.res[0].poleNo}}</p>
-                  <p style="top:185px">网关IP地址：{{list.res[0].poleNo}}</p>
+                  <p style="top:185px">网关IP地址：{{list.res[0].gatewagIp}}</p>
               </div>
               <div style="position:relative;margin: 0 30px 0 20px">
                    <p v-if="list.res[1].state == 1" style="top:-15px" class="linebox">类型：迁改</p>
@@ -90,7 +90,7 @@
                 <img src="../../public/img/123.png"/>
               </div>
               <div class="addivs">
-                  <p style="top:127px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:200px">安装地址：{{list.res[1].installAddress}}</p>
+                  <p style="top:127px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:200px" :title="list.res[1].installAddress">放置地址：{{list.res[1].installAddress}}</p>
               </div>
               <div style="position:relative;margin: 0 30px 0 20px" v-if="list.res[2]">
                    <p v-if="list.res[2].state == 1" class="linebox" style="top:-15px">类型：迁改</p>
@@ -100,9 +100,9 @@
                 <img src="../../public/img/123.png"/>
               </div>
               <div class="addiv" v-if="list.res[2]">
-                  <p style="top:135px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" :title="list.res[2].installAddress">放置地址：{{list.res[2].installAddress}}</p>
+                  <p style="top:135px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" :title="list.res[2].installAddress">安装地址：{{list.res[2].installAddress}}</p>
                   <p style="top:160px">立杆号：{{list.res[2].poleNo}}</p>
-                  <p style="top:185px">网关IP地址：{{list.res[2].poleNo}}</p>
+                  <p style="top:185px">网关IP地址：{{list.res[2].gatewagIp}}</p>
               </div>
               <div class="zhuanyixukes" style="margin-right:0;margin-left:35px" v-if="list.res[2]" @click="lookcontrail(list.res[1].resId)">查看轨迹</div>
               <div>
@@ -394,6 +394,7 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
         hadtime:true,
         model1:'两分钟',
         timer:null,
+        mintime:60000,
         oldid:'',
         removenum:0,
         rebuildType:true,
@@ -412,11 +413,11 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
             },],
       }
     },
-    // beforeDestroy() {
-    //     if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
-    //         clearInterval(this.timer); //关闭
-    //     }
-    // },
+    beforeDestroy() {
+        if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
+            clearInterval(this.timer); //关闭
+        }
+    },
     mounted() {
     // this.drawLine();
     // this.drawLines();
@@ -427,19 +428,19 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
       );
       if(localStorage.getItem('breaktime')){
         this.model1 = localStorage.getItem('breaktime')
-      //   if(localStorage.getItem('breaktime') == '两分钟'){
-      //      this.timers(2)
-      //   }else if(localStorage.getItem('breaktime') == '五分钟'){
-      //      this.timers(5)
-      //   }else if(localStorage.getItem('breaktime') == '十分钟'){
-      //      this.timers(10)
-      //   }else if(localStorage.getItem('breaktime') == '半小时'){
-      //     this.timers(30)
-      //   }
+        if(localStorage.getItem('breaktime') == '两分钟'){
+           this.timers(2)
+        }else if(localStorage.getItem('breaktime') == '五分钟'){
+           this.timers(5)
+        }else if(localStorage.getItem('breaktime') == '十分钟'){
+           this.timers(10)
+        }else if(localStorage.getItem('breaktime') == '半小时'){
+          this.timers(30)
+        }
         
-      // }else{
-      //   this.model1 = '两分钟'
-      //   this.timers(2)
+      }else{
+        this.model1 = '两分钟'
+        this.timers(2)
       }
       
     
@@ -453,21 +454,31 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
           this.statustable = true
         }  
       },
+      timers(i){
+      clearInterval(this.timer)
+      this.timer =  setInterval(() => { 
+            this.$http.get("res/ponitMove/selectCountPoint",{},res => {
+          this.statuslist = res.data;
+        },
+        err => {}
+      );
+        }, this.mintime*i)
+    },
        showno(){
         this.hadtime = true
         if(localStorage.getItem('breaktime') != this.model1){
-        //     localStorage.setItem('breaktime',this.model1);
-        //     if(this.model1 == '两分钟'){
-        //       this.timers(2)
-        //     }else if(this.model1 == '五分钟'){
-        //       this.timers(5)
-        //     }else if(this.model1 == '十分钟'){
-        //       this.timers(10)
-        //     }else if(this.model1 == '半小时'){
-        //       this.timers(30)
-        //     }
-        // }else{
-        //   localStorage.setItem('breaktime',this.model1);
+            localStorage.setItem('breaktime',this.model1);
+            if(this.model1 == '两分钟'){
+              this.timers(2)
+            }else if(this.model1 == '五分钟'){
+              this.timers(5)
+            }else if(this.model1 == '十分钟'){
+              this.timers(10)
+            }else if(this.model1 == '半小时'){
+              this.timers(30)
+            }
+        }else{
+          localStorage.setItem('breaktime',this.model1);
         }
         this.statustable = false
       },
@@ -631,6 +642,8 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
       //点位迁移
       addressmove(id){
             this.animal='异地迁改'
+            this.rebuildType = true
+            this.installadd = ''
             this.$http.get('res/ponitMove/selectPonitInfo?id='+id,{},res=>{
               this.movedata = res.data
               this.detecheck = true
@@ -639,6 +652,7 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
       changelabel(name){
         if(name == '原地迁改'){
            this.rebuildType = false
+           this.installadd = ''
         }else{
           this.rebuildType = true
         }
@@ -666,7 +680,6 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
             "installAddress":this.installadd,
             "resId":this.movedata[0].placePosition.resId,
             "id":this.movedata[0].placePosition.id,
-            "modification":'{id:'+this.movedata[1].oldAddress.id+',longitude:'+this.movedata[1].oldAddress.longitude+',latitude:'+this.movedata[1].oldAddress.latitude+'}',
           },res=>{
                this.$Message.success(res.message);
                this.detecheck = false

@@ -71,6 +71,7 @@ export default {
         num:{
             handler: function(val,odlval) {
                 this.init() 
+                // history.go(0)
             }
        }
       },
@@ -177,14 +178,15 @@ export default {
             this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
             let map = new obj.Map('map', {logo: false,basemap: "streets-navigation-vector",},);// 创建地图实例
             // let map = new obj.Map('map', {logo: false,basemap: "delorme",},);
+            
             let pt = new obj.Point(114.420148, 30.474698); // 设置中心点
             map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
             let img = new TDT('img'); // 影像
             let cia = new TDT('cia');//路网
+            
             map.addLayer(img); // 将图层添加到map对象
             map.addLayer(cia);
             this.mapObj.map = map;
-            
             this.$http.get("res/ponitMove/selectPonintForMap",{},res=>{
                 // console.log(res.data)
                 this.point = res.data
@@ -199,7 +201,7 @@ export default {
                 //     map.graphics.add(graphic)},3000);
               },err=>{
               })
-
+       
          
             
              
@@ -208,6 +210,7 @@ export default {
             var that = this
             let gl = new this.mapObj.GraphicsLayer({id:el.id});
             this.mapObj.map.addLayer(gl);
+            // gl.removeAll()
             var labelPoint=new esri.geometry.Point(el.longitude,el.latitude);
             var labelSymbol =  new esri.symbol.PictureMarkerSymbol({
                 url:require('../../public/img/96.png'),
@@ -220,8 +223,7 @@ export default {
             var labelGraphic=new this.mapObj.Graphic(labelPoint,labelSymbol);
 
             //添加到地图 
-            console.log(123)
-            gl.clear();
+            
             gl.add(labelGraphic);
             gl.onClick = function(evt){
             that.$emit('ip',el.id)
