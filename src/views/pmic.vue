@@ -339,7 +339,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
         columns4:[{title: '安装地址',key: 'install_address'},
                   {title: 'IP地址',key: 'electric_ip',width: 110},
                   {title: '责任人',key: 'userName',width: 85},
-                  {title: '项目名称',key: 'projectName',width: 180},
+                  {title: '项目名称',key: 'projectName',width: 150},
                   {title: '经度',key: 'longitude',width: 90},
                   {title: '纬度',key: 'latitude',width: 90},
                   //  {title: 'IP地址',key: 'deviceIp',width: 108,
@@ -371,7 +371,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
                           },tmpStr)
                         }
                   },
-                  {title: '详情',key: 'action',width:70,
+                  {title: '详情',key: 'action',width:100,
                     render: (h, params) => {
                       return h('div', [
                           h('div', {

@@ -1,7 +1,7 @@
 <template>
     <div class="bigbox">
       <p class="toptitle">武汉公安综合安全运维系统</p>
-      <span class="toptime">数据更新日期：圣诞节是可敬的开始交肯德基</span>
+      <span class="toptime">数据更新日期：{{timedata}}&nbsp;<img src="../../public/img/116.png" style="vertical-align: middle"/></span>
       <div class="maintop">
          <div class="top-left">
            <p class="titletop">事件统计</p>
@@ -20,25 +20,28 @@
             </div>
          </div>
          <div class="top-right">
-           <div style="display:flex;text-align:left">
-            <div style="margin-left:10px;position:relative;cursor: pointer;" @click="mapcheck(1)">
+           <div style="display:flex;text-align:left;z-index:2">
+            <div style="margin-left:10px;position:relative;cursor: pointer;" @click.stop="mapcheck(1)">
               <img src="../../public/img/24.png" v-if="mapchecks != 1"/>
               <img src="../../public/img/25.png" v-if="mapchecks == 1"/>
               <p style="position:absolute;font-size:14px;top: 7px;left: 12px;">地图总览</p>
               <p style="position:absolute;font-size:14px;top: 7px;left: 12px;color:#10FFF0" v-if="mapchecks == 1">地图总览</p>
             </div>
-            <div style="margin-left:10px;position:relative;cursor: pointer;" @click="mapcheck(2)">
+            <div style="margin-left:10px;position:relative;cursor: pointer;" @click.stop="mapcheck(2)">
               <img src="../../public/img/24.png" v-if="mapchecks != 2"/>
               <img src="../../public/img/25.png" v-if="mapchecks == 2"/>
               <p style="position:absolute;font-size:14px;top: 7px;left: 12px;">网关总览</p>
               <p style="position:absolute;font-size:14px;top: 7px;left: 12px;color:#10FFF0" v-if="mapchecks == 2">网关总览</p>
             </div>
-            <div style="margin-left:10px;position:relative;cursor: pointer;"  @click="mapcheck(3)">
+            <div style="margin-left:10px;position:relative;cursor: pointer;"  @click.stop="mapcheck(3)">
               <img src="../../public/img/24.png" v-if="mapchecks != 3"/>
               <img src="../../public/img/25.png" v-if="mapchecks == 3"/>
               <p style="position:absolute;font-size:14px;top: 7px;left: 12px;">电源总览</p>
               <p style="position:absolute;font-size:14px;top: 7px;left: 12px;color:#10FFF0" v-if="mapchecks == 3">电源总览</p>
             </div>
+           </div>
+           <div class="mapdiv" v-if="mapchecks == 1">
+              <ArcgisMapbig />
            </div>
            <div class="allnum" v-if="mapchecks == 1">
               <div id="echartsqq" >
@@ -46,6 +49,9 @@
            </div>
            <div class="thermodynamic" v-if="mapchecks == 2">
               <div id="thermodynamicwg" ></div>
+           </div>
+           <div class="thermodynamics" v-if="mapchecks == 3">
+              <div id="thermodynamicpmic" ></div>
            </div>
            <div class="runstatic" v-if="mapchecks == 2">
               <div id="echartsrunstatic" ></div>
@@ -72,27 +78,40 @@
     </div>
 </template>
 <script>
-// import ArcgisMaplog from "@/components/ArcgisMaplog";
+import whjson from '../../public/wuhan.json'
+import ArcgisMapbig from "@/components/ArcgisMapbig";
   export default {
     name: 'bigscreenshow',
     components: {
-        // ArcgisMaplog
+        ArcgisMapbig
     },
     data () {
       return {
+          timer:null,
+          mintime:60000,
           mapchecks:1,
           conutlist:[],
           cameradata:[],
           allnumdata1:[],
           allnumdata2:[],
+          timedata:'',
       }
     },
-    created(){
+    beforeDestroy() {
+        if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
+            clearInterval(this.timer); //关闭
+        }
     },
     mounted(){
       this.new()
+      this.timers()
     },
     methods: {
+      timers(){
+            this.timer =  setInterval(() => { 
+                    this.new();
+                }, this.mintime*1)
+        },
       mapcheck(index){
          if(index == 1){
            this.mapchecks = 1
@@ -104,12 +123,14 @@
            this.mapchecks = 2
            setTimeout(() => {
               this.echartsruns(this.allnumdata1)
+              this.echartsthermodynamic(this.allnumdata1)
            }, 100);
            
          }else if(index == 3){
            this.mapchecks = 3
            setTimeout(() => {
               this.echartspmicruns(this.allnumdata2)
+              this.echartsthermodynamicpmic(this.allnumdata2)
            }, 100);
          }
       },
@@ -117,6 +138,7 @@
         this.$http.get("res/screenDisplay/cameraOverview",{},res=>{
               //底部摄像机在线状态
               this.echartscamera(res.data)
+              this.timedata=res.data.currentTime.date
             },err=>{});
 
         this.$http.get("res/screenDisplay/particular",{},res=>{
@@ -144,6 +166,215 @@
             },err=>{});
          
          
+      },
+      echartsthermodynamicpmic(data){
+          var myChart = null;
+        	var div_ = document.getElementById("thermodynamicpmic");
+        	div_.removeAttribute("_echarts_instance_");
+        	myChart = this.$echarts.init(div_);
+        //  let myChart = this.$echarts.init(document.getElementById('echartsrunstatic'))
+         window.addEventListener("resize", function () {
+          myChart.resize();
+         });
+         this.$echarts.registerMap('wuhan', whjson);
+          myChart.setOption({
+              tooltip: {
+                  trigger: 'item',
+                  formatter: '{b}:{c}'
+              },
+              toolbox: {
+                  show: false,
+              },
+              // visualMap: {
+              //     min: 800,
+              //     max: 50000,
+              //     text:['High','Low'],
+              //     realtime: false,
+              //     calculable: true,
+              //     bottom:50,
+              //     textStyle:{
+              //         color:"#00eaff"
+              //     },
+              //     inRange: {
+              //         color: ['lightskyblue','yellow', 'orangered']
+              //     }
+              // },
+              series: [
+                  {
+                      name: '重点人员在汉活动情况',
+                      type: 'map',
+                      mapType: 'wuhan', // 自定义扩展图表类型
+                      roam:true,
+                      zoom:'1.2',
+                      itemStyle:{
+                          normal: {
+                          color: '#fff',
+                          borderColor: 'rgba(62, 187, 185, 1)',
+                          borderWidth: 1,
+                          areaColor: {
+                              type: 'radial',
+                              x: 0.5,
+                              y: 0.5,
+                              r: 0.8,
+                              colorStops: [{
+                                  offset: 0,
+                                  color: 'rgba(13,25,58, 0)' // 0% 处的颜色
+                              }, {
+                                  offset: 1,
+                                  color: 'rgba(47,79,79, .2)' // 100% 处的颜色
+                              }],
+                              globalCoord: false // 缺省为 false
+                          },
+                          shadowColor: 'rgba(62, 187, 185, 1)',
+                          // shadowColor: 'rgba(255, 255, 255, 1)',
+                          shadowOffsetX: -2,
+                          shadowOffsetY: 2,
+                          shadowBlur: 10
+                      },
+                      emphasis: {
+                          areaColor: '#389BB7',
+                          borderWidth: 0,
+                      }
+                      },
+                      label:{
+                          normal:{
+                            //  show: true,
+                              textStyle:{
+                                  color:"#fff"
+                              },
+                          },
+                          emphasis: {
+                                show: true,
+                                textStyle: {
+                                    color: '#57DC90'
+                                }
+                            }
+                      },
+                      data:data.areaStatics,
+                      // 自定义名称映射
+                      nameMap: {
+                          'Central and Western': '江岸区',
+                          'Eastern': '江汉区',
+                          'Islands': '硚口区',
+                          'Kowloon City': '汉阳区',
+                          'Kwai Tsing': '武昌区',
+                          'Kwun Tong': '洪山区',
+                          'North': '青山区',
+                          'Sai Kung': '东西湖区',
+                          'Sha Tin': '蔡甸区',
+                          'Sham Shui Po': '江夏区',
+                          'Southern': '黄陂区',
+                          'Tai Po': '新洲区',
+                          'Tsuen Wan': '汉南区'
+                      }
+                  }
+              ]
+          });
+      },
+      echartsthermodynamic(data){
+        // console.log(whjson)
+        var myChart = null;
+        	var div_ = document.getElementById("thermodynamicwg");
+        	div_.removeAttribute("_echarts_instance_");
+        	myChart = this.$echarts.init(div_);
+        //  let myChart = this.$echarts.init(document.getElementById('echartsrunstatic'))
+         window.addEventListener("resize", function () {
+          myChart.resize();
+         });
+         this.$echarts.registerMap('wuhan', whjson);
+          myChart.setOption({
+              tooltip: {
+                  trigger: 'item',
+                  formatter: '{b}:{c}'
+              },
+              toolbox: {
+                  show: false,
+              },
+              // visualMap: {
+              //     min: 800,
+              //     max: 50000,
+              //     text:['High','Low'],
+              //     realtime: false,
+              //     calculable: true,
+              //     bottom:50,
+              //     textStyle:{
+              //         color:"#00eaff"
+              //     },
+              //     inRange: {
+              //         color: ['lightskyblue','yellow', 'orangered']
+              //     }
+              // },
+              series: [
+                  {
+                      name: '重点人员在汉活动情况',
+                      type: 'map',
+                      mapType: 'wuhan', // 自定义扩展图表类型
+                      roam:true,
+                      zoom:'1.2',
+                      itemStyle:{
+                          normal: {
+                          color: '#fff',
+                          borderColor: 'rgba(62, 187, 185, 1)',
+                          borderWidth: 1,
+                          areaColor: {
+                              type: 'radial',
+                              x: 0.5,
+                              y: 0.5,
+                              r: 0.8,
+                              colorStops: [{
+                                  offset: 0,
+                                  color: 'rgba(13,25,58, 0)' // 0% 处的颜色
+                              }, {
+                                  offset: 1,
+                                  color: 'rgba(47,79,79, .2)' // 100% 处的颜色
+                              }],
+                              globalCoord: false // 缺省为 false
+                          },
+                          shadowColor: 'rgba(62, 187, 185, 1)',
+                          // shadowColor: 'rgba(255, 255, 255, 1)',
+                          shadowOffsetX: -2,
+                          shadowOffsetY: 2,
+                          shadowBlur: 10
+                      },
+                      emphasis: {
+                          areaColor: '#389BB7',
+                          borderWidth: 0,
+                      }
+                      },
+                      label:{
+                          normal:{
+                            //  show: true,
+                              textStyle:{
+                                  color:"#fff"
+                              },
+                          },
+                          emphasis: {
+                                show: true,
+                                textStyle: {
+                                    color: '#57DC90'
+                                }
+                            }
+                      },
+                      data:data.areaStatics,
+                      // 自定义名称映射
+                      nameMap: {
+                          'Central and Western': '江岸区',
+                          'Eastern': '江汉区',
+                          'Islands': '硚口区',
+                          'Kowloon City': '汉阳区',
+                          'Kwai Tsing': '武昌区',
+                          'Kwun Tong': '洪山区',
+                          'North': '青山区',
+                          'Sai Kung': '东西湖区',
+                          'Sha Tin': '蔡甸区',
+                          'Sham Shui Po': '江夏区',
+                          'Southern': '黄陂区',
+                          'Tai Po': '新洲区',
+                          'Tsuen Wan': '汉南区'
+                      }
+                  }
+              ]
+          });
       },
       echartsruns(data){
           var myChart = null;
@@ -1809,7 +2040,19 @@
     top: 60px;
     /* background: red; */
   }
+  .thermodynamics{
+    width: calc(60% - 20px);
+    height: 410px;
+    position: absolute;
+    left: 20px;
+    top: 60px;
+    /* background: red; */
+  }
   #thermodynamicwg{
+    width:100%;
+    height: 100%;
+  }
+  #thermodynamicpmic{
     width:100%;
     height: 100%;
   }
@@ -1860,5 +2103,12 @@
        width:100%;
        height: 100%; 
    }
-   
+   .mapdiv{
+      position: absolute;
+      width: calc(80% - 40px);
+      height: 410px;
+      left: 20px;
+      top: 60px;
+      z-index:1;
+   }
 </style>

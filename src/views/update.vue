@@ -210,7 +210,7 @@
     },
     mounted(){
       var h = document.documentElement.clientHeight || document.body.clientHeight;
-      console.log(h)
+      // console.log(h)
       document.getElementsByClassName("divbox")[0].style.height = (h-20)+'px'
         this.$http.post("res/upgrade/selectGatewayState",{current:1},res=>{
             this.data1 = res.data.list

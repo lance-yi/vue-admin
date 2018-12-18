@@ -9,6 +9,7 @@ import book from '@/subpage/book.vue'
 import role from '@/subpage/role.vue'
 import menu from '@/subpage/menu.vue'
 import log from '@/views/log.vue'
+import analysis from '@/views/analysis.vue'
 import bigscreenshow from '@/views/bigscreenshow.vue'
 import update from '@/views/update.vue'
 import pmic from '@/views/pmic.vue'
@@ -46,6 +47,11 @@ const router = new Router({
       path: '/personmanagedetail',
       name: 'personmanage',
       component: personmanagedetail
+    },
+    {
+      path: '/analysis',
+      name: 'analysis',
+      component: analysis
     },
     {
       path: '/log',

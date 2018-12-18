@@ -103,8 +103,8 @@ export default {
     })
   },
   mounted() {
-    // console.log(this.$route.name)
-
+    this.lists.forEach (el=>{ if(el.path == '/bigscreenshow') { el.path = '#' }})
+    // console.log(this.lists)
   },
   methods: {
     changeSide(bl){
@@ -114,6 +114,12 @@ export default {
       if(url == this.$route.path){
         this.$router.go(0)
       }
+      // console.log(url)
+      // console.log(this.$route.path)
+      if(url == '#'){
+        window.open("http://192.168.8.180:8888/#/bigscreenshow")
+      }
+      
     },
     asyncList: function (num) {
       var that = this
