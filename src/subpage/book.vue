@@ -3,7 +3,7 @@
                  <div style="padding:0 20px;text-align:left" >
                       <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" @click="addbook">新增</button>
                       <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" @click="detele">删除</button>
-                 <i-table border stripe :columns="wordbookhead" :data="wordbookdata" id="wordbook" @on-selection-change="checkbookchange"></i-table>
+                 <i-table border stripe :columns="wordbookhead" :data="wordbookdata" id="wordbook" @on-selection-change="checkbookchange" class="bigtable"></i-table>
                  </div>
                  
         <Modal

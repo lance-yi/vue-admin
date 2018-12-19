@@ -1,6 +1,6 @@
 <template>
     <div @click="showno" >
-        <div style="position:absolute;top:90px;left:30%;z-index:99">
+        <div style="position:absolute;top:90px;left:30%;z-index:29">
                 <i-button type="primary" class="sure" @click.stop="breaktime" style="border-radius:4px" v-if="hadtime">刷新</i-button>
                 <div @click.stop="breaktime">
                 <Select v-model="model1" style="width:100px" v-if="!hadtime">
@@ -8,7 +8,7 @@
                 </Select>
                 </div>
         </div>
-        <div style="position:absolute;top:90px;left:50%;z-index:99">
+        <div style="position:absolute;top:90px;left:50%;z-index:29">
                 <i-input  v-model="serachvalue" placeholder="安装地址、路口名称" style="width: 200px" class="sousuo"></i-input>
                 <i-button type="primary" class="sure" @click="serachroad">搜索</i-button>
         </div>
@@ -314,10 +314,10 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
                   {title: 'IP地址',key: 'electricIp',width: 110},
                   {title: '责任人',key: 'userName',width: 85},
                   {title: '项目名称',key: 'projectName',width: 180},
-                  {title: '经度',key: 'longitude',width: 90},
-                  {title: '纬度',key: 'latitude',width: 90},
-                  {title: '线杆编号',key: 'poleNo'},
-                  {title: '详情',key: 'action',width:200,
+                  {title: '经度',key: 'longitude',width: 105},
+                  {title: '纬度',key: 'latitude',width: 105},
+                  {title: '线杆编号',key: 'poleNo',width: 110},
+                  {title: '详情',key: 'action',width:250,
                     render: (h, params) => {
                       return h('div', [
                           // h('div', {

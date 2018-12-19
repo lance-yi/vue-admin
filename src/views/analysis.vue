@@ -10,7 +10,8 @@
           <div class="ploticonbox" v-if="aplotshow">
               <div class="iconbox" @click="checkplot(1)">
                  <div>
-                  <img src="../../public/img/115.png"/>
+                  <img src="../../public/img/126.png" v-if="hadcol != 1"/>
+                  <img src="../../public/img/129.png" v-if="hadcol == 1"/>
                  </div>
                  <div style="margin-left: 20px;text-align:left">
                   <p style="font-size:22px;font-weight: bold;" :class="hadcol == 1?'hadcolor':''">20%</p>
@@ -19,7 +20,8 @@
               </div>
               <div class="iconbox" @click="checkplot(2)">
                  <div>
-                  <img src="../../public/img/115.png"/>
+                  <img src="../../public/img/130.png" v-if="hadcol != 2"/>
+                  <img src="../../public/img/125.png" v-if="hadcol == 2"/>
                  </div>
                  <div style="margin-left: 20px;text-align:left">
                   <p style="font-size:22px;font-weight: bold;" :class="hadcol == 2?'hadcolor':''">5%</p>
@@ -28,7 +30,8 @@
               </div>
               <div class="iconbox" @click="checkplot(3)">
                  <div>
-                  <img src="../../public/img/115.png"/>
+                  <img src="../../public/img/1301.png" v-if="hadcol != 3"/>
+                  <img src="../../public/img/128.png" v-if="hadcol == 3"/>
                  </div>
                  <div style="margin-left: 20px;text-align:left">
                   <p style="font-size:22px;font-weight: bold;" :class="hadcol == 3?'hadcolor':''">20%</p>
@@ -61,9 +64,9 @@
                     <img src="../../public/img/1242.png"/>
                     导出
                 </div>
-              <div class="exj1" v-if="hadcol == 2">
+              <div class="exj1" v-if="hadcol == 2" @click="tasknum">
                     <img src="../../public/img/124.png"/>
-                    各区域任务分配
+                    各区域任务数分配
                 </div>
           </div>
 
@@ -72,21 +75,76 @@
                     <img src="../../public/img/1242.png"/>
                     导出
                 </div>
-              <div class="exj1">
+              <div class="exj1" @click="tasknum">
                     <img src="../../public/img/124.png"/>
-                    各区域任务分配
+                    各区域任务数分配
                 </div>
           </div>
-
+         <div :class="aplotshow?'checkcom':'checkcoms'">
+             <Select v-model="model10" multiple  placeholder="请选择责任单位"  @on-open-change="changecom" @on-change="channgecomlist">
+                <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
+         </div>
           <div class="plotbox" v-if="aplotshow">
             <div id="camera"></div>
           </div>
 
           <div class="tablebox" v-if="!aplotshow">
            <!-- <Table :columns="columns11" :data="data10" border :height="hxnum"></Table> -->
-           <Table :columns="columns11" :data="data10" border ></Table>
+           <Table :columns="columns11" :data="data10" border stripe></Table>
            <img src="../../public/img/134.png" class="theadimg"/>
           </div>
+        </div>
+
+        <Modal v-model="modal2" width="360" id="cameraaddnum">
+            <p slot="header" style="color:#85A2FE;text-align:center">
+                <span>填写说明：请填写各区域需接入的摄像机数量</span>
+            </p>
+            <div class="mainaddnum">
+                <p><span>洪山区</span><InputNumber  :min="0" v-model="valuetable" style="width: 180px"></InputNumber></p>
+                <!-- <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
+                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
+                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
+                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
+                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
+                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
+                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
+                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
+                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
+                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
+                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
+                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p> -->
+            </div>
+            <div slot="footer" style="text-align:center">
+                <button   class="zhuanyixukes" >确认配置</button>
+            </div>
+        </Modal>
+
+        <div class="statusbox"  v-if="statustable" >
+             <p class="detailpage">{{statustabletitle}}<img src="../../public/img/xxx.png" @click="statustable = false" style="position:absolute;right:20px;z-index: 2;top:20px"/></p>
+             <div style="padding:20px" >
+              <i-table border stripe :columns="columns4" :data="data2"></i-table>
+             </div>
+        </div>
+        <div class="statusbox"  v-if="onegear" >
+             <p class="detailpage">一机一档统计明细<img src="../../public/img/xxx.png" @click="onegear = false" style="position:absolute;right:20px;z-index: 2;top:20px"/></p>
+             <div style="margin-top:20px;">
+                 <span>检索条件：</span>
+                 <RadioGroup v-model="term" @on-change="changeterm">
+                    <Radio label="all">
+                        <span>全部</span>
+                    </Radio>
+                    <Radio label="good">
+                        <span>合格</span>
+                    </Radio>
+                    <Radio label="nogood">
+                        <span>不合格</span>
+                    </Radio>
+                </RadioGroup>
+             </div>
+             <div style="padding:20px" >
+              <i-table border stripe :columns="columns4" :data="data2"></i-table>
+             </div>
         </div>
     </div>
 </template>
@@ -99,15 +157,95 @@
     },
     data () {
       return {
+          term:'all',
+          statustable:false,
+          valuetable:0,
+          modal2:false,
+            cityList: [
+                {
+                    value: '111',
+                    label: 'New York'
+                },
+                {
+                    value: '222',
+                    label: 'London'
+                },
+                {
+                    value: 'Sydney',
+                    label: 'Sydney'
+                },
+                {
+                    value: 'Ottawa',
+                    label: 'Ottawa'
+                },
+                {
+                    value: 'Paris',
+                    label: 'Paris'
+                },
+                {
+                    value: 'Canberra',
+                    label: 'Canberra'
+                }
+            ],
+          model10: [],      
           hxnum:'',
+          comchanges:0,
           hadcol:1,
           aplotshow:true,
           data1:['总数','在线数','在线率'],
           cameradata:[],
+          columns4:[{title: '设备编码',key: 'installAddress',width: 160},
+                  {title: '设备名称',key: 'electricIp',width: 110},
+                  {title: '设备厂商',key: 'userName',width: 140},
+                  {title: '行政区域',key: 'longitude',width: 100},
+                  {title: '监控点位类型',key: 'latitude',width: 140},
+                  {title: '安装地址',key: 'poleNo',width: 200},
+                  {title: '经度',key: 'action',width:105,},
+                  {title: '纬度',key: 'poleNo',width: 105},
+                  {title: '摄像机位置类型',key: 'poleNo',width: 150},
+                  {title: '监视方位',key: 'poleNo',width: 110},
+                  {title: '安装时间',key: 'poleNo',width: 110},
+                  {title: 'MAC地址',key: 'poleNo',width: 120},
+                  {title: 'IPV4地址',key: 'poleNo',width: 120},
+                  {title: '设备型号',key: 'poleNo',width: 110},
+                  {title: '点位俗称',key: 'poleNo',width: 110},
+                  {title: 'IPV6地址',key: 'poleNo',width: 120},
+                  {title: '摄像机类型',key: 'poleNo',width: 110},
+                  {title: '摄像机功能类型',key: 'poleNo',width: 150},
+                  {title: '补光属性',key: 'poleNo',width: 110},
+                  {title: '摄像机编码格式',key: 'poleNo',width: 150},
+                  {title: '联网属性',key: 'poleNo',width: 110},
+                  {title: '所属辖区公安机关',key: 'poleNo',width: 180},
+                  {title: '管理单位',key: 'poleNo',width: 110},
+                  {title: '管理单位联系方式',key: 'poleNo',width: 180},
+                  {title: '录像保存天数',key: 'poleNo',width: 140},
+                  {title: '设备状态',key: 'poleNo',width: 110},
+                  {title: '所属部门/行业',key: 'poleNo',width: 150},
+                  {
+                        title: '操作',
+                        key: 'name',
+                        align: 'center',
+                        width: 110,
+                        fixed: 'right',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('div', {
+                                    on: {
+                                        click: () => {
+                                        this.handleRowChange(params.row)
+                                        }
+                                    },
+                                    style:{color:'#1d60fe',cursor:'pointer'}
+                                }, '查看详情')
+                            ]);
+                        }
+                    }
+                  ],
+          data2:[{'installAddress':'12345678987654321','userName':'山东黄金点击返回','action':'124.123456'}],
           columns11: [
                     {
                         title: '区域',
-                        key: 'name',
+                        key: 'areaName',
                         align: 'center',
                         width: 149,
                         fixed: 'left',
@@ -118,18 +256,50 @@
                         children: [
                             {
                                 title: '总数',
-                                key: 'age',
+                                key: 'taskNum',
                                 align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('span', {
+                                            on: {
+                                                click: () => {
+                                                    // console.log(params.row.formId)
+                                                    this.gotoStatisticaldetal(params.row.areaName,1)
+                                                }
+                                            },
+                                            style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
+                                        }, params.row.taskNum)
+                                    ]);
+                                    }
                             },
                             {
                                 title: '在线数',
-                                key: 'age',
+                                key: 'onlineNum',
                                 align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('span', {
+                                            on: {
+                                                click: () => {
+                                                    // console.log(params.row.formId)
+                                                    this.gotoStatisticaldetal(params.row.areaName,1)
+                                                }
+                                            },
+                                            style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
+                                        }, params.row.onlineNum)
+                                    ]);
+                                    }
                             },
                             {
                                 title: '在线率',
-                                key: 'age',
+                                key: 'onlineRate',
                                 align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('span', {
+                                        }, params.row.onlineRate+'%')
+                                    ]);
+                                    }
                             }
                         ]
                     },
@@ -139,18 +309,50 @@
                         children: [
                             {
                                 title: '接入任务数',
-                                key: 'age',
+                                key: 'taskNum',
                                 align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('span', {
+                                            on: {
+                                                click: () => {
+                                                    // console.log(params.row.formId)
+                                                    this.gotoStatisticaldetal(params.row.areaName,2)
+                                                }
+                                            },
+                                            style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
+                                        }, params.row.taskNum)
+                                    ]);
+                                    }
                             },
                             {
                                 title: '联网数',
-                                key: 'age',
+                                key: 'accessNum',
                                 align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('span', {
+                                            on: {
+                                                click: () => {
+                                                    // console.log(params.row.formId)
+                                                    this.gotoStatisticaldetal(params.row.areaName,2)
+                                                }
+                                            },
+                                            style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
+                                        }, params.row.accessNum)
+                                    ]);
+                                    }
                             },
                             {
                                 title: '联网率',
-                                key: 'age',
+                                key: 'accessRate',
                                 align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('div', {
+                                        }, params.row.accessRate+'%')
+                                    ]);
+                                    }
                             }
                         ]
                     },
@@ -160,7 +362,7 @@
                         children: [
                             {
                                 title: '总数',
-                                key: 'age',
+                                key: 'taskNum',
                                 align: 'center',
                                 render: (h, params) => {
                                     return h('div', [
@@ -168,35 +370,50 @@
                                             on: {
                                                 click: () => {
                                                     // console.log(params.row.formId)
-                                                    this.gotodetal(params.row.id)
+                                                    this.gotoStatisticaldetal(params.row.areaName,3)
                                                 }
                                             },
                                             style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
-                                        }, params.row.age)
+                                        }, params.row.taskNum)
                                     ]);
                                     }
                             },
                             {
                                 title: '合格数',
-                                key: 'age',
+                                key: 'archGoodNum',
                                 align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('span', {
+                                            on: {
+                                                click: () => {
+                                                    // console.log(params.row.formId)
+                                                    this.gotoStatisticaldetal(params.row.areaName,3)
+                                                }
+                                            },
+                                            style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
+                                        }, params.row.archGoodNum)
+                                    ]);
+                                    }
                             },
                             {
                                 title: '合格率',
-                                key: 'age',
+                                key: 'archGoodRate',
                                 align: 'center',
                                 render: (h, params) => {
                                     return h('div', [
                                         h('div', {
                                             style:{color:'#515a6e',cursor:'default'}
-                                        }, params.row.age)
+                                        }, params.row.archGoodRate+'%')
                                     ]);
                                     }
                             }
                         ]
                     }
                 ],
-                data10: [{'age':100,'name':'洪山区'},{'age':100,'name':'洪山区'},{'age':100,'name':'洪山区'},{'age':100,'name':'洪山区'},{'age':100,'name':'洪山区'},{'age':100,'name':'洪山区'},{'age':100,'name':'洪山区'},{'age':100,'name':'洪山区'},{'age':100,'name':'洪山区'},{'age':100,'name':'洪山区'},{'age':100,'name':'洪山区'}]
+                data10: [],
+                statustabletitle:'',
+                onegear:false,
 
       }
     },
@@ -227,6 +444,22 @@
                this.echartscamera(this.cameradata,this.data1)
            }
        },
+       changecom(val){
+         if(val == false){
+            this.comchanges = 1
+            console.log(this.model10)
+         }else if(val == true){
+            this.comchanges = 0
+         }
+       },
+       channgecomlist(val){
+          console.log(val)
+       },
+    //    任务数分配
+       tasknum(){
+          this.modal2 = true
+          this.valuetable = 2
+       },
        plot(){
          this.aplotshow = true
          setTimeout(() => {
@@ -234,10 +467,35 @@
            }, 100);
          
        },
+    //    列表模式
        liebiao(){
-         this.aplotshow = false
+         this.$http.get("report/report/findReport",{},res=>{
+                this.data10 = res.data
+                this.aplotshow = false
+            },err=>{});
+         
+       },
+       changeterm(val){
+         console.log(val)
+       },
+       gotoStatisticaldetal(name,index){
+          console.log(name)
+          if(index == 1){
+             this.statustable = true
+             this.onegear = false
+             this.statustabletitle = '在线统计明细'
+          }else if(index == 2){
+             this.statustable = true
+             this.onegear = false
+             this.statustabletitle = '联网统计明细'
+          }else{
+             this.onegear = true
+             this.statustable = false
+             this.term = 'all'
+          }
        },
        echartscamera(data,title){
+           var that = this
            var myChart = null;
         	var div_ = document.getElementById("camera");
         	div_.removeAttribute("_echarts_instance_");
@@ -454,7 +712,11 @@
             }
           ]
               })
-
+              myChart.on('click', function(param) {
+                    console.log(param.name);
+                    console.log(that.hadcol)
+        })
+         
       }
     }
   }
@@ -521,7 +783,7 @@
     .exjlists{
         position: absolute;
         right: 0;
-        top:70px;
+        top:60px;
         display: flex;
     }
     .exjlist div img{
@@ -571,8 +833,9 @@
         width: 100%;
         height: calc(100% - 110px);
         position: absolute;
-        top: 110px; 
+        top: 100px; 
         padding: 0 20px;
+        z-index: 2;
         /* background: red; */
     }
     .theadimg{
@@ -581,5 +844,52 @@
         left: 21px;
         height: 79px;
         width: 148px;
+    }
+    .checkcom{
+        position: absolute;
+        top:150px;
+        left: 20px;
+        z-index:3;
+    }
+    .checkcoms{
+        position: absolute;
+        top:50px;
+        left: 20px;
+        z-index:3;
+    }
+    .ivu-select-dropdown-list{
+        z-index: 3;
+    }
+    .mainaddnum{
+        text-align: left;
+        padding: 0 0 0 30px;
+    }
+     .mainaddnum p{
+         margin-bottom: 10px;
+     }
+    .mainaddnum p span{
+        display: inline-block;
+        margin-right: 10px;
+    }
+    /* 明细列表 */
+    .statusbox {
+      width: 1350px;
+      background: #fff;
+      position: absolute;
+      top: 15%;
+      left: 0%;
+      right: 0%;
+      margin: 0 auto;
+      box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
+      z-index: 30;
+      padding-bottom:20px;
+      min-height:70%
+    }
+    .detailpage{
+      margin: 0px 20px;
+      font-size:16px;
+      text-align: left;
+      padding: 10px 0;
+      border-bottom:1px solid #C3C3C3
     }
 </style>

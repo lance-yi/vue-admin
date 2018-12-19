@@ -15,6 +15,7 @@ export default initArcgis;
         padding-top: 60px;
          /* width: 100vw; */
         height:100vh; 
+        z-index:20;
         /* background: url("../assets/start.gif") no-repeat center; */
     }
 </style>

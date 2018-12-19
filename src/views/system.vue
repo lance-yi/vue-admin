@@ -10,7 +10,7 @@
                       <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" @click="detelepersons">删除</button>
                       <i-input  v-model="serachvalue" placeholder="" style="width: 200px;margin-left:30%" class="sousuo"></i-input>
                       <i-button type="primary" class="sure" @click="serachroad">搜索</i-button>
-                 <i-table border stripe :columns="persondatahead" :data="persondata" id="wordbook" @on-selection-change="checkpersonchange"></i-table>
+                 <i-table border stripe :columns="persondatahead" :data="persondata" id="wordbook" @on-selection-change="checkpersonchange" class="bigtable"></i-table>
                 </div>
                 <Page :total='total' show-total style="margin-top:10px" :current.sync="pages" @on-change="changeliebiaopage" v-if="list.path == '/system/userdeploy'"></Page>
                 <router-view v-if="bookname == list.title"></router-view>

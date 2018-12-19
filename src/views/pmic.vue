@@ -340,8 +340,8 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
                   {title: 'IP地址',key: 'electric_ip',width: 110},
                   {title: '责任人',key: 'userName',width: 85},
                   {title: '项目名称',key: 'projectName',width: 150},
-                  {title: '经度',key: 'longitude',width: 90},
-                  {title: '纬度',key: 'latitude',width: 90},
+                  {title: '经度',key: 'longitude',width: 105},
+                  {title: '纬度',key: 'latitude',width: 105},
                   //  {title: 'IP地址',key: 'deviceIp',width: 108,
                   //  render:(h,params)=>{
                   //         return h('span',{
@@ -353,7 +353,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
                   //       }
                   // },
                   {title: '故障发生时间',key: 'occurTime',width: 130},
-                  {title: '工单状态',key: 'alertStatus',width:120,
+                  {title: '电源状态',key: 'alertStatus',width:120,
                    render:(h,params)=>{
                           let tmpStr = "";
                           if(params.row.alertStatus=="0"){

@@ -21,7 +21,7 @@
                             </CheckboxGroup>
                        </Col>
                         <Col span="16">
-                           <i-table border  :columns="roletablehead" :data="roletabledata" id="wordbook" @on-selection-change="checkbookchange"></i-table>
+                           <i-table border  :columns="roletablehead" :data="roletabledata" id="wordbook" @on-selection-change="checkbookchange" ></i-table>
                        </Col>
                       </Row>
                  </div>
