@@ -524,7 +524,7 @@
                       <img src="../../public/img/19.png" slot="dot" v-if="list.isAlert == 4"  @click="checkicons(list.ipAddr)"/>
                       <img src="../../public/img/18.png" slot="dot" v-if="list.isAlert == 1" />
                       <div class="timelinecont">
-                        <p style="min-width:180px">端口号：<span>{{list.lan}}</span></p>
+                        <p style="min-width:120px">端口号：<span>{{list.lan}}</span></p>
                         <p style="min-width:180px">接入设备类型：<span>{{list.resType}}</span></p>
                         <p style="min-width:100px;margin-left: 5px">状态：<span>{{list.state?"处理中":"待处理"}}</span></p>
                         <p style="min-width:200px;margin-left: 5px">告警类型：<span>{{list.typeName}}</span></p>
@@ -873,7 +873,7 @@
                         <span style="color: #696C6F;">{{rightlist.maintenanceUser}}</span>
                       </div>
                      </div>
-                   <div class="detail-text" style="margin:20px">
+                   <div class="detail-text" style="margin:20px;min-height: 0px;">
                      <div style="left:75px;height:20px" class="fixedborder" v-if="reportlist.lan =='LAN8'"></div>
                         <img src="../../public/img/1.gif" style="left:59px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 2&&reportlist.lan =='LAN8'"/>
                         <img src="../../public/img/2.gif" style="left:59px;width:35px;height:40px" class="fixedimgs" v-if="reportlist.isAlert == 1&&reportlist.lan =='LAN8'"/>
@@ -1515,9 +1515,9 @@ export default {
       rightlist:[],
       type:'',
       typelist:[],
-      columns1: [{title: '采样时间',key: 'creatTime', width:155,},
-                {title: '网络延时',key: 'status',width:95,},
-                {title: '丢包率',key: 'packetLoss',width:80,},
+      columns1: [{title: '采样时间',key: 'creatTime', width:155,align: 'center'},
+                {title: '网络延时',key: 'status',width:95,align: 'center'},
+                {title: '丢包率',key: 'packetLoss',width:80,align: 'center'},
                  {title: '再ping一下',key:'ping',width:115,
               render: (h, params) => {
                     return h('div', [

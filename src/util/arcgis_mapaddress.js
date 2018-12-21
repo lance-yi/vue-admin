@@ -70,8 +70,7 @@ export default {
         },
         num:{
             handler: function(val,odlval) {
-                this.init() 
-                // history.go(0)
+                this.refresh()
             }
        }
       },
@@ -79,8 +78,22 @@ export default {
         timers(i){
             clearInterval(this.timer)
             this.timer =  setInterval(() => { 
-                    this.init();
+                this.refresh()
                 }, this.mintime*i)
+        },
+        refresh(){
+            this.point.forEach (el=>{ 
+                var targetLayer=this.mapObj.map.getLayer(el.id);
+                this.mapObj.map.removeLayer(targetLayer);
+            })
+            this.$http.get("res/ponitMove/selectPonintForMap",{},res=>{
+                this.point = res.data
+                var that = this
+                this.point.forEach (el=>{ 
+                        that.createCircle(el)
+                })
+              },err=>{
+              })
         },
         init() {
             // 加载js;
@@ -173,7 +186,7 @@ export default {
             };
         },
         initMap(obj) {
-            // graphicsLayer.clear();
+            
             // obj.basemaps.delorme = {baseMapLayers: [{url: "http://100.16.3.40:6080/arcgis/rest/services/wuhann/MapServer"}]}
             this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
             let map = new obj.Map('map', {logo: false,basemap: "streets-navigation-vector",},);// 创建地图实例
@@ -182,7 +195,6 @@ export default {
             map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
             let img = new TDT('img'); // 影像
             let cia = new TDT('cia');//路网
-            
             map.addLayer(img); // 将图层添加到map对象
             map.addLayer(cia);
             this.mapObj.map = map;
@@ -200,11 +212,12 @@ export default {
                 //     map.graphics.add(graphic)},3000);
               },err=>{
               })
-                         
+        
+            
         },
         createCircle(el) {
             var that = this
-            let gl = new this.mapObj.GraphicsLayer({id:el.id});
+            var gl = new this.mapObj.GraphicsLayer({id:el.id});
             this.mapObj.map.addLayer(gl);
             var labelPoint=new esri.geometry.Point(el.longitude,el.latitude);
             var labelSymbol =  new esri.symbol.PictureMarkerSymbol({
@@ -214,16 +227,15 @@ export default {
                 "type":"esriPMS",
                 "angle": 0,
               });
-            // var labelSymbol=new esri.symbol.SimpleMarkerSymbol();
+
             var labelGraphic=new this.mapObj.Graphic(labelPoint,labelSymbol);
 
             //添加到地图 
-            // this.mapObj.map.graphics.add(labelGraphic)
             gl.add(labelGraphic);
+            
             gl.onClick = function(evt){
             that.$emit('ip',el.id)
             }
-
 
             
         },

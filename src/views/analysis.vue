@@ -71,8 +71,8 @@
           </div>
 
           <div class="exjlists" v-if="!aplotshow">
-              <div class="exj2" >
-                    <img src="../../public/img/1242.png"/>
+              <div class="exj2" @click="educetable">
+                    <img src="../../public/img/1242.png" />
                     导出
                 </div>
               <div class="exj1" @click="tasknum">
@@ -120,8 +120,75 @@
             </div>
         </Modal>
 
+
+
+        <Modal v-model="modalmain" width="800" id="cameraaddnum">
+            <p slot="header" style="text-align:left;color:#696C6F">
+                <span>详情</span>
+            </p>
+            <div class="mainaddnum">
+              <div><span>设备编码：{{maindata.nationnalId}}</span><span>设备名称：{{maindata.cameraName}}</span></div>
+              <div><span>设备厂商：{{maindata.manufacturer}}</span><span>行政区域：{{maindata.areaName}}</span></div>
+              <div ><span>监控点位类型：{{maindata.pointType}}</span><div style="display:inline-block;word-wrap: break-word;word-break: normal;width:388px">安装地址：{{maindata.installAddress}}</div></div>
+              <div><span>经度：{{maindata.longitude}}</span><span>纬度：{{maindata.latitude}}</span></div>
+              <div><span>摄像机位置类型：{{maindata.cameraPositionType}}</span><span>监视方位：{{maindata.cameraPosition}}</span></div>
+              <div><span>安装时间：{{maindata.installTime}}</span><span>MAC地址：{{maindata.mac}}</span></div>
+              <div><span>IPV4地址：{{maindata.ipAddress}}</span><span>IPV6地址：{{maindata.ipv6Address}}</span></div>
+              <div><span>设备型号：{{maindata.model}}</span><span>点位俗称：{{maindata.pointName}}</span></div>
+              <div><span>摄像机类型：{{maindata.cameraType}}</span><span>摄像机功能类型：{{maindata.cameraFunctionType}}</span></div>
+              <div><span>补光属性：{{maindata.lightingType}}</span><span>摄像机编码格式：{{maindata.cameraCode}}</span></div>
+              <div><span>联网属性：{{maindata.network_properties}}</span><span>所属辖区公安机关：{{maindata.deptId}}</span></div>
+              <div><span>管理单位：{{maindata.managementUnit}}</span><span>管理单位联系方式：{{maindata.managementPhone}}</span></div>
+              <div><span>录像保存天数：{{maindata.videoSaveDays}}</span><span>设备状态：{{maindata.deviceStatus}}</span></div>
+              <div><span>所属部门/行业：{{maindata.industry}}</span><span v-if="maindata.isReport == 0" >是否上报：否</span><span v-if="maindata.isReport == 1" >是否上报：是</span></div>
+            </div>
+            <div slot="footer" style="text-align:center">
+                <button   class="zhuanyixukes" @click="modalmain = false" style="padding: 5px 20px;">确认</button>
+            </div>
+        </Modal>
+
+
+         <Modal v-model="modalmains" width="800" id="cameraaddnum">
+            <p slot="header" style="text-align:left;color:#696C6F">
+                <span>详情</span>
+            </p>
+            <div class="mainaddnum" v-if="modalmains">
+              <div><span>设备编码：<em :class="maindata.nationnalId.state == 0?'errotext':''">{{maindata.nationnalId.value}}</em></span><span>设备名称：<em :class="maindata.cameraName.state == 0?'errotext':''">{{maindata.cameraName.value}}</em></span></div>
+              <div><span>设备厂商：<em :class="maindata.manufacturer.state == 0?'errotext':''">{{maindata.manufacturer.value}}</em></span><span>行政区域：<em :class="maindata.areaName.state == 0?'errotext':''">{{maindata.areaName.value}}</em></span></div>
+              <div ><span>监控点位类型：<em :class="maindata.pointType.state == 0?'errotext':''">{{maindata.pointType.value}}</em></span><div style="display:inline-block;word-wrap: break-word;word-break: normal;width:388px">安装地址：<em :class="maindata.installAddress.state == 0?'errotext':''">{{maindata.installAddress.value}}</em></div></div>
+              <div><span>经度：<em :class="maindata.longitude.state == 0?'errotext':''">{{maindata.longitude.value}}</em></span><span>纬度：<em :class="maindata.latitude.state == 0?'errotext':''">{{maindata.latitude.value}}</em></span></div>
+              <div><span>摄像机位置类型：<em :class="maindata.cameraPositionType.state == 0?'errotext':''">{{maindata.cameraPositionType.value}}</em></span><span>监视方位：<em :class="maindata.cameraPosition.state == 0?'errotext':''">{{maindata.cameraPosition.value}}</em></span></div>
+              <div><span>安装时间：<em :class="maindata.installTime.state == 0?'errotext':''">{{maindata.installTime.value}}</em></span><span>MAC地址：<em :class="maindata.mac.state == 0?'errotext':''">{{maindata.mac.value}}</em></span></div>
+              <div><span>IPV4地址：<em :class="maindata.ipAddress.state == 0?'errotext':''">{{maindata.ipAddress.value}}</em></span><span>IPV6地址：<em :class="maindata.ipv6Address.state == 0?'errotext':''">{{maindata.ipv6Address.value}}</em></span></div>
+              <div><span>设备型号：<em :class="maindata.model.state == 0?'errotext':''">{{maindata.model.value}}</em></span><span>点位俗称：<em :class="maindata.pointName.state == 0?'errotext':''">{{maindata.pointName.value}}</em></span></div>
+              <div><span>摄像机类型：<em :class="maindata.cameraType.state == 0?'errotext':''">{{maindata.cameraType.value}}</em></span><span>摄像机功能类型：<em :class="maindata.cameraFunctionType.state == 0?'errotext':''">{{maindata.cameraFunctionType.value}}</em></span></div>
+              <div><span>补光属性：<em :class="maindata.lightingType.state == 0?'errotext':''">{{maindata.lightingType.value}}</em></span><span>摄像机编码格式：<em :class="maindata.cameraCode.state == 0?'errotext':''">{{maindata.cameraCode.value}}</em></span></div>
+              <div><span>联网属性：<em :class="maindata.network_properties.state == 0?'errotext':''">{{maindata.network_properties.value}}</em></span><span>所属辖区公安机关：<em :class="maindata.deptId.state == 0?'errotext':''">{{maindata.deptId.value}}</em></span></div>
+              <div><span>管理单位：<em :class="maindata.managementUnit.state == 0?'errotext':''">{{maindata.managementUnit.value}}</em></span><span>管理单位联系方式：<em :class="maindata.managementPhone.state == 0?'errotext':''">{{maindata.managementPhone.value}}</em></span></div>
+              <div><span>录像保存天数：<em :class="maindata.videoSaveDays.state == 0?'errotext':''">{{maindata.videoSaveDays.value}}</em></span><span>设备状态：<em :class="maindata.deviceStatus.state == 0?'errotext':''">{{maindata.deviceStatus.value}}</em></span></div>
+              <div><span>所属部门/行业：<em :class="maindata.industry.state == 0?'errotext':''">{{maindata.industry.value}}</em></span><span v-if="maindata.isQualified.value == 'true'" >是否合格：合格</span><span v-if="maindata.isQualified.value == 'false'" >是否合格：<em class="errotext">不合格</em></span></div>
+            </div>
+            <div slot="footer" style="text-align:center">
+                <button   class="zhuanyixukes" @click="modalmain = false" style="padding: 5px 20px;">确认</button>
+            </div>
+        </Modal>
+
         <div class="statusbox"  v-if="statustable" >
              <p class="detailpage">{{statustabletitle}}<img src="../../public/img/xxx.png" @click="statustable = false" style="position:absolute;right:20px;z-index: 2;top:20px"/></p>
+             <div style="margin-top:20px;" v-if="statustabletitle == '在线率统计明细'">
+                 <span>检索条件：</span>
+                 <RadioGroup v-model="allnum" @on-change="changeallnum">
+                    <Radio label="all">
+                        <span>总数</span>
+                    </Radio>
+                    <Radio label="online">
+                        <span>在线数</span>
+                    </Radio>
+                    <Radio label="unline">
+                        <span>离线数</span>
+                    </Radio>
+                </RadioGroup>
+             </div>
              <div style="padding:20px" >
               <i-table border stripe :columns="columns4" :data="data2"></i-table>
              </div>
@@ -143,7 +210,7 @@
                 </RadioGroup>
              </div>
              <div style="padding:20px" >
-              <i-table border stripe :columns="columns4" :data="data2"></i-table>
+              <i-table border stripe :columns="columns5" :data="data2"></i-table>
              </div>
         </div>
     </div>
@@ -157,6 +224,8 @@
     },
     data () {
       return {
+          allnum:'',
+          modalmain:false,
           term:'all',
           statustable:false,
           valuetable:0,
@@ -194,33 +263,51 @@
           aplotshow:true,
           data1:['总数','在线数','在线率'],
           cameradata:[],
-          columns4:[{title: '设备编码',key: 'installAddress',width: 160},
-                  {title: '设备名称',key: 'electricIp',width: 110},
-                  {title: '设备厂商',key: 'userName',width: 140},
-                  {title: '行政区域',key: 'longitude',width: 100},
-                  {title: '监控点位类型',key: 'latitude',width: 140},
-                  {title: '安装地址',key: 'poleNo',width: 200},
-                  {title: '经度',key: 'action',width:105,},
-                  {title: '纬度',key: 'poleNo',width: 105},
-                  {title: '摄像机位置类型',key: 'poleNo',width: 150},
-                  {title: '监视方位',key: 'poleNo',width: 110},
-                  {title: '安装时间',key: 'poleNo',width: 110},
-                  {title: 'MAC地址',key: 'poleNo',width: 120},
-                  {title: 'IPV4地址',key: 'poleNo',width: 120},
-                  {title: '设备型号',key: 'poleNo',width: 110},
-                  {title: '点位俗称',key: 'poleNo',width: 110},
-                  {title: 'IPV6地址',key: 'poleNo',width: 120},
-                  {title: '摄像机类型',key: 'poleNo',width: 110},
-                  {title: '摄像机功能类型',key: 'poleNo',width: 150},
-                  {title: '补光属性',key: 'poleNo',width: 110},
-                  {title: '摄像机编码格式',key: 'poleNo',width: 150},
-                  {title: '联网属性',key: 'poleNo',width: 110},
-                  {title: '所属辖区公安机关',key: 'poleNo',width: 180},
-                  {title: '管理单位',key: 'poleNo',width: 110},
-                  {title: '管理单位联系方式',key: 'poleNo',width: 180},
-                  {title: '录像保存天数',key: 'poleNo',width: 140},
-                  {title: '设备状态',key: 'poleNo',width: 110},
-                  {title: '所属部门/行业',key: 'poleNo',width: 150},
+          columns4:[{title: '设备编码',key: 'nationnalId',width: 180,align: 'center'},
+                  {title: '设备名称',key: 'cameraName',width: 110,align: 'center'},
+                  {title: '设备厂商',key: 'manufacturer',width: 140,align: 'center'},
+                  {title: '行政区域',key: 'areaName',width: 100,align: 'center'},
+                  {title: '监控点位类型',key: 'pointType',width: 140,align: 'center',},
+                  {title: '安装地址',key: 'installAddress',width: 200,align: 'center',},
+                  {title: '经度',key: 'longitude',width:105,align: 'center',},
+                  {title: '纬度',key: 'latitude',width: 105,align: 'center',},
+                  {title: '摄像机位置类型',key: 'cameraPositionType',width: 150,align: 'center',},
+                  {title: '监视方位',key: 'cameraPosition',width: 110,align: 'center',},
+                  {title: '安装时间',key: 'installTime',width: 160,align: 'center',},
+                  {title: 'MAC地址',key: 'mac',width: 140,align: 'center',},
+                  {title: 'IPV4地址',key: 'ipAddress',width: 120,align: 'center',},
+                  {title: '设备型号',key: 'model',width: 110,align: 'center',},
+                  {title: '点位俗称',key: 'pointName',width: 110,align: 'center',},
+                  {title: 'IPV6地址',key: 'ipv6Address',width: 220,align: 'center',},
+                  {title: '摄像机类型',key: 'cameraType',width: 110,align: 'center',},
+                  {title: '摄像机功能类型',key: 'cameraFunctionType',width: 150,align: 'center',},
+                  {title: '补光属性',key: 'lightingType',width: 110,align: 'center',},
+                  {title: '摄像机编码格式',key: 'cameraCode',width: 150,align: 'center',},
+                  {title: '联网属性',key: 'network_properties',width: 110,align: 'center',},
+                  {title: '所属辖区公安机关',key: 'deptId',width: 180,align: 'center',},
+                  {title: '管理单位',key: 'managementUnit',width: 110,align: 'center',},
+                  {title: '管理单位联系方式',key: 'managementPhone',width: 180,align: 'center',},
+                  {title: '录像保存天数',key: 'videoSaveDays',width: 140,align: 'center',},
+                  {title: '设备状态',key: 'deviceStatus',width: 110,align: 'center',},
+                  {title: '所属部门/行业',key: 'industry',width: 150,align: 'center',},
+                  {title: '是否上报',key: 'isReport',width: 100,align: 'center',
+                    render:(h,params)=>{
+                          let tmpStr = "";
+                          if(params.row.isReport=="0"){
+                            tmpStr="否";
+                          }else{
+                            tmpStr="是"
+                          }
+                          return h('span',{
+                              style:{
+                                 background: (params.row.isReport=="0")?"#EC626B":"#9CD875",
+                                 color:'#fff',
+                                 padding:'4px 12px',
+                                 display:'inline-block',
+                              }
+                          },tmpStr)
+                        }
+                  },
                   {
                         title: '操作',
                         key: 'name',
@@ -241,7 +328,285 @@
                         }
                     }
                   ],
-          data2:[{'installAddress':'12345678987654321','userName':'山东黄金点击返回','action':'124.123456'}],
+          columns5:[{title: '设备编码',key: 'nationnalId',width: 180,align: 'center',
+                    render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.nationnalId.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.nationnalId.value)
+                        }
+                  },
+                  {title: '设备名称',key: 'cameraName',width: 110,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.cameraName.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.cameraName.value)
+                        }
+                  },
+                  {title: '设备厂商',key: 'manufacturer',width: 140,align: 'center',
+                    render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.manufacturer.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.manufacturer.value)
+                        }
+                  },
+                  {title: '行政区域',key: 'areaName',width: 100,align: 'center',
+                    render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.areaName.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.areaName.value)
+                        }
+                  },
+                  {title: '监控点位类型',key: 'pointType',width: 140,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.pointType.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.pointType.value)
+                        }
+                  },
+                  {title: '安装地址',key: 'installAddress',width: 200,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.installAddress.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.installAddress.value)
+                        }
+                  },
+                  {title: '经度',key: 'longitude',width:105,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.longitude.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.longitude.value)
+                        }
+                  },
+                  {title: '纬度',key: 'latitude',width: 105,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.latitude.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.latitude.value)
+                        }
+                  },
+                  {title: '合格不合格',key: 'isQualified',width: 120,align: 'center',
+                   render:(h,params)=>{
+                       let tmpStr = "";
+                          if(params.row.isQualified == true){
+                            tmpStr="合格"
+                          }else{
+                            tmpStr="不合格"
+                          }
+                          return h('span',{
+                              style:{
+                                 color:(params.row.isQualified == false)?"#EC626B":"#515a6e",
+                              }
+                          },tmpStr)
+                        }
+                  },
+                  {title: '摄像机位置类型',key: 'cameraPositionType',width: 150,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.cameraPositionType.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.cameraPositionType.value)
+                        }
+                  },
+                  {title: '监视方位',key: 'cameraPosition',width: 110,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.cameraPosition.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.cameraPosition.value)
+                        }
+                  },
+                  {title: '安装时间',key: 'installTime',width: 160,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.installTime.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.installTime.value)
+                        }
+                  },
+                  {title: 'MAC地址',key: 'mac',width: 140,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.mac.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.mac.value)
+                        }
+                  },
+                  {title: 'IPV4地址',key: 'ipAddress',width: 120,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.ipAddress.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.ipAddress.value)
+                        }
+                  },
+                  {title: '设备型号',key: 'model',width: 110,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.model.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.model.value)
+                        }
+                  },
+                  {title: '点位俗称',key: 'pointName',width: 110,align: 'center',
+                    render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.pointName.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.pointName.value)
+                        }
+                  },
+                  {title: 'IPV6地址',key: 'ipv6Address',width: 220,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.ipv6Address.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.ipv6Address.value)
+                        }
+                  },
+                  {title: '摄像机类型',key: 'cameraType',width: 110,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.cameraType.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.cameraType.value)
+                        }
+                  },
+                  {title: '摄像机功能类型',key: 'cameraFunctionType',width: 150,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.cameraFunctionType.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.cameraFunctionType.value)
+                        }
+                  },
+                  {title: '补光属性',key: 'lightingType',width: 110,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.lightingType.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.lightingType.value)
+                        }
+                  },
+                  {title: '摄像机编码格式',key: 'cameraCode',width: 150,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.cameraCode.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.cameraCode.value)
+                        }
+                  },
+                  {title: '联网属性',key: 'network_properties',width: 110,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.network_properties.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.network_properties.value)
+                        }
+                  },
+                  {title: '所属辖区公安机关',key: 'deptId',width: 180,align: 'center',
+                    render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.deptId.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.deptId.value)
+                        }
+                  },
+                  {title: '管理单位',key: 'managementUnit',width: 110,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.managementUnit.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.managementUnit.value)
+                        }
+                  },
+                  {title: '管理单位联系方式',key: 'managementPhone',width: 180,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.managementPhone.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.managementPhone.value)
+                        }
+                  },
+                  {title: '录像保存天数',key: 'videoSaveDays',width: 140,align: 'center',
+                    render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.videoSaveDays.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.videoSaveDays.value)
+                        }
+                  },
+                  {title: '设备状态',key: 'deviceStatus',width: 110,align: 'center',
+                    render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.deviceStatus.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.deviceStatus.value)
+                        }
+                  },
+                  {title: '所属部门/行业',key: 'industry',width: 150,align: 'center',
+                   render:(h,params)=>{
+                          return h('span',{
+                              style:{
+                                 color:(params.row.industry.state=="0")?"#EC626B":"#515a6e",
+                              }
+                          },params.row.industry.value)
+                        }
+                  },
+                  {
+                        title: '操作',
+                        key: 'name',
+                        align: 'center',
+                        width: 110,
+                        fixed: 'right',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('div', {
+                                    on: {
+                                        click: () => {
+                                        this.handleone(params.row)
+                                        }
+                                    },
+                                    style:{color:'#1d60fe',cursor:'pointer'}
+                                }, '查看详情')
+                            ]);
+                        }
+                    }
+                  ],
+          data2:[],
           columns11: [
                     {
                         title: '区域',
@@ -256,7 +621,7 @@
                         children: [
                             {
                                 title: '总数',
-                                key: 'taskNum',
+                                key: 'accessNum',
                                 align: 'center',
                                 render: (h, params) => {
                                     return h('div', [
@@ -264,11 +629,11 @@
                                             on: {
                                                 click: () => {
                                                     // console.log(params.row.formId)
-                                                    this.gotoStatisticaldetal(params.row.areaName,1)
+                                                    this.gotoStatisticaldetal(params.row.areaCode,1)
                                                 }
                                             },
                                             style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
-                                        }, params.row.taskNum)
+                                        }, params.row.accessNum)
                                     ]);
                                     }
                             },
@@ -282,7 +647,7 @@
                                             on: {
                                                 click: () => {
                                                     // console.log(params.row.formId)
-                                                    this.gotoStatisticaldetal(params.row.areaName,1)
+                                                    this.gotoonlinenum(params.row.areaCode,1)
                                                 }
                                             },
                                             style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
@@ -311,19 +676,19 @@
                                 title: '接入任务数',
                                 key: 'taskNum',
                                 align: 'center',
-                                render: (h, params) => {
-                                    return h('div', [
-                                        h('span', {
-                                            on: {
-                                                click: () => {
-                                                    // console.log(params.row.formId)
-                                                    this.gotoStatisticaldetal(params.row.areaName,2)
-                                                }
-                                            },
-                                            style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
-                                        }, params.row.taskNum)
-                                    ]);
-                                    }
+                                // render: (h, params) => {
+                                //     return h('div', [
+                                //         h('span', {
+                                //             on: {
+                                //                 click: () => {
+                                //                     // console.log(params.row.formId)
+                                //                     this.gotoStatisticaldetal(params.row.areaCode,2)
+                                //                 }
+                                //             },
+                                //             style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
+                                //         }, params.row.taskNum)
+                                //     ]);
+                                //     }
                             },
                             {
                                 title: '联网数',
@@ -335,7 +700,7 @@
                                             on: {
                                                 click: () => {
                                                     // console.log(params.row.formId)
-                                                    this.gotoStatisticaldetal(params.row.areaName,2)
+                                                    this.gotoStatisticaldetal(params.row.areaCode,2)
                                                 }
                                             },
                                             style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
@@ -362,7 +727,7 @@
                         children: [
                             {
                                 title: '总数',
-                                key: 'taskNum',
+                                key: 'accessNum',
                                 align: 'center',
                                 render: (h, params) => {
                                     return h('div', [
@@ -370,11 +735,11 @@
                                             on: {
                                                 click: () => {
                                                     // console.log(params.row.formId)
-                                                    this.gotoStatisticaldetal(params.row.areaName,3)
+                                                    this.gotoStatisticaldetal(params.row.areaCode,3)
                                                 }
                                             },
                                             style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
-                                        }, params.row.taskNum)
+                                        }, params.row.accessNum)
                                     ]);
                                     }
                             },
@@ -388,7 +753,7 @@
                                             on: {
                                                 click: () => {
                                                     // console.log(params.row.formId)
-                                                    this.gotoStatisticaldetal(params.row.areaName,3)
+                                                    this.gotogoodnum(params.row.areaCode,3)
                                                 }
                                             },
                                             style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
@@ -414,6 +779,9 @@
                 data10: [],
                 statustabletitle:'',
                 onegear:false,
+                modalmains:false,
+                maindata:[],
+                areacode:'',
 
       }
     },
@@ -424,24 +792,44 @@
       // console.log(h)
       this.hxnum = (h-250)
       document.getElementsByClassName("divbox")[0].style.height = (h-20)+'px'
-      this.$http.get("res/screenDisplay/cameraOverview",{},res=>{
-              //底部摄像机在线状态
-              this.echartscamera(res.data,this.data1)
-              this.cameradata = res.data
+      this.online()
+      this.$http.get("/report/report/selectManagementUnit?",{dictCodes:'managementUnit'},res=>{
+              
             },err=>{});
     },
     methods: {
+        // 在线率
+        online(){
+          this.$http.get("report/report/findReportCount?",{type:1,state:'online'},res=>{
+              this.echartscamera(res.data,this.data1)
+              this.cameradata = res.data
+            },err=>{});
+        },
+        // 联网率
+        access(){
+          this.$http.get("report/report/findReportCount?",{type:1,state:'access'},res=>{
+              this.echartscamera(res.data,this.data1)
+              this.cameradata = res.data
+            },err=>{});
+        },
+        // 一机一档合格率
+       archgood(){
+          this.$http.get("report/report/findReportCount?",{type:1,state:'archGood'},res=>{
+              this.echartscamera(res.data,this.data1)
+              this.cameradata = res.data
+            },err=>{});
+        },
        checkplot(index){
            this.hadcol = index
            if(index == 1){
                this.data1 = ['总数','在线数','在线率']
-               this.echartscamera(this.cameradata,this.data1)
+               this.online()
            }else if(index == 2){
                this.data1 = ['接入任务数','已联网数','联网率']
-               this.echartscamera(this.cameradata,this.data1)
+               this.access()
            }else if(index == 3){
                this.data1 = ['总数','合格数','合格率']
-               this.echartscamera(this.cameradata,this.data1)
+               this.archgood()
            }
        },
        changecom(val){
@@ -469,30 +857,100 @@
        },
     //    列表模式
        liebiao(){
-         this.$http.get("report/report/findReport",{},res=>{
+         this.$http.get("report/report/findReport",{"managementUnit":''},res=>{
                 this.data10 = res.data
                 this.aplotshow = false
             },err=>{});
          
        },
+       //修改一机一档检索条件
        changeterm(val){
-         console.log(val)
+         if(val == 'all'){
+           this.$http.get("/report/report/countRecordDetial?",{state:'',areaCode:this.areacode},res=>{
+                this.data2 = res.data
+            },err=>{});
+         }else if(val == 'good'){
+            this.$http.get("/report/report/countRecordDetial?",{state:'1',areaCode:this.areacode},res=>{
+                this.data2 = res.data
+            },err=>{});
+         }else if(val == 'nogood'){
+             this.$http.get("/report/report/countRecordDetial?",{state:'0',areaCode:this.areacode},res=>{
+                this.data2 = res.data
+            },err=>{});
+         }
        },
-       gotoStatisticaldetal(name,index){
-          console.log(name)
+       //修改在线率检索条件
+       changeallnum(val){
+         if(val == 'all'){
+           this.$http.get("report/report/findReportForm?",{areaCode:this.areacode,state:''},res=>{
+                this.data2 = res.data
+            },err=>{});
+         }else if(val == 'online'){
+            this.$http.get("report/report/findReportForm?",{areaCode:this.areacode,state:'1'},res=>{
+                this.data2 = res.data
+            },err=>{});
+         }else if(val == 'unline'){
+             this.$http.get("report/report/findReportForm?",{areaCode:this.areacode,state:'0'},res=>{
+                this.data2 = res.data
+            },err=>{});
+         }
+       },
+       //在线数明细
+       gotoonlinenum(areaCode,index){
+          this.$http.get("report/report/findReportForm?",{areaCode:areaCode,state:1},res=>{
+                this.data2 = res.data
+                this.allnum = 'online'
+                this.statustabletitle = '在线率统计明细'
+                this.statustable = true
+                this.areacode = areaCode
+            },err=>{});
+       },
+       //一机一档合格数
+       gotogoodnum(areaCode,index){
+           this.term = 'good'
+             this.$http.get("/report/report/countRecordDetial?",{state:'1',areaCode:areaCode},res=>{
+                this.data2 = res.data
+                this.onegear = true
+                this.areacode = areaCode
+            },err=>{});
+       },
+       gotoStatisticaldetal(areaCode,index){
+           this.areacode = areaCode
           if(index == 1){
              this.statustable = true
              this.onegear = false
-             this.statustabletitle = '在线统计明细'
+             this.statustabletitle = '在线率统计明细'
+             this.allnum = 'all'
+             this.$http.get("report/report/findReportForm?",{areaCode:areaCode,state:''},res=>{
+                this.data2 = res.data
+            },err=>{});
           }else if(index == 2){
              this.statustable = true
              this.onegear = false
-             this.statustabletitle = '联网统计明细'
+             this.statustabletitle = '联网率统计明细'
+             this.$http.get("report/report/findReportForm?",{areaCode:areaCode,state:''},res=>{
+                this.data2 = res.data
+            },err=>{});
           }else{
              this.onegear = true
              this.statustable = false
              this.term = 'all'
+             this.$http.get("/report/report/countRecordDetial?",{state:'',areaCode:areaCode},res=>{
+                this.data2 = res.data
+            },err=>{});
           }
+       },
+       handleRowChange(data){
+          this.modalmain = true
+          this.maindata = data
+       },
+       handleone(data){
+          this.modalmains = true
+          this.maindata = data
+       },
+    //    导出表格
+       educetable(){
+         window.location.href=this.$http.root+'/report/report/downloadExcle';
        },
        echartscamera(data,title){
            var that = this
@@ -548,7 +1006,7 @@
           "xAxis": [
             {
               "type": "category",
-              "data": data.area,
+              "data": data[0],
               "axisPointer": {
                 "type": "shadow"
               },
@@ -567,8 +1025,10 @@
                 "color": "#7d838b"
               },
               "min": 0,
-              "max": data.max,
-              "interval": data.interval,
+              "max": function(value) { //设置y轴最大值
+                    return value.max+20;
+                },
+            //   "interval": data.interval,
               "axisLabel": {
                 "show": true,
                 "textStyle": {
@@ -611,7 +1071,7 @@
             {
               "name": title[0],
               "type": "bar",
-              "data": data.all,
+              "data": data[3],
               "barWidth": "auto",
               "itemStyle": {
                 "normal": {
@@ -650,7 +1110,7 @@
             {
               "name": title[1],
               "type": "bar",
-              "data":data.online,
+              "data":data[1],
               "barWidth": "auto",
               "itemStyle": {
                 "normal": {
@@ -692,7 +1152,7 @@
               "name": title[2],
               "type": "line",
               "yAxisIndex": 1,
-              "data":data.proportion,
+              "data":data[2],
               "itemStyle": {
                 "normal": {
                   "color": "#E531A8",
@@ -871,6 +1331,14 @@
         display: inline-block;
         margin-right: 10px;
     }
+    .mainaddnum div span:first-child{
+        width:350px;
+    }
+    .mainaddnum div span{
+        display: inline-block;
+        line-height: 35px;
+        font-size: 13px;
+    }
     /* 明细列表 */
     .statusbox {
       width: 1350px;
@@ -891,5 +1359,11 @@
       text-align: left;
       padding: 10px 0;
       border-bottom:1px solid #C3C3C3
+    }
+    .errotext{
+        color: #EC626B;
+    }
+    em{
+        font-style:normal;
     }
 </style>

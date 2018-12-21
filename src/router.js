@@ -8,6 +8,7 @@ import personmanagedetail from '@/subpage/personmanagedetail.vue'
 import book from '@/subpage/book.vue'
 import role from '@/subpage/role.vue'
 import menu from '@/subpage/menu.vue'
+import echartstime from '@/subpage/echartstime.vue'
 import log from '@/views/log.vue'
 import analysis from '@/views/analysis.vue'
 import bigscreenshow from '@/views/bigscreenshow.vue'
@@ -97,6 +98,11 @@ const router = new Router({
           path: '/system/menu',
           name: 'system',
           component: menu
+        },
+        {
+          path: '/system/echartstime',
+          name: 'system',
+          component: echartstime
         }
       ]
     }

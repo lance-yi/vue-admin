@@ -197,9 +197,12 @@ export default {
         title: '您确定要退出吗',
         // content: '<p>一些对话框内容</p><p>一些对话框内容</p>',
         onOk: () => {
+            this.$http.post("auth/jwt/invalid",{"token":localStorage.getItem('token')},res=>{
+            },err=>{});
           localStorage.removeItem('token')
           localStorage.removeItem('navlist')
           this.$router.push({path: '/'});
+          
         },
         onCancel: () => {
         }

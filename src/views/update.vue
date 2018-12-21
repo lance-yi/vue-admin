@@ -46,6 +46,16 @@
                   </CheckboxGroup>
                </div>
                <div class="control-top">
+                 <p>设备类型：</p>
+                    
+                  <RadioGroup  v-model="devicestate">
+                    <Radio  :label="list.code" v-for="(list,index) in devicedata" :key="index">
+                        <span>{{list.name}}</span>
+                    </Radio >
+                    
+                  </RadioGroup >
+               </div>
+               <div class="control-top">
                  <p style="margin-left:31px">其他：</p>
                  <i-input v-model="valuetable" placeholder="安装地址、IP、版本号、路口名称" style="width: 252px" ></i-input>
                  <i-button type="primary" class="sure" @click="serachtable" style="border-radius:4px">搜索</i-button>  
@@ -204,6 +214,8 @@
          totals:0,
          checkdata:[],
          checklist:[],
+         devicedata:[],
+         devicestate:'',
       }
     },
     created(){
@@ -225,6 +237,10 @@
           this.$http.get("res/upgrade/selectUpgradeList",{},res=>{
              this.timelinedata = res.data
           },err=>{});
+
+          this.$http.get("res/upgrade/selectGatewayDeviceType",{},res=>{
+             this.devicedata = res.data
+          },err=>{});
     },
     methods: {
       //选择网关状态
@@ -237,10 +253,11 @@
        },
        //关键字搜索
        serachtable(){
-         console.log(this.valuetable)
-         console.log(this.updatedetail)
-         console.log(this.wgstate)
-          this.$http.post("res/upgrade/selectGatewayState",{state:this.updatedetail,param:this.valuetable,current:1,gatewayState:this.wgstate},res=>{
+        //  console.log(this.valuetable)
+        //  console.log(this.updatedetail)
+        //  console.log(this.wgstate)
+        //  console.log(this.devicestate)
+          this.$http.post("res/upgrade/selectGatewayState",{state:this.updatedetail,param:this.valuetable,current:1,gatewayState:this.wgstate,deviceType:this.devicestate},res=>{
              this.data1 = res.data.list
             this.totals = res.data.total
             this.data1.forEach ((el,index)=>{
@@ -307,7 +324,7 @@
        someup(){
          this.checklist = []
          this.checkdata.forEach ((el,index)=>{
-           var obj = {'resid':el.id,'gateway_ip':el.gateway_ip}
+           var obj = {'resid':el.id,'gateway_ip':el.gateway_ip,'deviceType':el.deviceType}
              this.checklist.push(obj)
          })
          if(this.checklist.length > 0){

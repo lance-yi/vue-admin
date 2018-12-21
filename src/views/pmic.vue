@@ -116,22 +116,22 @@
                   <div v-if="typelist.length > 0"> 
                       <div>
                         <span>1</span>
-                        <i-switch size="large" @on-change="switchchange(1,$event)" v-model="typelist[0].no1 == 1?true:false">
+                        <i-switch size="large" @on-change="switchchange(1,$event)" v-model="typelist[0].PORT1 == 1?true:false">
                           <span slot="open">开</span>
                           <span slot="close">关</span>
                         </i-switch>
                          <span>2</span>
-                        <i-switch size="large" @on-change="switchchange(2,$event)" v-model="typelist[1].no2 == 1?true:false">
+                        <i-switch size="large" @on-change="switchchange(2,$event)" v-model="typelist[1].PORT2 == 1?true:false">
                           <span slot="open">开</span>
                           <span slot="close">关</span>
                         </i-switch>
                         <span>3</span>
-                        <i-switch size="large" @on-change="switchchange(3,$event)" v-model="typelist[2].no3 == 1?true:false">
+                        <i-switch size="large" @on-change="switchchange(3,$event)" v-model="typelist[2].PORT3 == 1?true:false">
                           <span slot="open">开</span>
                           <span slot="close">关</span>
                         </i-switch>
                          <span>4</span>
-                        <i-switch size="large" @on-change="switchchange(4,$event)" v-model="typelist[3].no4 == 1?true:false">
+                        <i-switch size="large" @on-change="switchchange(4,$event)" v-model="typelist[3].PORT4 == 1?true:false">
                           <span slot="open">开</span>
                           <span slot="close">关</span>
                         </i-switch>
@@ -662,7 +662,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
       }else if(val == true){
         var aa = 1
       }
-      this.$set(this.changeobj, 'no'+i, aa)
+      this.$set(this.changeobj, 'PORT'+i, aa)
     },
       allowchangetype(){
         // console.log(this.changeobj)
