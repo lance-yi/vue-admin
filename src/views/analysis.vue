@@ -14,7 +14,7 @@
                   <img src="../../public/img/129.png" v-if="hadcol == 1"/>
                  </div>
                  <div style="margin-left: 20px;text-align:left">
-                  <p style="font-size:22px;font-weight: bold;" :class="hadcol == 1?'hadcolor':''">20%</p>
+                  <p style="font-size:22px;font-weight: bold;" :class="hadcol == 1?'hadcolor':''">{{find3Ratedata.accessRate}}%</p>
                   <p style="font-size:14px" :class="hadcol == 1?'hadcolor':''">在线率</p>
                  </div>
               </div>
@@ -24,7 +24,7 @@
                   <img src="../../public/img/125.png" v-if="hadcol == 2"/>
                  </div>
                  <div style="margin-left: 20px;text-align:left">
-                  <p style="font-size:22px;font-weight: bold;" :class="hadcol == 2?'hadcolor':''">5%</p>
+                  <p style="font-size:22px;font-weight: bold;" :class="hadcol == 2?'hadcolor':''">{{find3Ratedata.onlineRate}}%</p>
                   <p style="font-size:14px" :class="hadcol == 2?'hadcolor':''">联网率</p>
                  </div>
               </div>
@@ -34,7 +34,7 @@
                   <img src="../../public/img/128.png" v-if="hadcol == 3"/>
                  </div>
                  <div style="margin-left: 20px;text-align:left">
-                  <p style="font-size:22px;font-weight: bold;" :class="hadcol == 3?'hadcolor':''">20%</p>
+                  <p style="font-size:22px;font-weight: bold;" :class="hadcol == 3?'hadcolor':''">{{find3Ratedata.archGoodRate}}%</p>
                   <p style="font-size:14px" :class="hadcol == 3?'hadcolor':''">一机一档合格率</p>
                  </div>
               </div>
@@ -60,7 +60,7 @@
           </div>
           
           <div class="exjlist" v-if="aplotshow">
-              <div class="exj2" >
+              <div class="exj2" @click="educetable">
                     <img src="../../public/img/1242.png"/>
                     导出
                 </div>
@@ -101,22 +101,10 @@
                 <span>填写说明：请填写各区域需接入的摄像机数量</span>
             </p>
             <div class="mainaddnum">
-                <p><span>洪山区</span><InputNumber  :min="0" v-model="valuetable" style="width: 180px"></InputNumber></p>
-                <!-- <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
-                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
-                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
-                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
-                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
-                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
-                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
-                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
-                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
-                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
-                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p>
-                <p><span>洪山区</span><i-input v-model="valuetable"  style="width: 180px" ></i-input></p> -->
+                <p v-for="(list,index) in taskdata" :key="index"><span style="width:50px">{{list.areaName}}</span><InputNumber  :min="0" v-model="list.num" style="width: 180px" :precision="0"></InputNumber></p>
             </div>
             <div slot="footer" style="text-align:center">
-                <button   class="zhuanyixukes" >确认配置</button>
+                <button   class="zhuanyixukes" @click="allowdeploy">确认配置</button>
             </div>
         </Modal>
 
@@ -148,7 +136,7 @@
         </Modal>
 
 
-         <Modal v-model="modalmains" width="800" id="cameraaddnum">
+         <Modal v-model="modalmains" width="840" id="cameraaddnum">
             <p slot="header" style="text-align:left;color:#696C6F">
                 <span>详情</span>
             </p>
@@ -169,7 +157,7 @@
               <div><span>所属部门/行业：<em :class="maindata.industry.state == 0?'errotext':''">{{maindata.industry.value}}</em></span><span v-if="maindata.isQualified.value == 'true'" >是否合格：合格</span><span v-if="maindata.isQualified.value == 'false'" >是否合格：<em class="errotext">不合格</em></span></div>
             </div>
             <div slot="footer" style="text-align:center">
-                <button   class="zhuanyixukes" @click="modalmain = false" style="padding: 5px 20px;">确认</button>
+                <button   class="zhuanyixukes" @click="modalmains = false" style="padding: 5px 20px;">确认</button>
             </div>
         </Modal>
 
@@ -190,7 +178,7 @@
                 </RadioGroup>
              </div>
              <div style="padding:20px" >
-              <i-table border stripe :columns="columns4" :data="data2"></i-table>
+              <i-table border stripe :columns="columns4" :data="data2" class="longtable"></i-table>
              </div>
         </div>
         <div class="statusbox"  v-if="onegear" >
@@ -210,7 +198,7 @@
                 </RadioGroup>
              </div>
              <div style="padding:20px" >
-              <i-table border stripe :columns="columns5" :data="data2"></i-table>
+              <i-table border stripe :columns="columns5" :data="data2" class="longtable"></i-table>
              </div>
         </div>
     </div>
@@ -230,32 +218,7 @@
           statustable:false,
           valuetable:0,
           modal2:false,
-            cityList: [
-                {
-                    value: '111',
-                    label: 'New York'
-                },
-                {
-                    value: '222',
-                    label: 'London'
-                },
-                {
-                    value: 'Sydney',
-                    label: 'Sydney'
-                },
-                {
-                    value: 'Ottawa',
-                    label: 'Ottawa'
-                },
-                {
-                    value: 'Paris',
-                    label: 'Paris'
-                },
-                {
-                    value: 'Canberra',
-                    label: 'Canberra'
-                }
-            ],
+          cityList: [],
           model10: [],      
           hxnum:'',
           comchanges:0,
@@ -782,7 +745,9 @@
                 modalmains:false,
                 maindata:[],
                 areacode:'',
-
+                comlistdata:[],
+                taskdata:[],
+                find3Ratedata:[],
       }
     },
     created(){
@@ -794,27 +759,30 @@
       document.getElementsByClassName("divbox")[0].style.height = (h-20)+'px'
       this.online()
       this.$http.get("/report/report/selectManagementUnit?",{dictCodes:'managementUnit'},res=>{
-              
+              this.cityList = res.data
+            },err=>{});
+      this.$http.get("/report/report/find3Rate?managementUnit="+this.comlistdata,{},res=>{
+            this.find3Ratedata = res.data[0]
             },err=>{});
     },
     methods: {
         // 在线率
         online(){
-          this.$http.get("report/report/findReportCount?",{type:1,state:'online'},res=>{
+          this.$http.get("report/report/findReportCount?managementUnit="+this.comlistdata,{type:1,state:'online'},res=>{
               this.echartscamera(res.data,this.data1)
               this.cameradata = res.data
             },err=>{});
         },
         // 联网率
         access(){
-          this.$http.get("report/report/findReportCount?",{type:1,state:'access'},res=>{
+          this.$http.get("report/report/findReportCount?managementUnit="+this.comlistdata,{type:1,state:'access'},res=>{
               this.echartscamera(res.data,this.data1)
               this.cameradata = res.data
             },err=>{});
         },
         // 一机一档合格率
        archgood(){
-          this.$http.get("report/report/findReportCount?",{type:1,state:'archGood'},res=>{
+          this.$http.get("report/report/findReportCount?managementUnit="+this.comlistdata,{type:1,state:'archGood'},res=>{
               this.echartscamera(res.data,this.data1)
               this.cameradata = res.data
             },err=>{});
@@ -835,18 +803,38 @@
        changecom(val){
          if(val == false){
             this.comchanges = 1
-            console.log(this.model10)
          }else if(val == true){
             this.comchanges = 0
          }
        },
        channgecomlist(val){
-          console.log(val)
+          this.comlistdata = val
+           if(this.hadcol == 1){
+            //    this.data1 = ['总数','在线数','在线率']
+               this.online()
+           }else if( this.hadcol == 2){
+            //    this.data1 = ['接入任务数','已联网数','联网率']
+               this.access()
+           }else if( this.hadcol == 3){
+            //    this.data1 = ['总数','合格数','合格率']
+               this.archgood()
+           }
+           this.$http.get("report/report/findReport?managementUnit="+this.comlistdata,{},res=>{
+                this.data10 = res.data
+            },err=>{});
+
+            this.$http.get("/report/report/find3Rate?managementUnit="+this.comlistdata,{},res=>{
+                    this.find3Ratedata = res.data[0]
+                    },err=>{});
+
        },
     //    任务数分配
        tasknum(){
           this.modal2 = true
           this.valuetable = 2
+          this.$http.get("report/report/selectTaskNum",{},res=>{
+               this.taskdata = res.data
+            },err=>{});
        },
        plot(){
          this.aplotshow = true
@@ -857,24 +845,25 @@
        },
     //    列表模式
        liebiao(){
-         this.$http.get("report/report/findReport",{"managementUnit":''},res=>{
+         this.aplotshow = false
+         this.$http.get("report/report/findReport?managementUnit="+this.comlistdata,{},res=>{
                 this.data10 = res.data
-                this.aplotshow = false
+                
             },err=>{});
          
        },
        //修改一机一档检索条件
        changeterm(val){
          if(val == 'all'){
-           this.$http.get("/report/report/countRecordDetial?",{state:'',areaCode:this.areacode},res=>{
+           this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'',areaCode:this.areacode},res=>{
                 this.data2 = res.data
             },err=>{});
          }else if(val == 'good'){
-            this.$http.get("/report/report/countRecordDetial?",{state:'1',areaCode:this.areacode},res=>{
+            this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'1',areaCode:this.areacode},res=>{
                 this.data2 = res.data
             },err=>{});
          }else if(val == 'nogood'){
-             this.$http.get("/report/report/countRecordDetial?",{state:'0',areaCode:this.areacode},res=>{
+             this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'0',areaCode:this.areacode},res=>{
                 this.data2 = res.data
             },err=>{});
          }
@@ -882,22 +871,22 @@
        //修改在线率检索条件
        changeallnum(val){
          if(val == 'all'){
-           this.$http.get("report/report/findReportForm?",{areaCode:this.areacode,state:''},res=>{
+           this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:''},res=>{
                 this.data2 = res.data
             },err=>{});
          }else if(val == 'online'){
-            this.$http.get("report/report/findReportForm?",{areaCode:this.areacode,state:'1'},res=>{
+            this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:'1'},res=>{
                 this.data2 = res.data
             },err=>{});
          }else if(val == 'unline'){
-             this.$http.get("report/report/findReportForm?",{areaCode:this.areacode,state:'0'},res=>{
+             this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:'0'},res=>{
                 this.data2 = res.data
             },err=>{});
          }
        },
        //在线数明细
        gotoonlinenum(areaCode,index){
-          this.$http.get("report/report/findReportForm?",{areaCode:areaCode,state:1},res=>{
+          this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:areaCode,state:1},res=>{
                 this.data2 = res.data
                 this.allnum = 'online'
                 this.statustabletitle = '在线率统计明细'
@@ -908,7 +897,7 @@
        //一机一档合格数
        gotogoodnum(areaCode,index){
            this.term = 'good'
-             this.$http.get("/report/report/countRecordDetial?",{state:'1',areaCode:areaCode},res=>{
+             this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'1',areaCode:areaCode},res=>{
                 this.data2 = res.data
                 this.onegear = true
                 this.areacode = areaCode
@@ -921,21 +910,21 @@
              this.onegear = false
              this.statustabletitle = '在线率统计明细'
              this.allnum = 'all'
-             this.$http.get("report/report/findReportForm?",{areaCode:areaCode,state:''},res=>{
+             this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:areaCode,state:''},res=>{
                 this.data2 = res.data
             },err=>{});
           }else if(index == 2){
              this.statustable = true
              this.onegear = false
              this.statustabletitle = '联网率统计明细'
-             this.$http.get("report/report/findReportForm?",{areaCode:areaCode,state:''},res=>{
+             this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:areaCode,state:''},res=>{
                 this.data2 = res.data
             },err=>{});
           }else{
              this.onegear = true
              this.statustable = false
              this.term = 'all'
-             this.$http.get("/report/report/countRecordDetial?",{state:'',areaCode:areaCode},res=>{
+             this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'',areaCode:areaCode},res=>{
                 this.data2 = res.data
             },err=>{});
           }
@@ -947,6 +936,36 @@
        handleone(data){
           this.modalmains = true
           this.maindata = data
+       },
+       //确认配置
+       allowdeploy(){
+          var aa = 1
+          var that = this
+          this.taskdata.forEach ((el,index)=>{if(el.num == null){aa = 2}}) 
+          if(aa == 2){
+            this.$Message.error('各区域任务数请填写完整');
+          }else{
+            this.$http.put("report/report/updateReportTaskNum",this.taskdata,{},res=>{
+            },err=>{});
+                
+               
+
+               setTimeout(function() {
+                 //更新列表
+               that.$http.get("report/report/findReport?managementUnit="+that.comlistdata,{},res=>{
+                that.data10 = res.data
+                that.$Message.info('更新成功')
+                that.modal2 = false
+                },err=>{});
+                //更新联网率
+                that.access()
+                that.$http.get("/report/report/find3Rate",{managementUnit:that.comlistdata},res=>{
+                    that.find3Ratedata = res.data[0]
+                    },err=>{});
+                }, 500);
+               
+          } 
+         
        },
     //    导出表格
        educetable(){

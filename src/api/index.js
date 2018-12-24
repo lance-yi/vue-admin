@@ -57,6 +57,18 @@ function apiAxios (method, url, params, success, failure) {
     if(err.response.status == 401){
       Message.info('登录信息过期，请重新登录');
       router.replace('/');
+
+      // axios({
+      //   method: 'post',
+      //   url: 'auth/jwt/invalid',
+      //   baseURL: window.g.ApiUrl,
+      //   dataType: 'json',
+      //   Authorization:localStorage.getItem('token'),
+      //   data:{"token":localStorage.getItem('token')}
+      // }).then(res=>{
+        
+      // })
+      
     }else {
       throw new Error(err)
     }

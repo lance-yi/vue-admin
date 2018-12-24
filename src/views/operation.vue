@@ -844,6 +844,32 @@
                   </div>
             </div>
 
+            <!-- <div class="reportbox" style="width:620px">
+                  <p class="detailpage">事件偏移预警详情 <img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px"/></p>
+                  <div class="offsetbox">
+                     <p>预警信息：<span >系统在2018/11/12 12:00:00 </span>检测到摄像机 <span>2018/11/12 12:00:00</span>,请注意时间出现偏移</p>
+                     <p style="margin:40px 0 20px 0px">系统时间：</p>
+                     <div class="callinbox2" style="text-align:left">
+                            <span>2018</span>年
+                            <span>12</span>月
+                            <span>1</span>日
+                            <span>12</span>时
+                            <span>12</span>分钟
+                            <span>12</span>秒
+                    </div>
+                     <p style="margin:40px 0 20px 0px">摄像机时间：</p>
+                     <div class="callinbox" style="padding:0;text-align:left">
+                            <span>2018</span>年
+                            <span>12</span>月
+                            <span>1</span>日
+                            <span>12</span>时
+                            <span>12</span>分钟
+                            <span>12</span>秒
+                    </div>
+                  </div>
+                  
+            </div> -->
+
 
             <div class="reportbox" style="width:800px;left:10%" v-if="repoetmapshow">
                   <p class="detailpage">分析报告 <img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px"/></p>
@@ -4569,4 +4595,23 @@ export default {
   z-index: 20;
   cursor: pointer;
 }
+.offsetbox{
+  padding: 20px 0 20px 20px;
+}
+.offsetbox p{
+   text-align: left;
+   font-size: 13px;
+}
+.offsetbox p span{
+   color:#5285FE;
+}
+.callinbox2 span{
+    display:inline-block;
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
+    color: #5285FE;
+    padding: 3px 5px;
+    margin: 5px;
+    border-radius:4px;
+  }
 </style>

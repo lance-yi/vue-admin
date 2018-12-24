@@ -117,7 +117,7 @@ export default {
       // console.log(url)
       // console.log(this.$route.path)
       if(url == '#'){
-        window.open("http://192.168.8.180:8888/#/bigscreenshow")
+        window.open(window.g.bigscreenUrl+"#/bigscreenshow")
       }
       
     },

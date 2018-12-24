@@ -117,21 +117,21 @@ import ArcgisMapbig from "@/components/ArcgisMapbig";
            this.mapchecks = 1
            setTimeout(() => {
               this.echartsallnum(this.allnumdata1,this.allnumdata2)
-           }, 100);
+           }, 200);
            
          }else if(index == 2){
            this.mapchecks = 2
            setTimeout(() => {
               this.echartsruns(this.allnumdata1)
               this.echartsthermodynamic(this.allnumdata1)
-           }, 100);
+           }, 200);
            
          }else if(index == 3){
            this.mapchecks = 3
            setTimeout(() => {
               this.echartspmicruns(this.allnumdata2)
               this.echartsthermodynamicpmic(this.allnumdata2)
-           }, 100);
+           }, 200);
          }
       },
       new(){
@@ -378,7 +378,7 @@ import ArcgisMapbig from "@/components/ArcgisMapbig";
       },
       echartsruns(data){
           var myChart = null;
-        	var div_ = document.getElementById("echartsrunstatic");
+            var div_ = document.getElementById("echartsrunstatic");
         	div_.removeAttribute("_echarts_instance_");
         	myChart = this.$echarts.init(div_);
         //  let myChart = this.$echarts.init(document.getElementById('echartsrunstatic'))

@@ -536,12 +536,12 @@ import TreeGrid from '@/components/treeGrid2.0'
     created(){
     },
     mounted(){
-    //    this.personolddata = this.formpersondate
-    //    this.$http.get("oauth/user/searchUser",{param:'',current: 1},res=>{
-    //              this.persondata = res[0].user
-    //              this.total = res[0].total
-    //         //  console.log(res[0].user)
-    //         },err=>{});
+       this.personolddata = this.formpersondate
+       this.$http.get("oauth/user/searchUser",{param:'',current: 1},res=>{
+                 this.persondata = res[0].user
+                 this.total = res[0].total
+            //  console.log(res[0].user)
+            },err=>{});
     this.$http.get("oauth/menu/menuTreeByPath?path=/system",{},res=>{
                 this.navlist = res.data
                 this.$router.push({path:res.data[0].path})
@@ -715,6 +715,7 @@ import TreeGrid from '@/components/treeGrid2.0'
             this.formpersondate.deptName = list.department.deptName
         },
         personok(name){
+            console.log(this.formpersondate)
             if(this.nopersonadd == 0){
                 this.$refs[name].validate((valid) => {
                     if (valid) {
