@@ -571,7 +571,7 @@ import TreeGrid from '@/components/treeGrid2.0'
             //  this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
             //       this.data = res.data      
             //  },err=>{});
-         }else if(name == '报表生成'){
+         }else if(name == '报表生成策略'){
               this.$router.push({path:'/system/echartstime'})
          }
       },

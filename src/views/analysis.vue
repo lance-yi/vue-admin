@@ -1,12 +1,12 @@
 <template>
     <div style="padding-left: 260px;min-width: 1000px;padding-top: 60px" class="divbox">
         <div class="topbox">
-           <button   class="zhuanyixukes" style="padding: 5px 20px;">摄像机报表</button>
-           <!-- <button   class="zhuanyixuke" style="padding: 5px 20px;">摄像机报表</button>
-           <button   class="zhuanyixuke" style="padding: 5px 20px;">摄像机报表</button>
-           <button   class="zhuanyixuke" style="padding: 5px 20px;">摄像机报表</button> -->
+           <button   class="zhuanyixukes" style="padding: 5px 20px;" v-if="checknum == 1" >摄像机报表</button>
+           <button   class="zhuanyixuke" style="padding: 5px 20px;" v-if="checknum != 1" @click="cameraplot(1)">摄像机报表</button>
+           <button   class="zhuanyixukes" style="padding: 5px 20px;" v-if="checknum == 2">自动生成考核报表</button>
+           <button   class="zhuanyixuke" style="padding: 5px 20px;" v-if="checknum != 2" @click="cameraplot(2)">自动生成考核报表</button>
         </div>
-        <div class="mainbox">
+        <div :class="aplotshow?'mainbox':'mainbox2'" v-if="checknum == 1">
           <div class="ploticonbox" v-if="aplotshow">
               <div class="iconbox" @click="checkplot(1)">
                  <div>
@@ -125,7 +125,7 @@
               <div><span>设备型号：{{maindata.model}}</span><span>点位俗称：{{maindata.pointName}}</span></div>
               <div><span>摄像机类型：{{maindata.cameraType}}</span><span>摄像机功能类型：{{maindata.cameraFunctionType}}</span></div>
               <div><span>补光属性：{{maindata.lightingType}}</span><span>摄像机编码格式：{{maindata.cameraCode}}</span></div>
-              <div><span>联网属性：{{maindata.network_properties}}</span><span>所属辖区公安机关：{{maindata.deptId}}</span></div>
+              <div><span>联网属性：{{maindata.networkProperties}}</span><span>所属辖区公安机关：{{maindata.deptId}}</span></div>
               <div><span>管理单位：{{maindata.managementUnit}}</span><span>管理单位联系方式：{{maindata.managementPhone}}</span></div>
               <div><span>录像保存天数：{{maindata.videoSaveDays}}</span><span>设备状态：{{maindata.deviceStatus}}</span></div>
               <div><span>所属部门/行业：{{maindata.industry}}</span><span v-if="maindata.isReport == 0" >是否上报：否</span><span v-if="maindata.isReport == 1" >是否上报：是</span></div>
@@ -151,7 +151,7 @@
               <div><span>设备型号：<em :class="maindata.model.state == 0?'errotext':''">{{maindata.model.value}}</em></span><span>点位俗称：<em :class="maindata.pointName.state == 0?'errotext':''">{{maindata.pointName.value}}</em></span></div>
               <div><span>摄像机类型：<em :class="maindata.cameraType.state == 0?'errotext':''">{{maindata.cameraType.value}}</em></span><span>摄像机功能类型：<em :class="maindata.cameraFunctionType.state == 0?'errotext':''">{{maindata.cameraFunctionType.value}}</em></span></div>
               <div><span>补光属性：<em :class="maindata.lightingType.state == 0?'errotext':''">{{maindata.lightingType.value}}</em></span><span>摄像机编码格式：<em :class="maindata.cameraCode.state == 0?'errotext':''">{{maindata.cameraCode.value}}</em></span></div>
-              <div><span>联网属性：<em :class="maindata.network_properties.state == 0?'errotext':''">{{maindata.network_properties.value}}</em></span><span>所属辖区公安机关：<em :class="maindata.deptId.state == 0?'errotext':''">{{maindata.deptId.value}}</em></span></div>
+              <div><span>联网属性：<em :class="maindata.networkProperties.state == 0?'errotext':''">{{maindata.networkProperties.value}}</em></span><span>所属辖区公安机关：<em :class="maindata.deptId.state == 0?'errotext':''">{{maindata.deptId.value}}</em></span></div>
               <div><span>管理单位：<em :class="maindata.managementUnit.state == 0?'errotext':''">{{maindata.managementUnit.value}}</em></span><span>管理单位联系方式：<em :class="maindata.managementPhone.state == 0?'errotext':''">{{maindata.managementPhone.value}}</em></span></div>
               <div><span>录像保存天数：<em :class="maindata.videoSaveDays.state == 0?'errotext':''">{{maindata.videoSaveDays.value}}</em></span><span>设备状态：<em :class="maindata.deviceStatus.state == 0?'errotext':''">{{maindata.deviceStatus.value}}</em></span></div>
               <div><span>所属部门/行业：<em :class="maindata.industry.state == 0?'errotext':''">{{maindata.industry.value}}</em></span><span v-if="maindata.isQualified.value == 'true'" >是否合格：合格</span><span v-if="maindata.isQualified.value == 'false'" >是否合格：<em class="errotext">不合格</em></span></div>
@@ -201,6 +201,30 @@
               <i-table border stripe :columns="columns5" :data="data2" class="longtable"></i-table>
              </div>
         </div>
+
+
+        <div class="main2box" v-if="checknum == 2">
+            <div style="padding-top:20px;" >
+                <RadioGroup v-model="mounthsnum" @on-change="changemounthsnum">
+                    <Radio label="all">
+                        <span>全部</span>
+                    </Radio>
+                    <Radio label="one">
+                        <span>近一月</span>
+                    </Radio>
+                    <Radio label="three">
+                        <span>近三月</span>
+                    </Radio>
+                </RadioGroup>
+            </div>
+            <div class="scatterbox">
+               <div id="echartsscatter" ></div>
+            </div>
+            <div class="tablebox" style="top:450px;width:calc(100% - 280px)">
+            <Table :columns="columns11" :data="data10" border stripe></Table>
+            <img src="../../public/img/134.png" class="theadimg"/>
+          </div>
+        </div>
     </div>
 </template>
 <script>
@@ -212,6 +236,8 @@
     },
     data () {
       return {
+          mounthsnum:'all',
+          checknum:1,
           allnum:'',
           modalmain:false,
           term:'all',
@@ -246,7 +272,7 @@
                   {title: '摄像机功能类型',key: 'cameraFunctionType',width: 150,align: 'center',},
                   {title: '补光属性',key: 'lightingType',width: 110,align: 'center',},
                   {title: '摄像机编码格式',key: 'cameraCode',width: 150,align: 'center',},
-                  {title: '联网属性',key: 'network_properties',width: 110,align: 'center',},
+                  {title: '联网属性',key: 'networkProperties',width: 110,align: 'center',},
                   {title: '所属辖区公安机关',key: 'deptId',width: 180,align: 'center',},
                   {title: '管理单位',key: 'managementUnit',width: 110,align: 'center',},
                   {title: '管理单位联系方式',key: 'managementPhone',width: 180,align: 'center',},
@@ -486,13 +512,13 @@
                           },params.row.cameraCode.value)
                         }
                   },
-                  {title: '联网属性',key: 'network_properties',width: 110,align: 'center',
+                  {title: '联网属性',key: 'networkProperties',width: 110,align: 'center',
                    render:(h,params)=>{
                           return h('span',{
                               style:{
-                                 color:(params.row.network_properties.state=="0")?"#EC626B":"#515a6e",
+                                 color:(params.row.networkProperties.state=="0")?"#EC626B":"#515a6e",
                               }
-                          },params.row.network_properties.value)
+                          },params.row.networkProperties.value)
                         }
                   },
                   {title: '所属辖区公安机关',key: 'deptId',width: 180,align: 'center',
@@ -787,6 +813,10 @@
               this.cameradata = res.data
             },err=>{});
         },
+        //报表生成时间表
+        // timeplot(){
+        //   this.echartstime()
+        // },
        checkplot(index){
            this.hadcol = index
            if(index == 1){
@@ -966,6 +996,26 @@
                
           } 
          
+       },
+       cameraplot(index){
+           this.checknum = index
+          if(index == 1){
+              this.aplotshow = true  
+               setTimeout(() => {
+              this.echartscamera(this.cameradata,this.data1)
+           }, 100);
+          }else if(index == 2){
+              this.$http.get("res/report/selectReportByDate?",{time:''},res=>{
+                  setTimeout(() => {
+                    this.echartstime(res.data)
+                }, 100);
+              },err=>{});
+              
+          }
+          
+       },
+       changemounthsnum(val){
+         console.log(val)
        },
     //    导出表格
        educetable(){
@@ -1196,6 +1246,147 @@
                     console.log(that.hadcol)
         })
          
+      },
+      echartstime(data){
+            var that = this
+             let myChart = null;
+        	let div_ = document.getElementById("echartsscatter");
+        	div_.removeAttribute("_echarts_instance_");
+        	myChart = this.$echarts.init(div_);
+            window.addEventListener("resize", function () {
+              myChart.resize();
+            });
+            var schema = [
+            {name: 'date', index: 0, text: '日'},
+            {name: 'AQIindex', index: 1, text: 'AQI指数'},
+            {name: 'CO', index: 2, text: '号'},
+            {name: 'SO2', index: 3, text: '日期'},
+            {name: 'NO2', index: 4, text: '时间'},
+            {name: 'CO', index: 5, text: '星期'},
+        ];
+
+        var date = new Date('2018-12-23');
+        var Ymd = date.toLocaleDateString();
+        // var dataBJ = [
+        //     {value:['30',Ymd+' 00:00','30','2018-11-30',' 00:01','周三'],symbol:'image://'+window.g.bigscreenUrl+'img/136.png',symbolSize:25},
+        //     {value:['20',Ymd+' 06:15','20','2018-11-20',' 06:15','周三'],symbol:'image://'+window.g.bigscreenUrl+'img/136.png',symbolSize:25},
+        //     [21,Ymd+' 06:15','21','2018-11-21',' 06:15','周三'],
+        //     [1,Ymd+' 08:00','1','2018-11-1',' 08:00','周三'],
+        //     [1,Ymd+' 08:16','1','2018-11-1',' 08:16','周二'],
+        //     [1,Ymd+' 08:15','1','2018-11-1',' 08:15','周二'],
+        //     [1,Ymd+' 08:17','1','2018-11-1',' 08:17','周二'],
+        //     [5,Ymd+' 18:00','5','2018-11-5',' 18:00','周三'],
+        //     [10,Ymd+' 12:12','10','2018-11-10',' 12:12','周三'],
+        // ];
+        
+   
+
+        var itemStyle = {
+            normal: {
+                opacity: 0.8,
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowOffsetY: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+        };
+        // var dataBb = []
+        myChart.on('click', function (params){
+            console.log(params)
+            
+            });
+
+            myChart.setOption({
+                    color: [
+                    '#dd4444', '#fec42c', '#80F1BE'
+                ],
+                grid: {
+                    left: 70,
+                    right: 50,
+                    top: 10,
+                    bottom: 20
+                },
+                tooltip: {
+                    show:true,
+                    trigger:'item',
+                    padding: 10,
+                    backgroundColor: '#222',
+                    borderColor: '#777',
+                    borderWidth: 1,
+                    formatter: function (obj) {
+                        var value = obj.value;
+                        return '<div style="border-bottom: 1px solid rgba(255,255,255,.3); font-size: 18px;padding-bottom: 7px;margin-bottom: 7px">'
+                            + '</div>'
+                            + schema[3].text + '：' + value[3] + '<br>'
+                            + schema[5].text + '：' + value[5] + '<br>'
+                            + schema[4].text + '：' + value[4] + '<br>';
+                    }
+                },
+                xAxis: {
+                    type: 'value',
+                    // name: '日期',
+                    // nameGap: 16,
+                    min:0,
+                    max:31,
+                    nameTextStyle: {
+                        fontSize: 14
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                   // inverse:true,
+                    //data:['31','', '', '','','', '25', '', '','','', '20', '', '','','', '15', '', '','','', '10', '', '','','','5','','','','1'],
+                },
+                yAxis:{
+                    type: 'time',
+                    min: Ymd + ' 00:00:00',
+                    max: Ymd + ' 23:59:59',
+                    interval: 6 * 60 * 60 * 1000,
+                    axisLabel: {
+                        formatter: function(v) {
+                            var date = new Date(v);
+                            return `${('0' + date.getHours()).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`;
+                        }
+                    },
+                    // X轴 竖线坐标指示线
+                    splitLine: {
+                        show: true
+                    }
+                }
+                ,
+                dataZoom: [
+                {
+                    type: 'slider',
+                    show: true,
+                    showDetail: false,
+                    yAxisIndex: [0],
+                    left: '97%',
+                    start: 0, //数据窗口范围的起始百分比
+                    end: 100
+                }],
+                series: [
+                    {
+                        name: '北京',
+                        type: 'scatter',
+                        symbol:'image://'+window.g.bigscreenUrl+'img/136.png',
+                        itemStyle: itemStyle,
+                        symbolSize:25,
+                        label: {
+                            normal: {
+                                show: true,
+                                color:'#5285FE',
+                                position: [7, 8],
+                                formatter: function(params) {
+                                    return params.data[2];
+                                }
+                            }
+                        },
+                        showAllSymbol: true,
+                        data: data
+                    }
+
+                ]
+            })
       }
     }
   }
@@ -1213,6 +1404,22 @@
        box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
        margin-top: 5px;
        position: relative;
+   }
+   .mainbox2{
+       height: calc(100% - 50px);
+       background: #F8F9FA;
+       margin-right: 20px;
+       box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+       margin-top: 5px;
+       position: relative;
+       min-height: 817px;
+   }
+   .main2box{
+       height: calc(143% - 50px);
+       background: #F8F9FA;
+       margin-right: 20px;
+       box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+       margin-top: 5px;
    }
    .ploticonbox{
         display: flex;
@@ -1384,5 +1591,13 @@
     }
     em{
         font-style:normal;
+    }
+    .scatterbox{
+       width:100%;
+        height:250px; 
+    }
+    #echartsscatter{
+        width:100%;
+        height:100%;
     }
 </style>

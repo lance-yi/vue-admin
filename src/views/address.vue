@@ -80,7 +80,7 @@
                   <p style="top:135px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" :title="list.res[0].installAddress">安装地址：{{list.res[0].installAddress}}</p>
                   <!-- <p style="top:130px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" title="撒旦风口浪尖是快乐的附件是快乐的房间里见识到了开发建设开绿灯飞机">安装地址：撒旦风口浪尖是快乐的附件是快乐的房间里见识到了开发建设开绿灯飞机</p> -->
                   <p style="top:160px">立杆号：{{list.res[0].poleNo}}</p>
-                  <p style="top:185px">网关IP地址：{{list.res[0].gatewagIp}}</p>
+                  <p style="top:185px">网关IP地址：{{list.res[0].gatewayIp}}</p>
               </div>
               <div style="position:relative;margin: 0 30px 0 20px">
                    <p v-if="list.res[1].state == 1" style="top:-15px" class="linebox">类型：迁改</p>
@@ -90,7 +90,7 @@
                 <img src="../../public/img/123.png"/>
               </div>
               <div class="addivs">
-                  <p style="top:127px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:200px" :title="list.res[1].installAddress">放置地址：{{list.res[1].installAddress}}</p>
+                  <p style="top:127px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:200px" :title="list.res[1].placementPosition">放置地址：{{list.res[1].placementPosition}}</p>
               </div>
               <div style="position:relative;margin: 0 30px 0 20px" v-if="list.res[2]">
                    <p v-if="list.res[2].state == 1" class="linebox" style="top:-15px">类型：迁改</p>
@@ -102,7 +102,7 @@
               <div class="addiv" v-if="list.res[2]">
                   <p style="top:135px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:247px" :title="list.res[2].installAddress">安装地址：{{list.res[2].installAddress}}</p>
                   <p style="top:160px">立杆号：{{list.res[2].poleNo}}</p>
-                  <p style="top:185px">网关IP地址：{{list.res[2].gatewagIp}}</p>
+                  <p style="top:185px">网关IP地址：{{list.res[2].gatewayIp}}</p>
               </div>
               <div class="zhuanyixukes" style="margin-right:0;margin-left:35px" v-if="list.res[2]" @click="lookcontrail(list.res[1].resId)">查看轨迹</div>
               <div>
@@ -232,7 +232,7 @@
                 <img src="../../public/img/123.png"/>
               </div>
               <div class="addivs">
-                  <p style="top:127px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:200px">放置地址：{{list.res[1].installAddress}}</p>
+                  <p style="top:127px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:200px">放置地址：{{list.res[1].placementPosition}}</p>
               </div>
               <div style="position:relative;margin: 0 30px 0 20px" v-if="list.res[2]">
                    <p v-if="list.res[2].state == 1" class="linebox" style="top:-15px">类型：迁改</p>
@@ -311,7 +311,7 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
         totals:0,
         getwayip:'',
         columns4:[{title: '安装地址',key: 'installAddress'},
-                  {title: 'IP地址',key: 'electricIp',width: 110},
+                  {title: 'IP地址',key: 'gatewayIp',width: 110},
                   {title: '责任人',key: 'userName',width: 85},
                   {title: '项目名称',key: 'projectName',width: 180},
                   {title: '经度',key: 'longitude',width: 105},
@@ -502,6 +502,7 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
       statusclick(index) {
         this.pages = 1
         this.statustable = true
+        this.rightdialogshow = false
         this.value = "";
         if (index == 0) {
            this.checknum = 'name2'
@@ -736,6 +737,7 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
       top: 60px;
       z-index: 18;
       padding: 30px;
+      border: 1px solid #13C7D9;
     }
     .rightdialog div {
       font-size: 15px;

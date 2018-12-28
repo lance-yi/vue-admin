@@ -12,6 +12,7 @@
                 <i-input  v-model="serachvalue" placeholder="安装地址、路口名称" style="width: 200px" class="sousuo"></i-input>
                 <i-button type="primary" class="sure" @click="serachroad">搜索</i-button>
         </div>
+        <img src="../../public/img/138.png" class="iconobjs" style="top:350px" @click="countshows"/>
         <img src="../../public/img/bigobj2.png" :class="rightdialogshow?'iconobj':'iconobjs'" @click.stop="showrightdialog()"/>
         <div class="rightdialog" v-if="rightdialogshow">
             <div @click.stop="statusclick(0)">
@@ -60,7 +61,7 @@
                 <div class="detail-text" >
                   
                   <img src="../../public/img/dy.png" class="detail-textimg"/>
-                  <div v-if="lampdata.length > 0">
+                  <div v-if="lampdata.length > 0&&lampdata[1]&&lampdata[2]&&lampdata[3]">
                   <img src="../../public/img/g.png" class="fixedimg" style="bottom:85px;left:12px" v-if="msgdata.res_state==1"/>
                   <img src="../../public/img/r.png" class="fixedimg" style="bottom:85px;left:12px" v-if="msgdata.res_state==0"/>
 
@@ -80,15 +81,15 @@
                     <div class="detail-textbox">
                       <p>安装地址：<span style="color:#1D60FE">{{rtopdata.install_address}}</span></p>
                       <div>
-                        <span style="min-width:180px;width:40%">设备IP：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" >{{rtopdata.electric_ip}}</span></span>
+                        <span style="min-width:191px;width:40%">设备IP：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkdevicelist(rtopdata.poleNo)">{{rtopdata.electric_ip}}</span></span>
                         <span style="margin-right:0">项目名称：<span style="color:#1D60FE">{{rtopdata.projectName}}</span></span>
                       </div>
                       <div>
-                        <span style="min-width:180px;width:40%">经度：<span style="color:#1D60FE">{{rtopdata.longitude}}</span></span>
+                        <span style="min-width:191px;width:40%">经度：<span style="color:#1D60FE">{{rtopdata.longitude}}</span></span>
                         <span style="margin-right:0">纬度：<span style="color:#1D60FE">{{rtopdata.latitude}}</span></span>
                       </div>
                       <div>
-                        <span style="min-width:180px;width:40%;">MAC地址：<span style="color:#1D60FE">{{rtopdata.mac}}</span></span>
+                        <span style="min-width:191px;width:40%;">MAC地址：<span style="color:#1D60FE">{{rtopdata.mac}}</span></span>
                         <span style="margin-right:0">责任人：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer"  @click.stop="checkperson(rtopdata.maintenance_user_id)">{{rtopdata.userName}}</span></span>
                       </div>
                     </div>
@@ -101,9 +102,9 @@
                 </div>
                
                <div class="control" v-if="typeone">
-                  <div v-if="usedlist.inUsed">
-                        <span style="min-width:330px">已使用端口：<span style="color:#1D60FE">{{usedlist.inUsed}}</span></span>
-                        <span>未使用端口：<span style="color:#1D60FE">{{usedlist.unUsed}}</span></span>
+                  <div >
+                        <span style="min-width:330px">已开通端口：<span style="color:#1D60FE">{{usedlist.inUsed}}</span></span>
+                        <span>未开通端口：<span style="color:#1D60FE">{{usedlist.unUsed}}</span></span>
                         <button   class="zhuanyixuke typechange" @click="typeswitch">端口控制</button>
                   </div>
                 </div>
@@ -208,7 +209,7 @@
         </div>
 </transition>
 
-<!-- 点击责任人弹窗 -->
+             <!-- 点击责任人弹窗 -->
             <div v-if="personshow" class="workdetail">
               <div class="detail-title" style="margin-top:10px;">
                   <p style="color:#1d60fe"><img src="../../public/img/sss.png" style="vertical-align: middle;margin-right:5px"/>人员信息</p>
@@ -297,9 +298,370 @@
                  <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
             </div>
 
+         <div class="workdetail" v-if="workdetailshow">
+              <Tabs active-key="0">
+                <Tab-pane :label="list.portName ?list.deviceType+'('+list.portName+')':list.deviceType" :key="index" v-for="(list,index) in workdetaillist">
+                  <div class="detail-title" style="margin-top:10px;">
+                    <img src="../../public/img/20.png"/>
+                    <p >基本信息</p>
+                  </div>
+                  <img src="../../public/img/xiaowg.png" style="position:absolute;top:-6px" v-if="list.deviceType == '安全网关'"/>
+                  <img src="../../public/img/dianzi.png" style="position:absolute;top:-6px" v-if="list.deviceType == '电子围栏'"/>
+                  <img src="../../public/img/wifi.png" style="position:absolute;top:-6px" v-if="list.deviceType == 'wifi嗅探'"/>
+                  <img src="../../public/img/shexiang.png" style="position:absolute;top:-6px" v-if="list.deviceType == '摄像机'"/>
+
+
+                  <div class="content" style="border:none;" v-if="list.deviceType == 'wifi嗅探' || list.deviceType == '电子围栏'">
+                    <div style="min-width:30%">
+                        <p>编码：</p>
+                        <span>{{list.entity.snCode}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>品牌：</p>
+                        <span>{{list.entity.manufacturer}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安装位置：</p>
+                        <span>{{list.entity.installAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>维护人员：</p>
+                        <span>{{list.entity.maintenanceUser}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>管理单位：</p>
+                        <span>{{list.entity.managementUnit}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>IP地址：</p>
+                        <span>{{list.entity.ipAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>MAC地址：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>附件：</p>
+                        <span style="border-bottom:1px solid #1D60FE;cursor:pointer;margin-right:20px" @click="download(down)" v-for="(down,index) in list.entity.enclosureUrl" :key="index">{{down}}</span>
+                      </div>
+                  </div>
+
+                  <div class="content" style="border:none;" v-if="list.deviceType == '安全网关'">
+                    <div style="min-width:30%">
+                        <p>中心端地址：</p>
+                        <span>{{list.entity.centPortAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>本机地址：</p>
+                        <span>{{list.entity.localAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>网关序列号：</p>
+                        <span>{{list.entity.snCode}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>网关IP：</p>
+                        <span>{{list.entity.gatewayIp}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>MAC地址：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>经度：</p>
+                        <span>{{list.entity.longitude}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>纬度：</p>
+                        <span>{{list.entity.latitude}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>地址掩码：</p>
+                        <span>{{list.entity.addressMask}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安装地址：</p>
+                        <span>{{list.entity.installAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>管理单位：</p>
+                        <span>{{list.entity.managementUnit}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>维护人员：</p>
+                        <span>{{list.entity.maintenanceUser}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>网关名称：</p>
+                        <span>{{list.entity.gatewayName}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>用户名：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>出场编码：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>系统时间：</p>
+                        <span>{{list.entity.systemTime}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>出场时间：</p>
+                        <span>{{list.entity.factoryTime}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>设备厂商：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>终端状态：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                  </div>
+
+
+                  <div class="content" style="border:none;" v-if="list.deviceType == '摄像机'">
+                    <div style="min-width:30%">
+                        <p>设备名称：</p>
+                        <span>{{list.entity.cameraName}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>设备厂商：</p>
+                        <span>{{list.entity.manufacturer}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>设备型号：</p>
+                        <span>{{list.entity.model}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安装地址：</p>
+                        <span>{{list.entity.installAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>行政区域：</p>
+                        <span>{{list.entity.areaCode}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>国标编码：</p>
+                        <span>{{list.entity.nationnalId}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>摄像机编码格式：</p>
+                        <span>{{list.entity.cameraCode}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安装时间：</p>
+                        <span>{{list.entity.installTime}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>补光类型：</p>
+                        <span>{{list.entity.lightingType}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>摄像机类型：</p>
+                        <span>{{list.entity.cameraType}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>录像保存天数：</p>
+                        <span>{{list.entity.videoSaveDays}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>联网属性：</p>
+                        <span >{{list.entity.networkProperties?'未联网':'已联网'}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>IPv4地址：</p>
+                        <span>{{list.entity.ipAddress}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>MAC地址：</p>
+                        <span>{{list.entity.mac}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>IPv6地址：</p>
+                        <span>{{list.entity.ipv6Address}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>设备状态：</p>
+                        <span>{{list.entity.deviceStatus?'异常':'正常'}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>监控点位类型：</p>
+                        <span>{{list.entity.pointType}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>监控方位：</p>
+                        <span>{{list.entity.cameraPosition}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>点位名称：</p>
+                        <span>{{list.entity.pointName}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>维护人员：</p>
+                        <span>{{list.entity.maintenanceUser}}</span>
+                      </div>
+                  </div>
+
+                  <div class="detail-title" style="margin-top:10px;" v-if="list.deviceType == '摄像机'">
+                    <img src="../../public/img/position.png"/>
+                    <p >位置属性</p>
+                  </div>
+                  <div class="content" style="border:none;" v-if="list.deviceType == '摄像机'">
+                      <div style="min-width:30%">
+                        <p>经度：</p>
+                        <span>{{list.entity.longitude}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>纬度：</p>
+                        <span>{{list.entity.latitude}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>管理单位：</p>
+                        <span>{{list.entity.managementUnit}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>是否上报：</p>
+                        <span>{{list.entity.isReport?"否":"是"}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>所属辖区公安机关：</p>
+                        <span>{{list.entity.deptId}}</span>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>管理单位联系方式：</p>
+                        <span>{{list.entity.managementPhone}}</span>
+                      </div>
+                      <div style="min-width:100%">
+                        <p>摄像机功能类型：</p>
+                        <span>{{list.entity.cameraFunctionType}}</span>
+                      </div>
+                      <div style="min-width:100%">
+                        <p>摄像机位置类型：</p>
+                        <span>{{list.entity.cameraPositionType}}</span>
+                      </div>
+                      <div style="min-width:100%">
+                        <p>所属部门行业：</p>
+                        <span>{{list.entity.industry}}</span>
+                      </div>
+                  </div>
 
 
 
+                </Tab-pane>
+                <!-- <Tab-pane label="标签二" key="key2">标签二的内容</Tab-pane> -->
+            </Tabs>
+            <img src="../../public/img/xxx.png" style="position:absolute;right:20px;top:10px" @click="closecard"/>
+            <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
+        </div>
+
+
+       
+       
+      <div class="statusbox" style="width:60%;top:20px;z-index:2000;margin:0 auto;min-width:950px;padding-bottom:20px;min-height:95%" v-if="countshow">
+        <p class="detailpage" style="text-align:center">用电统计<img src="../../public/img/xxx.png"  style="float:right;margin-top: 5px" @click="countshow = false"/></p>
+        <div style="padding:0 20px">
+          <div  class="msgtitle"><img src="../../public/img/137.png"/>条件栏</div>
+          <div class="control-top">
+                 <p>行政区域：</p>
+                  <CheckboxGroup v-model="addresscode" @on-change="checkAllGroupChange">
+                    <Checkbox
+                    :indeterminate="indeterminate"
+                    :value="checkAll"
+                    @click.prevent.native="handleCheckAll">全选</Checkbox>
+                    <Checkbox label="1">
+                        <span>青山区</span>
+                    </Checkbox>
+                    <Checkbox label="0">
+                        <span>洪山区</span>
+                    </Checkbox>
+                    <Checkbox label="1">
+                        <span>青山区</span>
+                    </Checkbox>
+                    <Checkbox label="0">
+                        <span>洪山区</span>
+                    </Checkbox>
+                    <Checkbox label="1">
+                        <span>青山区</span>
+                    </Checkbox>
+                    <Checkbox label="0">
+                        <span>洪山区</span>
+                    </Checkbox>
+                    <Checkbox label="1">
+                        <span>青山区</span>
+                    </Checkbox>
+                    <Checkbox label="0">
+                        <span>洪山区</span>
+                    </Checkbox>
+                    <Checkbox label="1">
+                        <span>青山区</span>
+                    </Checkbox>
+                    <Checkbox label="0">
+                        <span>洪山区</span>
+                    </Checkbox>
+                    <Checkbox label="1">
+                        <span>青山区</span>
+                    </Checkbox>
+                    <Checkbox label="0">
+                        <span>洪山区</span>
+                    </Checkbox>
+                    <Checkbox label="1">
+                        <span>青山区</span>
+                    </Checkbox>
+                    <Checkbox label="0">
+                        <span>洪山区</span>
+                    </Checkbox>
+                    <Checkbox label="1">
+                        <span>青山区</span>
+                    </Checkbox>
+                    <Checkbox label="0">
+                        <span>洪山区</span>
+                    </Checkbox>
+                  </CheckboxGroup>
+               </div>
+            <div class="control-top">
+                <p >责任单位：</p>
+                 <Select v-model="companylist" style="width:300px" multiple>
+                  <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
+                 <p style="margin-left:31px">安装地址：</p>
+                 <i-input v-model="valueadd" placeholder="安装地址、IP、版本号、路口名称" style="width: 252px" ></i-input>
+               </div>
+               <div class="zhuanyixukes" style="width: 90px;margin: 0 auto;margin-top: 30px;" >搜索</div>
+        </div>
+        <div style="padding:0 20px">
+          <div  class="msgtitle"><img src="../../public/img/mmm.png"/>信息栏</div>
+          <div  class="forbox" v-for="(list,index) in 2" :key="index"  style="margin:0 40px;text-align:left;">
+             <div class="morecontent" style="padding-bottom:0">
+            <p>安装地址：<span style="text-align:left;flex: 1">按时间大数据看多了就暗水电费健康了时代峰峻示阿斯加</span></p>
+             </div>     
+                <div class="morecontent">
+                   <div style="display: flex">
+                       <p style="min-width:180px">IP地址：<span>192.168.10.165</span></p>
+                   </div>
+                  <div style="display: flex;min-width:160px;margin-left: 10px">
+                  <p>行政区域：</p>
+                  <span style="text-align:left;flex: 1">东西湖区</span>
+                </div>
+                 <div style="display: flex;min-width:120px;margin-left: 10px">
+                    <p>端口数量：</p>
+                    <span style="text-align:left;flex: 1">4</span>
+                 </div>
+                    <p style="min-width:160px;margin-left: 5px">接入设备数量：<span>123个</span></p>
+                  <div style="display: flex;min-width:200px;margin-left: 10px">
+                    <p>用电统计：</p>
+                    <span style="text-align:left;flex: 1">123</span>
+                 </div>
+                </div>
+            </div>
+        </div>
+        
+      </div>
+    
+    
+    
     </div>
 </template>
 <script>
@@ -313,6 +675,38 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
     },
     data () {
       return {
+        countshow:false,
+        companylist:[],
+        cityList: [
+                    {
+                        value: 'New York',
+                        label: 'New York'
+                    },
+                    {
+                        value: 'London',
+                        label: 'London'
+                    },
+                    {
+                        value: 'Sydney',
+                        label: 'Sydney'
+                    },
+                    {
+                        value: 'Ottawa',
+                        label: 'Ottawa'
+                    },
+                    {
+                        value: 'Paris',
+                        label: 'Paris'
+                    },
+                    {
+                        value: 'Canberra',
+                        label: 'Canberra'
+                    }
+                ],
+        valueadd:'',
+        indeterminate: false,
+        checkAll: false,
+        addresscode:[],
         totals:0,
         data2:[],
         columns2: [
@@ -333,6 +727,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
                 {title: '检测时间',key: 'update_time',width:155,className:'updatetime'}
                 ],
         timelinelists:[],
+        workdetaillist:[],
         typelist:[],
         typeone:true,
         getwayip:'',
@@ -415,6 +810,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
         changeobj:{},
         typelist:[],
         electro:[],
+        workdetailshow:false,
         timeList:[{
                 value: '两分钟',
                 label: '两分钟'
@@ -524,6 +920,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
       statusclick(index) {
         this.pages = 1
         this.statustable = true
+        this.rightdialogshow = false
         this.value = "";
         if (index == 0) {
           this.$http.get("res/socElectrical/selectElectricDetailList?",{isAlert:0,current:1,pageSize:10},res=>{
@@ -669,6 +1066,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
         this.$http.put("res/socElectrical/updateControlbarState",{id:this.oldid,portMap:this.changeobj},res=>{
             
         },err=>{});
+        this.$Message.info('已发送修改请求');
       },
       allowchangetypeback(){
         this.typeone = true
@@ -686,6 +1084,13 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
     closecard(){
       this.personshow = false
       this.$refs.bright.style.overflow = "auto"
+    },
+    checkdevicelist(num){
+        this.workdetailshow = true
+        this.$refs.bright.style.overflow = "hidden"
+        this.$http.get("res/pole/getPoleDeviceByNo?",{poleNo:num},res=>{
+          this.workdetaillist = res.data
+          },err=>{});
     },
     checkperson(id){
          this.$http.get("oauth/certificate/getCertInfo",{userId:id},res=>{
@@ -735,6 +1140,36 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
               }
                     },err=>{});
         
+      },
+      handleCheckAll () {
+                if (this.indeterminate) {
+                    this.checkAll = false;
+                } else {
+                    this.checkAll = !this.checkAll;
+                }
+                this.indeterminate = false;
+
+                if (this.checkAll) {
+                    this.addresscode = ['0', '1'];
+                } else {
+                    this.addresscode = [];
+                }
+            },
+      checkAllGroupChange (data) {
+                if (data.length === 2) {
+                    this.indeterminate = false;
+                    this.checkAll = true;
+                } else if (data.length > 0) {
+                    this.indeterminate = true;
+                    this.checkAll = false;
+                } else {
+                    this.indeterminate = false;
+                    this.checkAll = false;
+                }
+            },
+      countshows(){
+        this.rightdialogshow = false
+        this.countshow = true
       }
     },
   }
@@ -771,6 +1206,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
       top: 60px;
       z-index: 18;
       padding: 30px;
+      border: 1px solid #13C7D9;
     }
     .rightdialog div {
       font-size: 15px;
@@ -873,7 +1309,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
       display: inline-block;
     }
     .detail-textbox div span:first-child{
-      margin-right: 10px;
+      /* margin-right: 10px; */
     }
     /* 控制栏 */
     .control{
@@ -969,9 +1405,9 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
     }
     .timelinetext {
       position: absolute;
-      left: -76px;
+      left: -80px;
       top: -2px;
-      font-size: 14px;
+      font-size: 13px;
       color:#1d60fe;
     }
     .roadstatus{
@@ -1065,5 +1501,52 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
       position:absolute;
       bottom:67px;
       cursor: pointer;
+    }
+    .msgtitle{
+    font-size: 16px;
+    border-bottom: 1px solid #DDDDDD;
+    text-align: left;
+    height: 40px;
+    padding-left: 10px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    min-width:900px;
+  }
+.msgtitle img{
+  margin-right: 5px;
+}
+.morecontent{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-bottom: 20px;
+    font-size: 14px;
+  }
+  .morecontent span{
+    color: #3C7FEE;
+  }
+  .forbox{
+    border-bottom:2px dashed #3C7FEE;
+    position: relative;
+    margin-top: 20px;
+  }
+  .control-top{
+      display: flex;
+      margin-top: 20px;
+      padding: 0 40px;
+      text-align: left;
+    }
+    .control-top p {
+      font-size: 14px;
+      min-width: 76px;
+    }
+    .ivu-checkbox-wrapper {
+    cursor: pointer;
+    font-size: 12px;
+    display: inline-block;
+    margin-right: 8px;
+    min-width: 66px;
+    margin-bottom: 10px;
     }
 </style>

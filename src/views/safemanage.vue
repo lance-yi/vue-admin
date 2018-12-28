@@ -698,7 +698,7 @@
                     <span >{{list.comm.principals}}</span>
                   </div>
                   <div style="min-width:40%">
-                    <p>安全负责人单位名称：</p>
+                    <p>单位名称：</p>
                     <span >{{list.comm.principalsCompany}}</span>
                   </div>
                   <div style="min-width:20%">
@@ -1585,6 +1585,7 @@ export default {
     },
     statusclick(index) {
       this.statusdata = true;
+      this.rightdialogshow = false
       this.value = "";
       if (index == 0) {
         this.$http.get(
@@ -3495,6 +3496,7 @@ export default {
   top: 60px;
   z-index: 18;
   padding: 30px;
+  border: 1px solid #13C7D9;
 }
 .rightdialog div {
   font-size: 15px;
@@ -3677,7 +3679,7 @@ export default {
 .detail-textbox{
   text-align: left;
   font-size: 14px;
-  margin-left: 30px;
+  margin-left: 15px;
   width: calc(100% - 620px);
 }
 .detail-textbox div{
@@ -3687,7 +3689,7 @@ export default {
   display: inline-block;
 }
 .detail-textbox div span:first-child{
-  margin-right: 10px;
+  /* margin-right: 10px; */
 }
 /* 控制栏 */
 .control{

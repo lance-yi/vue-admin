@@ -142,9 +142,9 @@
         <div  class="movebox">
           <div style="width: 90%">
             <div class="morecontent">
-              <p>姓名：<span style="color:#1D60FE">{{usermsg.userName}}</span></p>
+              <p style="min-width:110px">姓名：<span style="color:#1D60FE">{{usermsg.userName}}</span></p>
               <p>单位名称：<span style="color:#1D60FE">{{usermsg.company}}</span></p>
-              <p>手机号：<span style="color:#1D60FE">{{usermsg.mobile}}</span></p>
+              <p style="min-width:160px">手机号：<span style="color:#1D60FE">{{usermsg.mobile}}</span></p>
               <p>单位地址：<span style="color:#1D60FE">{{usermsg.companyAddress}}</span></p>
             </div>
           </div>
@@ -153,7 +153,7 @@
               <div class="morecontent" style="width: 50%">
                 <div style="display: flex">
                   <Checkbox v-model="list.isChecks"   @on-change="checkAllGroupChange()"></Checkbox>
-                  <p style="min-width:140px">设备IP：<span>{{list.gatewayIp}}</span></p>
+                  <p style="min-width:150px">设备IP：<span>{{list.gatewayIp}}</span></p>
                   <!-- <p style="min-width:140px">设备IP：<span>1234567891</span></p> -->
                 </div>
 
@@ -528,7 +528,7 @@
   min-width: 200px;
   margin-top: 25px;
   display: flex;
-  align-items: center;
+  /* align-items: center; */
 }
 .content div p{
   font-size: 14px;

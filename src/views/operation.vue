@@ -484,8 +484,6 @@
                       <div style="flex-wrap:nowrap">
                         <span style="min-width:180px;width:50%">湿度：<span style="color:#1D60FE">{{rightlist2.humidity}}%RH</span></span>
                         <span style="margin-right:0;">温度：<span style="color:#1D60FE">{{rightlist2.temperature}}℃</span></span>
-                        <!-- <span style="min-width:180px;width:50%">温度：<span style="color:#1D60FE">{{rightlist.longitude}}℃</span></span>
-                        <span style="margin-right:0;">湿度：<span style="color:#1D60FE">{{rightlist.latitude}}%RH</span></span> -->
                       </div>
                       <div>
                         <span style="min-width:180px;width:50%">经度：<span style="color:#1D60FE">{{rightlist.longitude}}</span></span>
@@ -532,7 +530,7 @@
                       </div>
                       <div style="display:flex;font-size:14px;margin-top:10px">
                         <div style="min-width:210px;text-align:left">
-                            <p>接入设备IP地址：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="onetypelist(list.poleNo,list.lan)">{{list.ipAddr}}</span></p>
+                            <p>接入设备IP地址：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="onetypelist(rightlist.poleNo,list.lan)">{{list.ipAddr}}</span></p>
                           </div>
                           
                         <!-- <div style="margin-left: 10px;min-width:400px;text-align:left">
@@ -661,7 +659,7 @@
                     <span>{{list.comm.principalsPhone}}</span>
                   </div>
                   <div style="min-width:40%">
-                    <p>运维负责人单位名称：</p>
+                    <p>单位名称：</p>
                     <span >{{list.comm.principalsCompany}}</span>
                   </div>
                    <div style="min-width:30%">
@@ -844,31 +842,32 @@
                   </div>
             </div>
 
-            <!-- <div class="reportbox" style="width:620px">
-                  <p class="detailpage">事件偏移预警详情 <img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px"/></p>
+            <div class="reportbox" style="width:640px;top:20%" v-if="timeOffsetAlertshow">
+                  <p class="detailpage">事件偏移预警详情 <img src="../../public/img/xxx.png" @click.stop="timeOffsetAlertshow = false" style="float:right;margin-top: 5px"/></p>
                   <div class="offsetbox">
-                     <p>预警信息：<span >系统在2018/11/12 12:00:00 </span>检测到摄像机 <span>2018/11/12 12:00:00</span>,请注意时间出现偏移</p>
+                     <p>预警信息：系统在<span >{{timeOffsetdata.currentTime}}</span>检测到摄像机 <span>{{timeOffsetdata.cameraTime}}</span>,请注意时间出现偏移</p>
                      <p style="margin:40px 0 20px 0px">系统时间：</p>
                      <div class="callinbox2" style="text-align:left">
-                            <span>2018</span>年
-                            <span>12</span>月
-                            <span>1</span>日
-                            <span>12</span>时
-                            <span>12</span>分钟
-                            <span>12</span>秒
+                            <span>{{timeOffsetdata.currentYear}}</span>年
+                            <span>{{timeOffsetdata.currentMonth}}</span>月
+                            <span>{{timeOffsetdata.currentDay}}</span>日
+                            <span>{{timeOffsetdata.currentHour}}</span>时
+                            <span>{{timeOffsetdata.currentMin}}</span>分钟
+                            <span>{{timeOffsetdata.currentS}}</span>秒
                     </div>
                      <p style="margin:40px 0 20px 0px">摄像机时间：</p>
                      <div class="callinbox" style="padding:0;text-align:left">
-                            <span>2018</span>年
-                            <span>12</span>月
-                            <span>1</span>日
-                            <span>12</span>时
-                            <span>12</span>分钟
-                            <span>12</span>秒
+                            <span>{{timeOffsetdata.cameraYear}}</span>年
+                            <span>{{timeOffsetdata.cameraMonth}}</span>月
+                            <span>{{timeOffsetdata.cameraDay}}</span>日
+                            <span>{{timeOffsetdata.cameraHour}}</span>时
+                            <span>{{timeOffsetdata.cameraMin}}</span>分钟
+                            <span>{{timeOffsetdata.cameraS}}</span>秒
                     </div>
+                    <img src="../../public/img/1341.png" class="borderimg"/>
+                    <p class="borderp">描述：时间偏移<span v-if="timeOffsetdata.diffDay">{{timeOffsetdata.diffDay}}天</span><span v-if="timeOffsetdata.diffHour">{{timeOffsetdata.diffHour}}时</span><span v-if="timeOffsetdata.diffMin">{{timeOffsetdata.diffMin}}分</span><span>{{timeOffsetdata.diffS}}秒</span></p>
                   </div>
-                  
-            </div> -->
+            </div>
 
 
             <div class="reportbox" style="width:800px;left:10%" v-if="repoetmapshow">
@@ -1534,12 +1533,14 @@ export default {
       levels: "",
       level:'cc',
       ss: "",
+      timeOffsetAlertshow:false,
       statuslist: [],
       timelinelist: [],
       iplist: [],
       getwayip:'',
       rightlist:[],
       type:'',
+      timeOffsetdata:[],
       typelist:[],
       columns1: [{title: '采样时间',key: 'creatTime', width:155,align: 'center'},
                 {title: '网络延时',key: 'status',width:95,align: 'center'},
@@ -1844,6 +1845,7 @@ export default {
     statusclick(index) {
       this.statusdata = true;
       this.statustable = false
+      this.rightdialogshow = false
       this.value = "";
       if (index == 0) {
         this.$http.get(
@@ -2146,7 +2148,7 @@ export default {
           //右侧状态数据
            this.$http.get("gis/gis/getGatewayIndexAlert?",{gatewayIp:this.rightlist.gatewayIp},res=>{
             this.rightlist2 = res.data
-            console.log(res.data)
+    
           },err=>{});
 
 
@@ -2232,6 +2234,11 @@ export default {
       cc.style.cssText="z-index:9999";
        this.$http.get("gis/gis/getGatewayById?",{gatewayId:data},res=>{
           this.rightlist = res.data
+          //右侧状态数据
+           this.$http.get("gis/gis/getGatewayIndexAlert?",{gatewayIp:this.rightlist.gatewayIp},res=>{
+            this.rightlist2 = res.data
+ 
+          },err=>{});
           //图表加载插口
            this.$http.get("res/resState/getLanDeviceType?",{gatewayId:data},res=>{
              this.LANshow = true
@@ -3157,6 +3164,7 @@ export default {
     },
     //点击右侧订单数
     statustablenum(i){
+      this.rightdialogshow = false
       this.statustablevalue = i
       this.tabletime = ''
       this.changetimedata = ''
@@ -3356,9 +3364,18 @@ export default {
                this.datamap = res.data
                this.repoetmapshow = true
                this.repoetshow = false
+               this.timeOffsetAlertshow = false
+          },err=>{});
+      }else if(list.alertType == 'timeOffsetAlert'){
+               this.repoetmapshow = false
+               this.repoetshow = false
+         this.$http.get("alert/analysisReport/findTimeOffsetAlertDetailByIp",{ip:list.ipAddr},res=>{
+               this.timeOffsetAlertshow = true
+               this.timeOffsetdata = res.data
           },err=>{});
       }else{
         this.repoetmapshow = false
+        this.timeOffsetAlertshow = false
         this.repoetshow = true
           this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:list.ipAddr,lan:list.lan,gatewayId:list.gatewayId},res=>{
               this.drawLine(res.data.lanFlow)
@@ -4101,6 +4118,7 @@ export default {
   top: 60px;
   z-index: 18;
   padding: 30px;
+  border: 1px solid #13C7D9;
 }
 .rightdialog div {
   font-size: 15px;
@@ -4597,6 +4615,7 @@ export default {
 }
 .offsetbox{
   padding: 20px 0 20px 20px;
+  position: relative;
 }
 .offsetbox p{
    text-align: left;
@@ -4613,5 +4632,16 @@ export default {
     padding: 3px 5px;
     margin: 5px;
     border-radius:4px;
+  }
+  .borderimg{
+    position: absolute;
+    top: 139px;
+    left: 380px;
+    height: 120px;
+  }
+  .borderp{
+    position: absolute;
+    top: 188px;
+    left: 420px;
   }
 </style>
