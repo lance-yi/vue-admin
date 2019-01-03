@@ -33,7 +33,7 @@
         </div>
 
         <!-- 运维表格弹窗 -->
-      <div class="statusbox" style="width:60%;top:20%;z-index:2000;left:3%;min-width:1180px;padding-bottom:20px;min-height:70%" v-if="statustable" @click.stop="funs()">
+      <div class="statusbox" style="width:60%;top:20%;z-index:2000;min-width:1180px;padding-bottom:20px;min-height:70%" v-if="statustable" @click.stop="funs()">
         <p class="detailpage"><img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px"/></p>
               <div style="margin-bottom:20px;margin-top:10px">
                 <i-input  v-model="valuetable" placeholder="安装地址、路口名称" style="width: 200px" class="sousuo"></i-input>
@@ -81,7 +81,7 @@
                     <div class="detail-textbox">
                       <p>安装地址：<span style="color:#1D60FE">{{rtopdata.install_address}}</span></p>
                       <div>
-                        <span style="min-width:191px;width:40%">设备IP：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkdevicelist(rtopdata.poleNo)">{{rtopdata.electric_ip}}</span></span>
+                        <span style="min-width:191px;width:40%">设备IP：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkdevicelist(rtopdata.id)">{{rtopdata.electric_ip}}</span></span>
                         <span style="margin-right:0">项目名称：<span style="color:#1D60FE">{{rtopdata.projectName}}</span></span>
                       </div>
                       <div>
@@ -210,7 +210,7 @@
 </transition>
 
              <!-- 点击责任人弹窗 -->
-            <div v-if="personshow" class="workdetail">
+            <div v-if="personshow" class="workdetail" @click.stop="personshow = true">
               <div class="detail-title" style="margin-top:10px;">
                   <p style="color:#1d60fe"><img src="../../public/img/sss.png" style="vertical-align: middle;margin-right:5px"/>人员信息</p>
                 </div>
@@ -298,8 +298,8 @@
                  <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
             </div>
 
-         <div class="workdetail" v-if="workdetailshow">
-              <Tabs active-key="0">
+         <div class="workdetail" v-if="workdetailshow" @click.stop="workdetailshow = true">
+              <Tabs active-key="0" @on-click="editorshow = true">
                 <Tab-pane :label="list.portName ?list.deviceType+'('+list.portName+')':list.deviceType" :key="index" v-for="(list,index) in workdetaillist">
                   <div class="detail-title" style="margin-top:10px;">
                     <img src="../../public/img/20.png"/>
@@ -309,7 +309,7 @@
                   <img src="../../public/img/dianzi.png" style="position:absolute;top:-6px" v-if="list.deviceType == '电子围栏'"/>
                   <img src="../../public/img/wifi.png" style="position:absolute;top:-6px" v-if="list.deviceType == 'wifi嗅探'"/>
                   <img src="../../public/img/shexiang.png" style="position:absolute;top:-6px" v-if="list.deviceType == '摄像机'"/>
-
+                  <img src="../../public/img/139.png" style="position:absolute;top:-6px" v-if="list.deviceType == '智能电源'"/>
 
                   <div class="content" style="border:none;" v-if="list.deviceType == 'wifi嗅探' || list.deviceType == '电子围栏'">
                     <div style="min-width:30%">
@@ -395,13 +395,13 @@
                         <p>网关名称：</p>
                         <span>{{list.entity.gatewayName}}</span>
                       </div>
-                      <div style="min-width:30%">
+                      <!-- <div style="min-width:30%">
                         <p>用户名：</p>
                         <span>{{list.entity.mac}}</span>
-                      </div>
+                      </div> -->
                       <div style="min-width:30%">
-                        <p>出场编码：</p>
-                        <span>{{list.entity.mac}}</span>
+                        <p>网关版本号：</p>
+                        <span>{{list.entity.gatewayVersion}}</span>
                       </div>
                       <div style="min-width:30%">
                         <p>系统时间：</p>
@@ -413,11 +413,7 @@
                       </div>
                       <div style="min-width:30%">
                         <p>设备厂商：</p>
-                        <span>{{list.entity.mac}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>终端状态：</p>
-                        <span>{{list.entity.mac}}</span>
+                        <span>{{list.entity.manufacturer}}</span>
                       </div>
                   </div>
 
@@ -504,7 +500,105 @@
                         <span>{{list.entity.maintenanceUser}}</span>
                       </div>
                   </div>
-
+                  <div class="content" style="border:none;" v-if="list.deviceType == '智能电源'">
+                    <div style="min-width:30%">
+                        <p>子网掩码：</p>
+                        <span v-if="editorshow">{{list.entity.addressMask}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.addressMask" :placeholder="list.entity.addressMask" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>行政区域：</p>
+                        <span v-if="editorshow">{{list.entity.areaCode}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.areaCode" :placeholder="list.entity.areaCode" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>证书编号：</p>
+                        <span v-if="editorshow">{{list.entity.certNum}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.certNum" :placeholder="list.entity.certNum" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <!-- <div style="min-width:30%">
+                        <p>证书登录密码：</p>
+                        <span>{{list.entity.certPasswd}}</span>
+                      </div> -->
+                      <div style="min-width:30%">
+                        <p>路口名称：</p>
+                        <span v-if="editorshow">{{list.entity.crossVillage}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.crossVillage" :placeholder="list.entity.crossVillage" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>设备型号：</p>
+                        <span v-if="editorshow">{{list.entity.devModel}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.devModel" :placeholder="list.entity.devModel" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>电源IP：</p>
+                        <span v-if="editorshow">{{list.entity.electricIp}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.electricIp" :placeholder="list.entity.electricIp" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安装地址：</p>
+                        <span v-if="editorshow">{{list.entity.installAddress}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.installAddress" :placeholder="list.entity.installAddress" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安装地址详情：</p>
+                        <span v-if="editorshow">{{list.entity.installAddressDetail}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.installAddressDetail" :placeholder="list.entity.installAddressDetail" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>端口数量：</p>
+                        <span v-if="editorshow">{{list.entity.lanNum}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.lanNum" :placeholder="list.entity.lanNum" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>纬度：</p>
+                        <span v-if="editorshow">{{list.entity.latitude}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>经度：</p>
+                        <span v-if="editorshow">{{list.entity.longitude}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>MAC地址：</p>
+                        <span v-if="editorshow">{{list.entity.mac}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.mac" :placeholder="list.entity.mac" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>责任人：</p>
+                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>责任人联系方式：</p>
+                        <span v-if="editorshow">{{list.entity.maintenanceUserPhone}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUserPhone" :placeholder="list.entity.maintenanceUserPhone" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>负责单位：</p>
+                        <span v-if="editorshow">{{list.entity.managementUnit}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.managementUnit" :placeholder="list.entity.managementUnit" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>负责单位电话：</p>
+                        <span v-if="editorshow">{{list.entity.managementUnitPhone}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.managementUnitPhone" :placeholder="list.entity.managementUnitPhone" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>设备厂商：</p>
+                        <span v-if="editorshow">{{list.entity.manufacturer}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.manufacturer" :placeholder="list.entity.manufacturer" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>电源类型：</p>
+                        <span v-if="editorshow">{{list.entity.teminalType}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.teminalType" :placeholder="list.entity.teminalType" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <!-- <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:45%"  @click="editorshow = false" v-if="editorshow">编辑</button>
+                      <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;bottom:10px;left:40%"   v-if="!editorshow" @click="backeditor(index)">返回</button>
+                       <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:60%"   v-if="!editorshow" @click="saveeditor(list)">保存</button> -->
+                  </div>
                   <div class="detail-title" style="margin-top:10px;" v-if="list.deviceType == '摄像机'">
                     <img src="../../public/img/position.png"/>
                     <p >位置属性</p>
@@ -553,14 +647,14 @@
                 </Tab-pane>
                 <!-- <Tab-pane label="标签二" key="key2">标签二的内容</Tab-pane> -->
             </Tabs>
-            <img src="../../public/img/xxx.png" style="position:absolute;right:20px;top:10px" @click="closecard"/>
+            <img src="../../public/img/xxx.png" style="position:absolute;right:20px;top:10px" @click.stop="workdetailshow = false"/>
             <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
         </div>
 
 
        
        
-      <div class="statusbox" style="width:60%;top:20px;z-index:2000;margin:0 auto;min-width:950px;padding-bottom:20px;min-height:95%" v-if="countshow">
+      <div class="statusbox" style="width:60%;top:20px;z-index:1000;margin:0 auto;min-width:950px;padding-bottom:20px;min-height:95%" v-if="countshow">
         <p class="detailpage" style="text-align:center">用电统计<img src="../../public/img/xxx.png"  style="float:right;margin-top: 5px" @click="countshow = false"/></p>
         <div style="padding:0 20px">
           <div  class="msgtitle"><img src="../../public/img/137.png"/>条件栏</div>
@@ -571,53 +665,8 @@
                     :indeterminate="indeterminate"
                     :value="checkAll"
                     @click.prevent.native="handleCheckAll">全选</Checkbox>
-                    <Checkbox label="1">
-                        <span>青山区</span>
-                    </Checkbox>
-                    <Checkbox label="0">
-                        <span>洪山区</span>
-                    </Checkbox>
-                    <Checkbox label="1">
-                        <span>青山区</span>
-                    </Checkbox>
-                    <Checkbox label="0">
-                        <span>洪山区</span>
-                    </Checkbox>
-                    <Checkbox label="1">
-                        <span>青山区</span>
-                    </Checkbox>
-                    <Checkbox label="0">
-                        <span>洪山区</span>
-                    </Checkbox>
-                    <Checkbox label="1">
-                        <span>青山区</span>
-                    </Checkbox>
-                    <Checkbox label="0">
-                        <span>洪山区</span>
-                    </Checkbox>
-                    <Checkbox label="1">
-                        <span>青山区</span>
-                    </Checkbox>
-                    <Checkbox label="0">
-                        <span>洪山区</span>
-                    </Checkbox>
-                    <Checkbox label="1">
-                        <span>青山区</span>
-                    </Checkbox>
-                    <Checkbox label="0">
-                        <span>洪山区</span>
-                    </Checkbox>
-                    <Checkbox label="1">
-                        <span>青山区</span>
-                    </Checkbox>
-                    <Checkbox label="0">
-                        <span>洪山区</span>
-                    </Checkbox>
-                    <Checkbox label="1">
-                        <span>青山区</span>
-                    </Checkbox>
-                    <Checkbox label="0">
-                        <span>洪山区</span>
+                    <Checkbox :label="list.areaCode" v-for="(list,index) in addcodelist" :key="index">
+                        <span>{{list.areaName}}</span>
                     </Checkbox>
                   </CheckboxGroup>
                </div>
@@ -629,33 +678,35 @@
                  <p style="margin-left:31px">安装地址：</p>
                  <i-input v-model="valueadd" placeholder="安装地址、IP、版本号、路口名称" style="width: 252px" ></i-input>
                </div>
-               <div class="zhuanyixukes" style="width: 90px;margin: 0 auto;margin-top: 30px;" >搜索</div>
+               <div class="zhuanyixukes" style="width: 90px;margin: 0 auto;margin-top: 30px;" @click="serach">搜索</div>
         </div>
         <div style="padding:0 20px">
           <div  class="msgtitle"><img src="../../public/img/mmm.png"/>信息栏</div>
-          <div  class="forbox" v-for="(list,index) in 2" :key="index"  style="margin:0 40px;text-align:left;">
+          <div style="height:520px;overflow:auto">
+          <div  class="forbox" v-for="(list,index) in countmaindata" :key="index"  style="margin:0 40px;text-align:left;">
              <div class="morecontent" style="padding-bottom:0">
-            <p>安装地址：<span style="text-align:left;flex: 1">按时间大数据看多了就暗水电费健康了时代峰峻示阿斯加</span></p>
+            <p>安装地址：<span style="text-align:left;flex: 1">{{list.installAddress}}</span></p>
              </div>     
                 <div class="morecontent">
                    <div style="display: flex">
-                       <p style="min-width:180px">IP地址：<span>192.168.10.165</span></p>
+                       <p style="min-width:170px">IP地址：<span>{{list.electricalIp}}</span></p>
                    </div>
-                  <div style="display: flex;min-width:160px;margin-left: 10px">
+                  <div style="display: flex;min-width:150px;margin-left: 10px">
                   <p>行政区域：</p>
-                  <span style="text-align:left;flex: 1">东西湖区</span>
+                  <span style="text-align:left;flex: 1">{{list.areaCode}}</span>
                 </div>
-                 <div style="display: flex;min-width:120px;margin-left: 10px">
+                 <div style="display: flex;min-width:110px;margin-left: 10px">
                     <p>端口数量：</p>
-                    <span style="text-align:left;flex: 1">4</span>
+                    <span style="text-align:left;flex: 1">{{list.lanNum}}</span>
                  </div>
-                    <p style="min-width:160px;margin-left: 5px">接入设备数量：<span>123个</span></p>
-                  <div style="display: flex;min-width:200px;margin-left: 10px">
+                    <p style="min-width:170px;margin-left: 5px">接入设备数量：<span>{{list.deviceNum}}个</span></p>
+                  <div style="display: flex;min-width:205px;margin-left: 10px">
                     <p>用电统计：</p>
-                    <span style="text-align:left;flex: 1">123</span>
+                    <span style="text-align:left;flex: 1">{{list.electricStatistics}}度/每天</span>
                  </div>
                 </div>
             </div>
+          </div>
         </div>
         
       </div>
@@ -675,34 +726,13 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
     },
     data () {
       return {
+        electricId:'',
+        polenum:'',
+        editorshow:true,
+        addcodelist:[],
         countshow:false,
         companylist:[],
-        cityList: [
-                    {
-                        value: 'New York',
-                        label: 'New York'
-                    },
-                    {
-                        value: 'London',
-                        label: 'London'
-                    },
-                    {
-                        value: 'Sydney',
-                        label: 'Sydney'
-                    },
-                    {
-                        value: 'Ottawa',
-                        label: 'Ottawa'
-                    },
-                    {
-                        value: 'Paris',
-                        label: 'Paris'
-                    },
-                    {
-                        value: 'Canberra',
-                        label: 'Canberra'
-                    }
-                ],
+        cityList: [],
         valueadd:'',
         indeterminate: false,
         checkAll: false,
@@ -810,6 +840,7 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
         changeobj:{},
         typelist:[],
         electro:[],
+        countmaindata:[],
         workdetailshow:false,
         timeList:[{
                 value: '两分钟',
@@ -1066,9 +1097,14 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
         this.$http.put("res/socElectrical/updateControlbarState",{id:this.oldid,portMap:this.changeobj},res=>{
             
         },err=>{});
-        this.$Message.info('已发送修改请求');
+        this.changeobj = {}
+        this.typeone = true
+        this.$http.get("res/socElectrical/selectControlbar?",{id:this.oldid},res=>{
+                    this.usedlist = res.data
+                    },err=>{});
       },
       allowchangetypeback(){
+        this.changeobj = {}
         this.typeone = true
         // 控制栏使用端口号
          this.$http.get("res/socElectrical/selectControlbar?",{id:this.oldid},res=>{
@@ -1085,10 +1121,11 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
       this.personshow = false
       this.$refs.bright.style.overflow = "auto"
     },
-    checkdevicelist(num){
+    checkdevicelist(id){
+      this.electricId = id
         this.workdetailshow = true
         this.$refs.bright.style.overflow = "hidden"
-        this.$http.get("res/pole/getPoleDeviceByNo?",{poleNo:num},res=>{
+        this.$http.get("res/socElectrical/getAlldevice?",{electricId:id},res=>{
           this.workdetaillist = res.data
           },err=>{});
     },
@@ -1150,13 +1187,13 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
                 this.indeterminate = false;
 
                 if (this.checkAll) {
-                    this.addresscode = ['0', '1'];
+                    this.addresscode = ['420102','420103','420104','420105','420106','420107','420111','420112','420113','420114','420115','420116','420117','420118']
                 } else {
                     this.addresscode = [];
                 }
             },
       checkAllGroupChange (data) {
-                if (data.length === 2) {
+                if (data.length === 14) {
                     this.indeterminate = false;
                     this.checkAll = true;
                 } else if (data.length > 0) {
@@ -1170,7 +1207,41 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
       countshows(){
         this.rightdialogshow = false
         this.countshow = true
-      }
+         this.$http.get("res/socElectrical/selectElectricStatisticsByCondition?",{},res=>{
+                  this.countmaindata = res.data
+                    },err=>{});
+          this.$http.get("/report/report/selectManagementUnit?",{dictCodes:'managementUnit'},res=>{
+              this.cityList = res.data
+            },err=>{});
+            this.$http.get("oauth/baseArea/selectAreaByParentCode?parentCode=420100",{},res=>{
+              this.addcodelist = res.data
+            },err=>{});
+      },
+      serach(){
+        // console.log(this.addresscode)
+        // console.log(this.companylist)
+        // console.log(this.valueadd)
+        this.$http.get("res/socElectrical/selectElectricStatisticsByCondition?areas="+this.addresscode,{managementUnit:this.companylist,param:this.valueadd,},res=>{
+              // this.addcodelist = res.data
+              if(res.data.length == 0){
+                this.countmaindata = []
+                this.$Message.info('暂无数据');
+              }else{
+                this.countmaindata = res.data
+              }
+            },err=>{});
+      },
+      saveeditor(list){
+      console.log(list)
+    },
+    backeditor(index){
+      
+       this.$http.get("res/socElectrical/getAlldevice?",{electricId:this.electricId},res=>{
+          this.workdetaillist = res.data
+          },err=>{});
+     
+      this.editorshow = true
+    }
     },
   }
 </script>
@@ -1200,13 +1271,13 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
     .rightdialog {
       width: 220px;
       height: 240px;
-      background: rgba(0, 0, 0, 0.4);
+      background: url(../../public/img/zzz.png) no-repeat center center/100% 100%;
       position: fixed;
       right: 0;
       top: 60px;
       z-index: 18;
       padding: 30px;
-      border: 1px solid #13C7D9;
+      border: 2px solid #13C7D9;
     }
     .rightdialog div {
       font-size: 15px;
@@ -1235,9 +1306,9 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
       /* height: 65%; */
       position: absolute;
       top: 150px;
-      left: 0;
+      /* left: 0; */
       right: 0;
-      margin: 0 auto;
+      /* margin: 0 auto; */
       box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
       z-index: 20;
     }
@@ -1549,4 +1620,9 @@ import ArcgisMapspmicsmall from "@/components/ArcgisMapspmicsmall";
     min-width: 66px;
     margin-bottom: 10px;
     }
+    .timego{
+  position: absolute;
+  left:845px;
+  top:8px;
+}
 </style>

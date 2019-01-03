@@ -165,7 +165,18 @@
              <p class="detailpage">{{statustabletitle}}<img src="../../public/img/xxx.png" @click="statustable = false" style="position:absolute;right:20px;z-index: 2;top:20px"/></p>
              <div style="margin-top:20px;" v-if="statustabletitle == '在线率统计明细'">
                  <span>检索条件：</span>
-                 <RadioGroup v-model="allnum" @on-change="changeallnum">
+                 <RadioGroup v-model="allnum" @on-change="changeallnum"  v-if="twocheckplot == 2">
+                    <Radio label="all">
+                        <span>总数</span>
+                    </Radio>
+                    <Radio label="online">
+                        <span>在线数</span>
+                    </Radio>
+                    <Radio label="unline">
+                        <span>离线数</span>
+                    </Radio>
+                </RadioGroup>
+                <RadioGroup v-model="allnum" @on-change="changeallnums"  v-if="twocheckplot == 1">
                     <Radio label="all">
                         <span>总数</span>
                     </Radio>
@@ -179,13 +190,25 @@
              </div>
              <div style="padding:20px" >
               <i-table border stripe :columns="columns4" :data="data2" class="longtable"></i-table>
+              <Page :total='total' show-total style="margin-top:10px" @on-change="changeonlinepage" :current.sync="pages" ></Page>
              </div>
         </div>
         <div class="statusbox"  v-if="onegear" >
              <p class="detailpage">一机一档统计明细<img src="../../public/img/xxx.png" @click="onegear = false" style="position:absolute;right:20px;z-index: 2;top:20px"/></p>
              <div style="margin-top:20px;">
                  <span>检索条件：</span>
-                 <RadioGroup v-model="term" @on-change="changeterm">
+                 <RadioGroup v-model="term" @on-change="changeterm" v-if="twocheckplot == 2">
+                    <Radio label="all">
+                        <span>全部</span>
+                    </Radio>
+                    <Radio label="good">
+                        <span>合格</span>
+                    </Radio>
+                    <Radio label="nogood">
+                        <span>不合格</span>
+                    </Radio>
+                </RadioGroup>
+                <RadioGroup v-model="term" @on-change="changeterms" v-if="twocheckplot == 1">
                     <Radio label="all">
                         <span>全部</span>
                     </Radio>
@@ -198,7 +221,8 @@
                 </RadioGroup>
              </div>
              <div style="padding:20px" >
-              <i-table border stripe :columns="columns5" :data="data2" class="longtable"></i-table>
+              <i-table border stripe :columns="columns5" :data="data3" class="longtable"></i-table>
+              <Page :total='total' show-total style="margin-top:10px" @on-change="changegoodpage" :current.sync="pages" ></Page>
              </div>
         </div>
 
@@ -220,9 +244,9 @@
             <div class="scatterbox">
                <div id="echartsscatter" ></div>
             </div>
-            <div class="tablebox" style="top:450px;width:calc(100% - 280px)">
-            <Table :columns="columns11" :data="data10" border stripe></Table>
-            <img src="../../public/img/134.png" class="theadimg"/>
+            <div class="tablebox" style="top:450px;width:calc(100% - 280px);height: calc(100% - 450px);">
+            <Table :columns="columns12" :data="data11" border stripe v-if="data11.length >0"></Table>
+            <img src="../../public/img/134.png" class="theadimg" v-if="data11.length >0"/>
           </div>
         </div>
     </div>
@@ -236,6 +260,8 @@
     },
     data () {
       return {
+          pages:1,
+          total:0,
           mounthsnum:'all',
           checknum:1,
           allnum:'',
@@ -595,7 +621,9 @@
                         }
                     }
                   ],
+          
           data2:[],
+          data3:[],
           columns11: [
                     {
                         title: '区域',
@@ -766,6 +794,176 @@
                     }
                 ],
                 data10: [],
+                data11:[],
+                columns12: [
+                    {
+                        title: '区域',
+                        key: 'areaName',
+                        align: 'center',
+                        width: 149,
+                        fixed: 'left',
+                    },
+                    {
+                        title: '在线率',
+                        align: 'center',
+                        children: [
+                            {
+                                title: '总数',
+                                key: 'accessNum',
+                                align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('span', {
+                                            on: {
+                                                click: () => {
+                                                    // console.log(params.row.formId)
+                                                    this.gotohisStatisticaldetal(params.row.areaName,1)
+                                                }
+                                            },
+                                            style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
+                                        }, params.row.accessNum)
+                                    ]);
+                                    }
+                            },
+                            {
+                                title: '在线数',
+                                key: 'onlineNum',
+                                align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('span', {
+                                            on: {
+                                                click: () => {
+                                                    // console.log(params.row.formId)
+                                                    this.gotohisonlinenum(params.row.areaName,1)
+                                                }
+                                            },
+                                            style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
+                                        }, params.row.onlineNum)
+                                    ]);
+                                    }
+                            },
+                            {
+                                title: '在线率',
+                                key: 'onlineRate',
+                                align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('span', {
+                                        }, params.row.onlineRate+'%')
+                                    ]);
+                                    }
+                            }
+                        ]
+                    },
+                    {
+                        title: '联网率',
+                        align: 'center',
+                        children: [
+                            {
+                                title: '接入任务数',
+                                key: 'taskNum',
+                                align: 'center',
+                                // render: (h, params) => {
+                                //     return h('div', [
+                                //         h('span', {
+                                //             on: {
+                                //                 click: () => {
+                                //                     // console.log(params.row.formId)
+                                //                     this.gotoStatisticaldetal(params.row.areaCode,2)
+                                //                 }
+                                //             },
+                                //             style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
+                                //         }, params.row.taskNum)
+                                //     ]);
+                                //     }
+                            },
+                            {
+                                title: '联网数',
+                                key: 'accessNum',
+                                align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('span', {
+                                            on: {
+                                                click: () => {
+                                                    // console.log(params.row.formId)
+                                                    this.gotohisStatisticaldetal(params.row.areaName,2)
+                                                }
+                                            },
+                                            style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
+                                        }, params.row.accessNum)
+                                    ]);
+                                    }
+                            },
+                            {
+                                title: '联网率',
+                                key: 'accessRate',
+                                align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('div', {
+                                        }, params.row.accessRate+'%')
+                                    ]);
+                                    }
+                            }
+                        ]
+                    },
+                    {
+                        title: '一机一档合格率',
+                        align: 'center',
+                        children: [
+                            {
+                                title: '总数',
+                                key: 'accessNum',
+                                align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('span', {
+                                            on: {
+                                                click: () => {
+                                                    // console.log(params.row.formId)
+                                                    this.gotohisStatisticaldetal(params.row.areaName,3)
+                                                }
+                                            },
+                                            style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
+                                        }, params.row.accessNum)
+                                    ]);
+                                    }
+                            },
+                            {
+                                title: '合格数',
+                                key: 'archGoodNum',
+                                align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('span', {
+                                            on: {
+                                                click: () => {
+                                                    // console.log(params.row.formId)
+                                                    this.gotohisgoodnum(params.row.areaName,3)
+                                                }
+                                            },
+                                            style:{color:'#1d60fe',cursor:'pointer','border-bottom':'1px solid #1d60fe'}
+                                        }, params.row.archGoodNum)
+                                    ]);
+                                    }
+                            },
+                            {
+                                title: '合格率',
+                                key: 'archGoodRate',
+                                align: 'center',
+                                render: (h, params) => {
+                                    return h('div', [
+                                        h('div', {
+                                            style:{color:'#515a6e',cursor:'default'}
+                                        }, params.row.archGoodRate+'%')
+                                    ]);
+                                    }
+                            }
+                        ]
+                    }
+                ],
                 statustabletitle:'',
                 onegear:false,
                 modalmains:false,
@@ -774,6 +972,8 @@
                 comlistdata:[],
                 taskdata:[],
                 find3Ratedata:[],
+                histime:'',
+                twocheckplot:2,
       }
     },
     created(){
@@ -813,10 +1013,6 @@
               this.cameradata = res.data
             },err=>{});
         },
-        //报表生成时间表
-        // timeplot(){
-        //   this.echartstime()
-        // },
        checkplot(index){
            this.hadcol = index
            if(index == 1){
@@ -884,78 +1080,162 @@
        },
        //修改一机一档检索条件
        changeterm(val){
-         if(val == 'all'){
-           this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'',areaCode:this.areacode},res=>{
-                this.data2 = res.data
-            },err=>{});
-         }else if(val == 'good'){
-            this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'1',areaCode:this.areacode},res=>{
-                this.data2 = res.data
-            },err=>{});
-         }else if(val == 'nogood'){
-             this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'0',areaCode:this.areacode},res=>{
-                this.data2 = res.data
-            },err=>{});
-         }
+             if(val == 'all'){
+                this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'',areaCode:this.areacode,current:1,pageSize:8},res=>{
+                        this.data3 = res.data.list
+                        this.total = res.data.total
+                        this.pages = 1
+                    },err=>{});
+                }else if(val == 'good'){
+                    this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'1',areaCode:this.areacode,current:1,pageSize:8},res=>{
+                        this.data3 = res.data.list
+                        this.total = res.data.total
+                        this.pages = 1
+                    },err=>{});
+                }else if(val == 'nogood'){
+                    this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'0',areaCode:this.areacode,current:1,pageSize:8},res=>{
+                        this.data3 = res.data.list
+                        this.total = res.data.total
+                        this.pages = 1
+                    },err=>{});
+                }
+       },
+       //修改一机一档检索条件
+       changeterms(val){
+               if(val == 'all'){
+                this.$http.get("res/report/selectErrorReport",{time:this.histime,areaName:this.areacode,earcState:"",current:1,pageSize:8},res=>{
+                        this.data3 = res.data[0].listAll
+                        this.total = res.data[0].total
+                        this.pages = 1
+                this.pages = 1
+                    },err=>{});
+                }else if(val == 'good'){
+                  this.$http.get("res/report/selectErrorReport",{time:this.histime,areaName:this.areacode,earcState:true,current:1,pageSize:8},res=>{
+                        this.data3 = res.data[0].listAll
+                        this.total = res.data[0].total
+                        this.pages = 1
+                    },err=>{});
+                }else if(val == 'nogood'){
+                   this.$http.get("res/report/selectErrorReport",{time:this.histime,areaName:this.areacode,earcState:false,current:1,pageSize:8},res=>{
+                        this.data3 = res.data[0].listAll
+                        this.total = res.data[0].total
+                        this.pages = 1
+                    },err=>{});
+                }
        },
        //修改在线率检索条件
        changeallnum(val){
-         if(val == 'all'){
-           this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:''},res=>{
-                this.data2 = res.data
-            },err=>{});
-         }else if(val == 'online'){
-            this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:'1'},res=>{
-                this.data2 = res.data
-            },err=>{});
-         }else if(val == 'unline'){
-             this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:'0'},res=>{
-                this.data2 = res.data
-            },err=>{});
-         }
+             if(val == 'all'){
+                this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:'',current:1,pageSize:8},res=>{
+                        this.data2 = res.data.list
+                        this.total = res.data.total
+                        this.pages = 1
+                    },err=>{});
+                }else if(val == 'online'){
+                    this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:'1',current:1,pageSize:8},res=>{
+                        this.data2 = res.data.list
+                        this.total = res.data.total
+                        this.pages = 1
+                    },err=>{});
+                }else if(val == 'unline'){
+                    this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:'0',current:1,pageSize:8},res=>{
+                        this.data2 = res.data.list
+                        this.total = res.data.total
+                        this.pages = 1
+                    },err=>{});
+                }
+
+            //    if(val == 'all'){
+            //     that.$http.get("res/report/selectReportDetail",{areaName:this.areacode,offlineState :'',time:this.histime},res=>{
+            //             that.data2 = res.data
+            //         },err=>{});
+            //     }else if(val == 'online'){
+            //         that.$http.get("res/report/selectReportDetail",{areaName:this.areacode,offlineState :'1',time:this.histime},res=>{
+            //             that.data2 = res.data
+            //         },err=>{});
+            //     }else if(val == 'unline'){
+            //         that.$http.get("res/report/selectReportDetail",{areaName:this.areacode,offlineState :'0',time:this.histime},res=>{
+            //             that.data2 = res.data
+            //         },err=>{});
+            //     }
+       },
+       //修改在线率检索条件
+       changeallnums(val){
+               if(val == 'all'){
+                this.$http.get("res/report/selectReportDetail",{areaName:this.areacode,offlineState :'',time:this.histime,current:1,pageSize:8},res=>{
+                        this.data2 = res.data[0].listAll
+                        this.total = res.data[0].total
+                        this.pages = 1
+                    },err=>{});
+                }else if(val == 'online'){
+                    this.$http.get("res/report/selectReportDetail",{areaName:this.areacode,offlineState :'1',time:this.histime,current:1,pageSize:8},res=>{
+                        this.data2 = res.data[0].listAll
+                        this.total = res.data[0].total
+                        this.pages = 1
+                    },err=>{});
+                }else if(val == 'unline'){
+                    this.$http.get("res/report/selectReportDetail",{areaName:this.areacode,offlineState :'0',time:this.histime,current:1,pageSize:8},res=>{
+                        this.data2 = res.data[0].listAll
+                        this.total = res.data[0].total
+                        this.pages = 1
+                    },err=>{});
+                }
        },
        //在线数明细
        gotoonlinenum(areaCode,index){
-          this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:areaCode,state:1},res=>{
-                this.data2 = res.data
+         this.twocheckplot = 2
+          this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:areaCode,state:1,current:1,pageSize:8},res=>{
+                this.data2 = res.data.list
                 this.allnum = 'online'
                 this.statustabletitle = '在线率统计明细'
                 this.statustable = true
                 this.areacode = areaCode
+                this.total = res.data.total
+                this.pages = 1
             },err=>{});
        },
        //一机一档合格数
        gotogoodnum(areaCode,index){
+           this.twocheckplot = 2
            this.term = 'good'
-             this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'1',areaCode:areaCode},res=>{
-                this.data2 = res.data
+             this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'1',areaCode:areaCode,current:1,pageSize:8},res=>{
+                this.data3 = res.data.list
                 this.onegear = true
                 this.areacode = areaCode
+                this.total = res.data.total
+                this.pages = 1
             },err=>{});
        },
        gotoStatisticaldetal(areaCode,index){
            this.areacode = areaCode
+           this.twocheckplot = 2
           if(index == 1){
              this.statustable = true
              this.onegear = false
              this.statustabletitle = '在线率统计明细'
              this.allnum = 'all'
-             this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:areaCode,state:''},res=>{
-                this.data2 = res.data
+             this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:areaCode,state:'',current:1,pageSize:8},res=>{
+                this.data2 = res.data.list
+                this.total = res.data.total
+                this.pages = 1
             },err=>{});
           }else if(index == 2){
              this.statustable = true
              this.onegear = false
              this.statustabletitle = '联网率统计明细'
-             this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:areaCode,state:''},res=>{
-                this.data2 = res.data
+             this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:areaCode,state:'',current:1,pageSize:8},res=>{
+                this.data2 = res.data.list
+                this.total = res.data.total
+                this.pages = 1
             },err=>{});
           }else{
              this.onegear = true
              this.statustable = false
              this.term = 'all'
-             this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'',areaCode:areaCode},res=>{
-                this.data2 = res.data
+             this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'',areaCode:areaCode,current:1,pageSize:8},res=>{
+                this.data3 = res.data.list
+                this.total = res.data.total
+                this.pages = 1
             },err=>{});
           }
        },
@@ -1006,20 +1286,193 @@
            }, 100);
           }else if(index == 2){
               this.$http.get("res/report/selectReportByDate?",{time:''},res=>{
+                  var num = res.data.length-1
+                  this.histime = res.data[num][6]
+                    this.$http.get("res/report/reportSummaryByArea",{time:res.data[num][6]},res=>{
+                        this.data11 = res.data
+                    },err=>{});
                   setTimeout(() => {
                     this.echartstime(res.data)
                 }, 100);
               },err=>{});
+
               
           }
           
        },
        changemounthsnum(val){
          console.log(val)
+         if(val == 'all'){
+           this.$http.get("res/report/selectReportByDate?",{time:''},res=>{
+                  var num = res.data.length-1
+                  this.histime = res.data[num][6]
+                    this.$http.get("res/report/reportSummaryByArea",{time:res.data[num][6]},res=>{
+                        this.data11 = res.data
+                    },err=>{});
+                  setTimeout(() => {
+                    this.echartstime(res.data)
+                }, 100);
+              },err=>{});
+         }else if(val == 'one'){
+           this.$http.get("res/report/selectReportByDate?",{time:'30'},res=>{
+                  var num = res.data.length-1
+                  this.histime = res.data[num][6]
+                    this.$http.get("res/report/reportSummaryByArea",{time:res.data[num][6]},res=>{
+                        this.data11 = res.data
+                    },err=>{});
+                  setTimeout(() => {
+                    this.echartstime(res.data)
+                }, 100);
+              },err=>{});
+         }else if(val == 'three'){
+             this.$http.get("res/report/selectReportByDate?",{time:'90'},res=>{
+                  var num = res.data.length-1
+                  this.histime = res.data[num][6]
+                    this.$http.get("res/report/reportSummaryByArea",{time:res.data[num][6]},res=>{
+                        this.data11 = res.data
+                    },err=>{});
+                  setTimeout(() => {
+                    this.echartstime(res.data)
+                }, 100);
+              },err=>{});
+         }     
        },
     //    导出表格
        educetable(){
          window.location.href=this.$http.root+'/report/report/downloadExcle';
+       },
+       //在线数明细
+       gotohisonlinenum(areaCode,index){
+           this.twocheckplot = 1
+            window.scrollTo(0,0); 
+            this.statustable = true
+            this.onegear = false
+          this.$http.get("res/report/selectReportDetail",{areaName:areaCode,offlineState :'1',time:this.histime,current:1,pageSize:8},res=>{
+                this.data2 = res.data[0].listAll
+                this.allnum = 'online'
+                this.statustabletitle = '在线率统计明细'
+                this.areacode = areaCode
+                this.total = res.data[0].total
+                        this.pages = 1
+            },err=>{});
+       },
+       //一机一档合格数
+       gotohisgoodnum(areaCode,index){
+           this.term = 'good'
+            window.scrollTo(0,0); 
+           this.twocheckplot = 1
+           this.onegear = true
+           this.statustable = false
+             this.$http.get("res/report/selectErrorReport",{time:this.histime,areaName:areaCode,earcState:true,current:1,pageSize:8},res=>{
+                this.data3 =res.data[0].listAll
+                this.areacode = areaCode
+                this.total = res.data[0].total
+                        this.pages = 1
+            },err=>{});
+       },
+       gotohisStatisticaldetal(areaName,index){
+           this.areacode = areaName
+           this.twocheckplot = 1
+           window.scrollTo(0,0);  
+          if(index == 1){
+             this.statustable = true
+             this.onegear = false
+             this.statustabletitle = '在线率统计明细'
+             this.allnum = 'all'
+             this.$http.get("res/report/selectReportDetail",{areaName:areaName,offlineState :'',time:this.histime,current:1,pageSize:8},res=>{
+                // this.$http.get("res/report/selectReportDetail",{},res=>{
+                this.data2 = res.data[0].listAll
+                this.total = res.data[0].total
+                this.pages = 1
+            },err=>{});
+          }else if(index == 2){
+             this.statustable = true
+             this.onegear = false
+             this.statustabletitle = '联网率统计明细'
+             this.$http.get("res/report/selectReportDetail",{areaName:areaName,offlineState :'',time:this.histime,current:1,pageSize:8},res=>{
+                this.data2 = res.data[0].listAll
+                this.total = res.data[0].total
+                        this.pages = 1
+            },err=>{});
+          }else{
+             this.onegear = true
+             this.statustable = false
+             this.term = 'all'
+            this.$http.get("res/report/selectErrorReport",{time:this.histime,areaName:areaName,earcState:"",current:1,pageSize:8},res=>{
+                this.data3 = res.data[0].listAll
+                this.total = res.data[0].total
+                        this.pages = 1
+            },err=>{});
+          }
+       },
+       //在线数分页
+       changeonlinepage(i){
+         if(this.twocheckplot == 2){
+             if(this.allnum == 'all'){
+                this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:'',current:i,pageSize:8},res=>{
+                        this.data2 = res.data.list
+                    },err=>{});
+                }else if(this.allnum == 'online'){
+                    this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:'1',current:i,pageSize:8},res=>{
+                        this.data2 = res.data.list
+                    },err=>{});
+                }else if(this.allnum == 'unline'){
+                    this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:'0',current:i,pageSize:8},res=>{
+                        this.data2 = res.data.list
+                    },err=>{});
+                }else if(this.allnum == ''){
+                    this.$http.get("report/report/findReportForm?managementUnit="+this.comlistdata,{areaCode:this.areacode,state:'',current:i,pageSize:8},res=>{
+                        this.data2 = res.data.list
+                    },err=>{});
+                }
+         }else if(this.twocheckplot == 1){
+           if(this.allnum == 'all'){
+                this.$http.get("res/report/selectReportDetail",{areaName:this.areacode,offlineState :'',time:this.histime,current:i,pageSize:8},res=>{
+                        this.data2 = res.data[0].listAll
+                    },err=>{});
+                }else if(this.allnum == 'online'){
+                    this.$http.get("res/report/selectReportDetail",{areaName:this.areacode,offlineState :'1',time:this.histime,current:i,pageSize:8},res=>{
+                        this.data2 = res.data[0].listAll
+                    },err=>{});
+                }else if(this.allnum == 'unline'){
+                    this.$http.get("res/report/selectReportDetail",{areaName:this.areacode,offlineState :'0',time:this.histime,current:i,pageSize:8},res=>{
+                        this.data2 = res.data[0].listAll
+                    },err=>{});
+                }
+         }
+       },
+       changegoodpage(i){
+         console.log(this.term)
+         console.log(this.twocheckplot)
+         if(this.twocheckplot == 2){
+             if(this.term == 'all'){
+                this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'',areaCode:this.areacode,current:i,pageSize:8},res=>{
+                        this.data3 = res.data.list
+                    },err=>{});
+                }else if(this.term == 'good'){
+                    this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'1',areaCode:this.areacode,current:i,pageSize:8},res=>{
+                        this.data3 = res.data.list
+                    },err=>{});
+                }else if(this.term == 'nogood'){
+                    this.$http.get("/report/report/countRecordDetial?managementUnit="+this.comlistdata,{state:'0',areaCode:this.areacode,current:i,pageSize:8},res=>{
+                        this.data3 = res.data.list
+                    },err=>{});
+                }
+         }else if(this.twocheckplot == 1){
+             if(this.term == 'all'){
+                this.$http.get("res/report/selectErrorReport",{time:this.histime,areaName:this.areacode,earcState:"",current:i,pageSize:8},res=>{
+                        this.data3 = res.data[0].listAll
+                    },err=>{});
+                }else if(this.term == 'good'){
+                  this.$http.get("res/report/selectErrorReport",{time:this.histime,areaName:this.areacode,earcState:true,current:i,pageSize:8},res=>{
+                        this.data3 = res.data[0].listAll
+                    },err=>{});
+                }else if(this.term == 'nogood'){
+                   this.$http.get("res/report/selectErrorReport",{time:this.histime,areaName:this.areacode,earcState:false,current:i,pageSize:8},res=>{
+                        this.data3 = res.data[0].listAll
+                    },err=>{});
+                }
+         }
        },
        echartscamera(data,title){
            var that = this
@@ -1249,8 +1702,8 @@
       },
       echartstime(data){
             var that = this
-             let myChart = null;
-        	let div_ = document.getElementById("echartsscatter");
+             var myChart = null;
+        	var div_ = document.getElementById("echartsscatter");
         	div_.removeAttribute("_echarts_instance_");
         	myChart = this.$echarts.init(div_);
             window.addEventListener("resize", function () {
@@ -1279,7 +1732,7 @@
         //     [10,Ymd+' 12:12','10','2018-11-10',' 12:12','周三'],
         // ];
         
-   
+       
 
         var itemStyle = {
             normal: {
@@ -1290,11 +1743,6 @@
                 shadowColor: 'rgba(0, 0, 0, 0.5)'
             }
         };
-        // var dataBb = []
-        myChart.on('click', function (params){
-            console.log(params)
-            
-            });
 
             myChart.setOption({
                     color: [
@@ -1360,7 +1808,7 @@
                     show: true,
                     showDetail: false,
                     yAxisIndex: [0],
-                    left: '97%',
+                    right: '0',
                     start: 0, //数据窗口范围的起始百分比
                     end: 100
                 }],
@@ -1387,6 +1835,13 @@
 
                 ]
             })
+
+            myChart.on('click', function (params){
+                that.histime = params.data[6]
+              that.$http.get("res/report/reportSummaryByArea",{time:params.data[6]},res=>{
+                   that.data11 = res.data
+              },err=>{});
+            });
       }
     }
   }
@@ -1415,7 +1870,7 @@
        min-height: 817px;
    }
    .main2box{
-       height: calc(143% - 50px);
+       height: 1050px;
        background: #F8F9FA;
        margin-right: 20px;
        box-shadow: 0px 2px 4px rgba(0,0,0,0.2);

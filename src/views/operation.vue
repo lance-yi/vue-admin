@@ -45,7 +45,7 @@
 
 
       <!-- 运维表格弹窗 -->
-      <div class="statusbox" style="width:95%;top:24%;z-index:2000;min-height:70%;padding-bottom:20px" v-if="statustable" @click.stop="statustable = true,bigrightshow = false,getwayip=''">
+      <div class="statusbox" style="width:1300px;top:24%;z-index:2000;min-height:70%;padding-bottom:20px" v-if="statustable" @click.stop="statustable = true,bigrightshow = false,getwayip=''">
         <p class="detailpage">工单管理 <img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px"/></p>
             <div class="remindsbox" v-if="sendremindshow">
               <div class="remindstitle">
@@ -106,7 +106,7 @@
               <button   class="zhuanyixukes" v-if="move" @click="movewarn">确认清除</button>
               <button   class="zhuanyixuke" v-if="move" @click="back">返回</button>
             </div> -->
-            <div>
+            <div style="display:flex;padding:0 52px">
               <div style="margin:20px 0">
                <span>派单时长：</span>
                      <Radio-group v-model="tabletime" @on-change="changetime($event)" >
@@ -121,7 +121,18 @@
                       </Radio>
                   </Radio-group>
               </div>
-              <div style="font-size：14px">
+              <div style="display: flex; margin: 0 auto;width: 323px;margin-top: 20px;">
+                <span>工单类型：</span>
+                <CheckboxGroup v-model="worktype">
+                    <Checkbox label="安全事件">
+                        <span>安全事件</span>
+                    </Checkbox>
+                    <Checkbox label="运维事件">
+                        <span>运维事件</span>
+                    </Checkbox>
+                  </CheckboxGroup>
+              </div>
+              <div style="font-size：14px;margin:20px 0">
                 关键字：<i-input v-model="valuetable" placeholder="" style="width: 252px" ></i-input>
               </div>
               <div style="margin:20px 0">
@@ -502,10 +513,37 @@
                 <div style="position:relative;margin-bottom:65px" v-if="backwg">
                   <button   class="zhuanyixukes backwg" @click="backwgs">返回网关</button>
                 </div>
-                <p v-if="!alertshow" style="font-size:15px">暂无告警信息</p>
+                
+                <div class="detail-title" v-if="wangguanshow">
+                  <img src="../../public/img/gx.png"/>
+                  <p>安全事件</p>
+                </div>
+                <div  class="hadpro"  style="margin-top:40px;padding-left:40px" v-if="wangguanshow">
+                  <div v-for="(aa,index) in descriptiondata" :key="index" style="margin-top: 15px;">
+                      <div class="timelinecont" >
+                        <p style="min-width:230px">告警类型：<span>{{aa.alertName}}</span></p>
+                        <p style="min-width:230px">发生时间：<span>{{aa.occurTime}}</span></p>
+                        <p style="min-width:150px">告警状态：<span v-if="aa.state == 0">待处理</span>
+                        <span v-if="aa.state == 1">正在处理</span>
+                        <span v-if="aa.state == 2">处理完成</span>
+                        </p>
+                        <p style="min-width:230px">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
+                    </div>
+                    <p style="margin-top: 5px;margin-bottom:30px">故障描述：
+                              <span style="color:rgb(255, 94, 94)" >{{aa.description}}</span>&nbsp;&nbsp;&nbsp;
+                              <a  class="brspans"  style="color:#1D60FE;margin-left:0;display:inline-block" @click.stop="tracing(aa.id)">事件追溯</a>&nbsp;&nbsp;&nbsp;
+                              <span v-if="aa.type == 'gatewayOfflineAlert'">分析报告：<a  class="brspans"  style="color:#1D60FE;margin-left:0;display:inline-block" @click.stop="see()">查看</a></span>
+                    </p>
+                    
+                  </div>
+                </div>
+                
+                
+                
+                <p v-if="!alertshow" style="font-size:15px">暂无运维事件</p>
                 <div class="detail-title" v-if="alertshow">
                   <img src="../../public/img/gx.png"/>
-                  <p>告警信息</p>
+                  <p>运维事件</p>
                 </div>
                  <div class="top-box" v-if="alertshow">
                   <div>
@@ -518,8 +556,8 @@
                   <Timeline>
                   <Timeline-item v-for="(list,index) in timelinelists" :key="index">
                       <img src="../../public/img/16.png" slot="dot" v-if="list.isAlert == 2" />
-                      <img src="../../public/img/nono.png" slot="dot" v-if="list.nono"  @click="checknonos(list.ipAddr)"/>
-                      <img src="../../public/img/19.png" slot="dot" v-if="list.isAlert == 4"  @click="checkicons(list.ipAddr)"/>
+                      <img src="../../public/img/nono.png" slot="dot" v-if="list.nono"  @click="checknonos(list.id)"/>
+                      <img src="../../public/img/19.png" slot="dot" v-if="list.isAlert == 4"  @click="checkicons(list.id)"/>
                       <img src="../../public/img/18.png" slot="dot" v-if="list.isAlert == 1" />
                       <div class="timelinecont">
                         <p style="min-width:120px">端口号：<span>{{list.lan}}</span></p>
@@ -711,7 +749,7 @@
                         <div style="display:block;width:100%;margin-top:0">
                         <div v-for="(list,num) in aa.detail" :key="num" style="margin-top:0">
                             <!-- <i-input type="textarea" :rows="4" :placeholder="list.alertDescription" style="width:50%;margin-right:10px" ></i-input><span style="margin-top:20px">检测时间：2018-11-05 09:40:58</span> -->
-                            <span style="color:#ff3636">检测时间：{{list.monitorTime}}</span><span style="margin-left:15px">故障描述：{{list.descr}}</span>
+                            <span style="color:#ff3636">检测时间：{{list.monitorTime}}</span><span style="margin-left:15px;color:#ff3636">故障描述：{{list.descr}}</span>
                         </div>
                         </div>
                     </div>
@@ -823,7 +861,7 @@
                       <img src="../../public/img/timego.png" class="timego" v-if="certlist.certificateStatus == 2"/>
                     </div>
                  </div>
-                 <img src="../../public/img/xxx.png" style="position:absolute;right:20px;top:10px" @click="closecard"/>
+                 <img src="../../public/img/xxx.png" style="position:absolute;right:20px;top:10px" @click.stop="closecard"/>
                  <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
             </div>
  
@@ -969,7 +1007,7 @@
 
             <!-- 点击ip弹窗 -->
             <div class="workdetail" v-if="workdetailshow">
-              <Tabs active-key="0">
+              <Tabs active-key="0" @on-click="editorshow = true">
                 <Tab-pane :label="list.portName ?list.deviceType+'('+list.portName+')':list.deviceType" :key="index" v-for="(list,index) in workdetaillist">
                   <div class="detail-title" style="margin-top:10px;">
                     <img src="../../public/img/20.png"/>
@@ -979,200 +1017,340 @@
                   <img src="../../public/img/dianzi.png" style="position:absolute;top:-6px" v-if="list.deviceType == '电子围栏'"/>
                   <img src="../../public/img/wifi.png" style="position:absolute;top:-6px" v-if="list.deviceType == 'wifi嗅探'"/>
                   <img src="../../public/img/shexiang.png" style="position:absolute;top:-6px" v-if="list.deviceType == '摄像机'"/>
+                  <img src="../../public/img/139.png" style="position:absolute;top:-6px" v-if="list.deviceType == '智能电源'"/>
                   <div class="content" style="border:none;" v-if="list.deviceType == 'wifi嗅探' || list.deviceType == '电子围栏'">
                     <div style="min-width:30%">
                         <p>编码：</p>
-                        <span>{{list.entity.snCode}}</span>
+                        <span v-if="editorshow">{{list.entity.snCode}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.snCode" :placeholder="list.entity.snCode" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>品牌：</p>
-                        <span>{{list.entity.manufacturer}}</span>
+                        <span v-if="editorshow">{{list.entity.manufacturer}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.manufacturer" :placeholder="list.entity.manufacturer" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>安装位置：</p>
-                        <span>{{list.entity.installAddress}}</span>
+                        <span v-if="editorshow">{{list.entity.installAddress}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.installAddress" :placeholder="list.entity.installAddress" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>维护人员：</p>
-                        <span>{{list.entity.maintenanceUser}}</span>
+                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>管理单位：</p>
-                        <span>{{list.entity.managementUnit}}</span>
+                        <span v-if="editorshow">{{list.entity.managementUnit}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.managementUnit" :placeholder="list.entity.managementUnit" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>IP地址：</p>
-                        <span>{{list.entity.ipAddress}}</span>
+                        <span v-if="editorshow">{{list.entity.ipAddress}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.ipAddress" :placeholder="list.entity.ipAddress" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>MAC地址：</p>
-                        <span>{{list.entity.mac}}</span>
+                        <span v-if="editorshow">{{list.entity.mac}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.mac" :placeholder="list.entity.mac" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>附件：</p>
                         <span style="border-bottom:1px solid #1D60FE;cursor:pointer;margin-right:20px" @click="download(down)" v-for="(down,index) in list.entity.enclosureUrl" :key="index">{{down}}</span>
                       </div>
+                      <!-- <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:45%"  @click="editorshow = false" v-if="editorshow">编辑</button>
+                      <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;bottom:10px;left:40%"   v-if="!editorshow" @click="backeditor(index)">返回</button>
+                       <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:60%"   v-if="!editorshow" @click="saveeditor(list)">保存</button> -->
                   </div>
 
                   <div class="content" style="border:none;" v-if="list.deviceType == '安全网关'">
                     <div style="min-width:30%">
                         <p>中心端地址：</p>
-                        <span>{{list.entity.centPortAddress}}</span>
+                        <span v-if="editorshow">{{list.entity.centPortAddress}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.centPortAddress" :placeholder="list.entity.centPortAddress" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>本机地址：</p>
-                        <span>{{list.entity.localAddress}}</span>
+                        <span v-if="editorshow">{{list.entity.localAddress}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.localAddress" :placeholder="list.entity.localAddress" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>网关序列号：</p>
-                        <span>{{list.entity.snCode}}</span>
+                        <span v-if="editorshow">{{list.entity.snCode}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.snCode" :placeholder="list.entity.snCode" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>网关IP：</p>
-                        <span>{{list.entity.gatewayIp}}</span>
+                        <span v-if="editorshow">{{list.entity.gatewayIp}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.gatewayIp" :placeholder="list.entity.gatewayIp" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>MAC地址：</p>
-                        <span>{{list.entity.mac}}</span>
+                        <span v-if="editorshow">{{list.entity.mac}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.mac" :placeholder="list.entity.mac" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>经度：</p>
-                        <span>{{list.entity.longitude}}</span>
+                        <span v-if="editorshow">{{list.entity.longitude}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>纬度：</p>
-                        <span>{{list.entity.latitude}}</span>
+                        <span v-if="editorshow">{{list.entity.latitude}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>地址掩码：</p>
-                        <span>{{list.entity.addressMask}}</span>
+                        <span v-if="editorshow">{{list.entity.addressMask}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.addressMask" :placeholder="list.entity.addressMask" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>安装地址：</p>
-                        <span>{{list.entity.installAddress}}</span>
+                        <span v-if="editorshow">{{list.entity.installAddress}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.installAddress" :placeholder="list.entity.installAddress" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>管理单位：</p>
-                        <span>{{list.entity.managementUnit}}</span>
+                        <span v-if="editorshow">{{list.entity.managementUnit}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.managementUnit" :placeholder="list.entity.managementUnit" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>维护人员：</p>
-                        <span>{{list.entity.maintenanceUser}}</span>
+                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>网关名称：</p>
-                        <span>{{list.entity.gatewayName}}</span>
+                        <span v-if="editorshow">{{list.entity.gatewayName}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.gatewayName" :placeholder="list.entity.gatewayName" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
-                        <p>用户名：</p>
-                        <span>{{list.entity.mac}}</span>
-                      </div>
-                      <div style="min-width:30%">
-                        <p>出场编码：</p>
-                        <span>{{list.entity.mac}}</span>
+                        <p>网关版本号：</p>
+                        <span v-if="editorshow">{{list.entity.gatewayVersion}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.gatewayVersion" :placeholder="list.entity.gatewayVersion" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>系统时间：</p>
-                        <span>{{list.entity.systemTime}}</span>
+                        <span v-if="editorshow">{{list.entity.systemTime}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.systemTime" :placeholder="list.entity.systemTime" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>出场时间：</p>
-                        <span>{{list.entity.factoryTime}}</span>
+                        <span v-if="editorshow">{{list.entity.factoryTime}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.factoryTime" :placeholder="list.entity.factoryTime" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>设备厂商：</p>
-                        <span>{{list.entity.mac}}</span>
+                        <span v-if="editorshow">{{list.entity.manufacturer}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.manufacturer" :placeholder="list.entity.manufacturer" style="width: 160px;margin-top: 0" />
                       </div>
-                      <div style="min-width:30%">
-                        <p>终端状态：</p>
-                        <span>{{list.entity.mac}}</span>
-                      </div>
+                      <!-- <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:45%"  @click="editorshow = false" v-if="editorshow">编辑</button>
+                      <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;bottom:10px;left:40%"   v-if="!editorshow" @click="backeditor(index)">返回</button>
+                       <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:60%"   v-if="!editorshow" @click="saveeditor(list)">保存</button> -->
                   </div>
 
 
                   <div class="content" style="border:none;" v-if="list.deviceType == '摄像机'">
                     <div style="min-width:30%">
                         <p>设备名称：</p>
-                        <span>{{list.entity.cameraName}}</span>
+                        <span v-if="editorshow">{{list.entity.cameraName}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.cameraName" :placeholder="list.entity.cameraName" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>设备厂商：</p>
-                        <span>{{list.entity.manufacturer}}</span>
+                        <span v-if="editorshow">{{list.entity.manufacturer}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.manufacturer" :placeholder="list.entity.manufacturer" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>设备型号：</p>
-                        <span>{{list.entity.model}}</span>
+                        <span v-if="editorshow">{{list.entity.model}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.model" :placeholder="list.entity.model" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>安装地址：</p>
-                        <span>{{list.entity.installAddress}}</span>
+                        <span v-if="editorshow">{{list.entity.installAddress}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.installAddress" :placeholder="list.entity.installAddress" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>行政区域：</p>
-                        <span>{{list.entity.areaCode}}</span>
+                        <span v-if="editorshow">{{list.entity.areaCode}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.areaCode" :placeholder="list.entity.areaCode" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>国标编码：</p>
-                        <span>{{list.entity.nationnalId}}</span>
+                        <span v-if="editorshow">{{list.entity.nationnalId}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.nationnalId" :placeholder="list.entity.nationnalId" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>摄像机编码格式：</p>
-                        <span>{{list.entity.cameraCode}}</span>
+                        <span v-if="editorshow">{{list.entity.cameraCode}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.cameraCode" :placeholder="list.entity.cameraCode" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>安装时间：</p>
-                        <span>{{list.entity.installTime}}</span>
+                        <span v-if="editorshow">{{list.entity.installTime}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.installTime" :placeholder="list.entity.installTime" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>补光类型：</p>
-                        <span>{{list.entity.lightingType}}</span>
+                        <span v-if="editorshow">{{list.entity.lightingType}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.lightingType" :placeholder="list.entity.lightingType" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>摄像机类型：</p>
-                        <span>{{list.entity.cameraType}}</span>
+                        <span v-if="editorshow">{{list.entity.cameraType}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.cameraType" :placeholder="list.entity.cameraType" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>录像保存天数：</p>
-                        <span>{{list.entity.videoSaveDays}}</span>
+                        <span v-if="editorshow">{{list.entity.videoSaveDays}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.videoSaveDays" :placeholder="list.entity.videoSaveDays" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>联网属性：</p>
-                        <span >{{list.entity.networkProperties?'未联网':'已联网'}}</span>
+                        <span v-if="editorshow">{{list.entity.networkProperties?'未联网':'已联网'}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.networkProperties" :placeholder="list.entity.networkProperties" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>IPv4地址：</p>
-                        <span>{{list.entity.ipAddress}}</span>
+                        <span v-if="editorshow">{{list.entity.ipAddress}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.ipAddress" :placeholder="list.entity.ipAddress" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>MAC地址：</p>
-                        <span>{{list.entity.mac}}</span>
+                        <span v-if="editorshow">{{list.entity.mac}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.mac" :placeholder="list.entity.mac" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>IPv6地址：</p>
-                        <span>{{list.entity.ipv6Address}}</span>
+                        <span v-if="editorshow">{{list.entity.ipv6Address}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.ipv6Address" :placeholder="list.entity.ipv6Address" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>设备状态：</p>
-                        <span>{{list.entity.deviceStatus?'异常':'正常'}}</span>
+                        <span v-if="editorshow">{{list.entity.deviceStatus?'异常':'正常'}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.deviceStatus" :placeholder="list.entity.deviceStatus" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>监控点位类型：</p>
-                        <span>{{list.entity.pointType}}</span>
+                        <span v-if="editorshow">{{list.entity.pointType}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.pointType" :placeholder="list.entity.pointType" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>监控方位：</p>
-                        <span>{{list.entity.cameraPosition}}</span>
+                        <span v-if="editorshow">{{list.entity.cameraPosition}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.cameraPosition" :placeholder="list.entity.cameraPosition" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>点位名称：</p>
-                        <span>{{list.entity.pointName}}</span>
+                        <span v-if="editorshow">{{list.entity.pointName}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.pointName" :placeholder="list.entity.pointName" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>维护人员：</p>
-                        <span>{{list.entity.maintenanceUser}}</span>
+                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
                       </div>
                   </div>
-
+                  <div class="content" style="border:none;" v-if="list.deviceType == '智能电源'">
+                    <div style="min-width:30%">
+                        <p>子网掩码：</p>
+                        <span v-if="editorshow">{{list.entity.addressMask}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.addressMask" :placeholder="list.entity.addressMask" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>行政区域：</p>
+                        <span v-if="editorshow">{{list.entity.areaCode}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.areaCode" :placeholder="list.entity.areaCode" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>证书编号：</p>
+                        <span v-if="editorshow">{{list.entity.certNum}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.certNum" :placeholder="list.entity.certNum" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <!-- <div style="min-width:30%">
+                        <p>证书登录密码：</p>
+                        <span>{{list.entity.certPasswd}}</span>
+                      </div> -->
+                      <div style="min-width:30%">
+                        <p>路口名称：</p>
+                        <span v-if="editorshow">{{list.entity.crossVillage}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.crossVillage" :placeholder="list.entity.crossVillage" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>设备型号：</p>
+                        <span v-if="editorshow">{{list.entity.devModel}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.devModel" :placeholder="list.entity.devModel" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>电源IP：</p>
+                        <span v-if="editorshow">{{list.entity.electricIp}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.electricIp" :placeholder="list.entity.electricIp" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安装地址：</p>
+                        <span v-if="editorshow">{{list.entity.installAddress}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.installAddress" :placeholder="list.entity.installAddress" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>安装地址详情：</p>
+                        <span v-if="editorshow">{{list.entity.installAddressDetail}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.installAddressDetail" :placeholder="list.entity.installAddressDetail" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>端口数量：</p>
+                        <span v-if="editorshow">{{list.entity.lanNum}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.lanNum" :placeholder="list.entity.lanNum" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>纬度：</p>
+                        <span v-if="editorshow">{{list.entity.latitude}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>经度：</p>
+                        <span v-if="editorshow">{{list.entity.longitude}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>MAC地址：</p>
+                        <span v-if="editorshow">{{list.entity.mac}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.mac" :placeholder="list.entity.mac" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>责任人：</p>
+                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>责任人联系方式：</p>
+                        <span v-if="editorshow">{{list.entity.maintenanceUserPhone}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUserPhone" :placeholder="list.entity.maintenanceUserPhone" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>负责单位：</p>
+                        <span v-if="editorshow">{{list.entity.managementUnit}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.managementUnit" :placeholder="list.entity.managementUnit" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>负责单位电话：</p>
+                        <span v-if="editorshow">{{list.entity.managementUnitPhone}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.managementUnitPhone" :placeholder="list.entity.managementUnitPhone" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>设备厂商：</p>
+                        <span v-if="editorshow">{{list.entity.manufacturer}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.manufacturer" :placeholder="list.entity.manufacturer" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
+                        <p>电源类型：</p>
+                        <span v-if="editorshow">{{list.entity.teminalType}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.teminalType" :placeholder="list.entity.teminalType" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <!-- <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:45%"  @click="editorshow = false" v-if="editorshow">编辑</button>
+                      <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;bottom:10px;left:40%"   v-if="!editorshow" @click="backeditor(index)">返回</button>
+                       <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:60%"   v-if="!editorshow" @click="saveeditor(list)">保存</button> -->
+                  </div>
                   <div class="detail-title" style="margin-top:10px;" v-if="list.deviceType == '摄像机'">
                     <img src="../../public/img/position.png"/>
                     <p >位置属性</p>
@@ -1180,40 +1358,52 @@
                   <div class="content" style="border:none;" v-if="list.deviceType == '摄像机'">
                       <div style="min-width:30%">
                         <p>经度：</p>
-                        <span>{{list.entity.longitude}}</span>
+                        <span v-if="editorshow">{{list.entity.longitude}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>纬度：</p>
-                        <span>{{list.entity.latitude}}</span>
+                        <span v-if="editorshow">{{list.entity.latitude}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>管理单位：</p>
-                        <span>{{list.entity.managementUnit}}</span>
+                        <span v-if="editorshow">{{list.entity.managementUnit}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.managementUnit" :placeholder="list.entity.managementUnit" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>是否上报：</p>
-                        <span>{{list.entity.isReport?"否":"是"}}</span>
+                        <span v-if="editorshow">{{list.entity.isReport?"否":"是"}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.isReport" :placeholder="list.entity.isReport" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>所属辖区公安机关：</p>
-                        <span>{{list.entity.deptId}}</span>
+                        <span v-if="editorshow">{{list.entity.deptId}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.deptId" :placeholder="list.entity.deptId" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
                         <p>管理单位联系方式：</p>
-                        <span>{{list.entity.managementPhone}}</span>
+                        <span v-if="editorshow">{{list.entity.managementPhone}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.managementPhone" :placeholder="list.entity.managementPhone" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:100%">
                         <p>摄像机功能类型：</p>
-                        <span>{{list.entity.cameraFunctionType}}</span>
+                        <span v-if="editorshow">{{list.entity.cameraFunctionType}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.cameraFunctionType" :placeholder="list.entity.cameraFunctionType" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:100%">
                         <p>摄像机位置类型：</p>
-                        <span>{{list.entity.cameraPositionType}}</span>
+                        <span v-if="editorshow">{{list.entity.cameraPositionType}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.cameraPositionType" :placeholder="list.entity.cameraPositionType" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:100%">
                         <p>所属部门行业：</p>
-                        <span>{{list.entity.industry}}</span>
+                        <span v-if="editorshow">{{list.entity.industry}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.industry" :placeholder="list.entity.industry" style="width: 160px;margin-top: 0" />
                       </div>
+                      <!-- <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:45%"  @click="editorshow = false" v-if="editorshow">编辑</button>
+                      <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;bottom:10px;left:40%"   v-if="!editorshow" @click="backeditor(index)">返回</button>
+                       <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:60%"   v-if="!editorshow" @click="saveeditor(list)">保存</button> -->
                   </div>
 
 
@@ -1434,6 +1624,39 @@
                  <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="backtowork(formlists)">退回</button>
                 <button   class="zhuanyixukes closebtn" @click.stop="closedetail">关闭</button>
             </div>
+
+
+            <div class="reportbox" style="width: 1000px;padding: 0 20px;padding-bottom: 20px;right: 10px;" v-if="wgeachrtsshow">
+             <div class="detail-title" style="margin-top:0;">
+                  <img src="../../public/img/23.png"/>
+                  <p>事件分析</p>
+                  <img src="../../public/img/xxx.png" @click.stop="closerebigmind" style="float:right;margin-top: 5px;margin-left: 843px;"/>
+             </div>
+             <div style="display:flex" >
+                  <div style="width: 450px;height: 250px;" id="myCharts">
+
+                  </div>
+                  <div id="myChart" style="width: 450px;height: 250px;margin-left:20px" ></div>
+             </div>
+           
+              <div  class="tablechangebox" v-if="this.dataone != []" style="margin-left:20px">
+                    <i-table border :columns="columns1" :data="dataone" width="447"></i-table>
+                    <p v-if="this.dataone.length > 0">分析建议：<span>{{dataone[0].description}}</span></p>
+              </div>
+      
+ 
+
+                <div style="position:relative" >
+                  <p class="roadstatus">路口状况</p>
+                  <ArcgisMapsmall :propsname='data2' v-if="data2 != ''"/>
+                  
+                  <div  class="tablechangebox tablemoal" style="margin-left:20px">
+                    <i-table border :columns="columns2" :data="data2" width="607"></i-table>
+                    <p>分析建议：<span>{{datades.description}}</span></p>
+                  </div>
+                </div>
+                <p class="epilog" >结论分析：<span>{{datades.finalDescription}}</span></p>
+            </div>
 </div>
 </template>
 <script>
@@ -1449,6 +1672,13 @@ export default {
   },
   data() {
     return {
+      datades:{},
+      wgeachrtsshow:false,
+      descriptiondata:[],
+      worktype:[],
+      onetypelistlan:'',
+      polenum:'',
+      editorshow:true,
       devicestate:{},
       timeslist:{},
       bigrightshow2:false,
@@ -1582,7 +1812,7 @@ export default {
                           },params.row.deviceIp)
                         }
                   },
-                  {title: 'MAC地址',key: 'deviceMac',width: 107},
+                  // {title: 'MAC地址',key: 'deviceMac',width: 107},
                   {title: '线杆编号',key: 'poleNo',width:80},
                   {title: '安装地址',key: 'deviceInstallAddress'},
                   {title: '故障描述',key: 'detail'},
@@ -1606,9 +1836,9 @@ export default {
                           },tmpStr)
                         }
                   },
-                  {title: '反馈人',key: 'feedbackPerson',width:80,},
-                  {title: '反馈时间',key: 'feedbackTime',width:140,},
-                  {title: '承诺解决时间',key: 'promiseResolveTime',width:100,},
+                  // {title: '反馈人',key: 'feedbackPerson',width:80,},
+                  // {title: '反馈时间',key: 'feedbackTime',width:140,},
+                  // {title: '承诺解决时间',key: 'promiseResolveTime',width:100,},
                   {title: '工单状态',key: 'processStatus',width:80,
                    render:(h,params)=>{
                           // let tmpStr = "";
@@ -1928,7 +2158,7 @@ export default {
     },
     checkicons(ip, imgcheck, status) {
       this.timelinelists.forEach(el => {
-        if (el.gatewayIp == ip ||el.ipAddr == ip) {
+        if (el.id == ip ) {
           (el.nono = true), (el.isAlert = 5);
         }
       });
@@ -1942,7 +2172,7 @@ export default {
     },
     checknonos(ip) {
       this.timelinelists.forEach(el => {
-        if (el.gatewayIp == ip||el.ipAddr == ip) {
+        if (el.id == ip) {
           (el.nono = false), (el.isAlert = 4);
         }
       });
@@ -2151,7 +2381,10 @@ export default {
     
           },err=>{});
 
-
+          //安全事件信息
+          this.$http.get("alert/warning/getDeviceInfo",{gateId:data,level:3,requestModular:1},res=>{
+              this.descriptiondata = res.data[0].description
+          },err=>{});
           //图表加载插口
            this.$http.get("res/resState/getLanDeviceType?",{gatewayId:data},res=>{
              this.LANshow = true
@@ -2179,7 +2412,7 @@ export default {
               }
           },err=>{});
 
-
+       
 
           //当前工单
            this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:data,workType:'运维事件'},res=>{
@@ -2202,6 +2435,21 @@ export default {
           //通讯状况表
           this.$http.get("gis/gis/getGatewayState?",{gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
+          },err=>{});
+
+
+          //表格1
+          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.rightlist.gatewayIp},res=>{
+              this.dataone = res.data
+              this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
+          },err=>{});
+
+          //表格2
+          this.$http.get("gis/gis/getCrossGatewayByIp?",{gatewayIp:this.rightlist.gatewayIp},res=>{
+              this.data2 = res.data.gateMapList
+              this.datades = res.data
+              this.data2.forEach (el=>{ if(el.isOnline == 1) { el.isOnline = '在线' }else{el.isOnline = '离线'}})
+              // console.log(this.data2)
           },err=>{});
 
       },err=>{});
@@ -2231,7 +2479,7 @@ export default {
       this.getwayip = data
       this.typeone = true
       var cc=document.getElementsByClassName("bigright")[0];
-      cc.style.cssText="z-index:9999";
+      cc.style.cssText="z-index:100";
        this.$http.get("gis/gis/getGatewayById?",{gatewayId:data},res=>{
           this.rightlist = res.data
           //右侧状态数据
@@ -2245,7 +2493,10 @@ export default {
              this.devicetype = res.data
           },err=>{});
 
-
+          //安全事件信息
+          this.$http.get("alert/warning/getDeviceInfo",{gateId:data,level:3,requestModular:1},res=>{
+              this.descriptiondata = res.data[0].description
+          },err=>{});
          //发送工单按钮显示隐藏
           this.$http.get("res/socGateway/getForWorkflow?",{gatewayId:data,workType:'运维事件',requestModular:2},res=>{
             if(res.data.alertId.length > 0){
@@ -2270,12 +2521,13 @@ export default {
           //表格1
           this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.rightlist.gatewayIp},res=>{
               this.dataone = res.data
-              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+              this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
 
           //表格2
           this.$http.get("gis/gis/getCrossGatewayByIp?",{gatewayIp:this.rightlist.gatewayIp},res=>{
-              this.data2 = res.data
+              this.data2 = res.data.gateMapList
+              this.datades = res.data
               this.data2.forEach (el=>{ if(el.isOnline == 1) { el.isOnline = '在线' }else{el.isOnline = '离线'}})
               // console.log(this.data2)
           },err=>{});
@@ -2368,7 +2620,7 @@ export default {
       //表格1
           this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.rightlist.gatewayIp},res=>{
               this.dataone = res.data
-              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+              this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
     },
     checklansix(){
@@ -2407,7 +2659,7 @@ export default {
           //表格1
           this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN6.deviceIp},res=>{
               this.dataone = res.data
-              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+              this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
           
           //当前工单
@@ -2475,7 +2727,7 @@ export default {
           //表格1
           this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN5.deviceIp},res=>{
               this.dataone = res.data
-              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+              this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
           //当前工单
            this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN5',workType:'运维事件'},res=>{
@@ -2541,7 +2793,7 @@ export default {
           //表格1
           this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN4.deviceIp},res=>{
               this.dataone = res.data
-              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+              this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
           //当前工单
            this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN4',workType:'运维事件'},res=>{
@@ -2607,7 +2859,7 @@ export default {
           //表格1
           this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN3.deviceIp},res=>{
               this.dataone = res.data
-              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+              this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
           //当前工单
            this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN3',workType:'运维事件'},res=>{
@@ -2675,7 +2927,7 @@ export default {
           //表格1
           this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN2.deviceIp},res=>{
               this.dataone = res.data
-              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+              this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
           //当前工单
            this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN2',workType:'运维事件'},res=>{
@@ -2741,7 +2993,7 @@ export default {
           //表格1
           this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN1.deviceIp},res=>{
               this.dataone = res.data
-              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+              this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
            //当前工单
            this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN1',workType:'运维事件'},res=>{
@@ -2807,7 +3059,7 @@ export default {
           //表格1
           this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN7.deviceIp},res=>{
               this.dataone = res.data
-              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+              this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
           //当前工单
            this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN7',workType:'运维事件'},res=>{
@@ -2872,7 +3124,7 @@ export default {
           //表格1
           this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN8.deviceIp},res=>{
               this.dataone = res.data
-              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+              this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
           //当前工单
            this.$http.get("workflow/workflow/findFormListCurrent?",{gatewayId:this.msgtypelist.gatewayId,lan:'LAN8',workType:'运维事件'},res=>{
@@ -3076,6 +3328,8 @@ export default {
       },err=>{});
     },
     checkdevicelist(num){
+        this.onetypelistlan = ''
+        this.polenum = num
         this.workdetailshow = true
         this.$refs.bright.style.overflow = "hidden"
         this.$http.get("res/pole/getPoleDeviceByNo?",{poleNo:num},res=>{
@@ -3156,6 +3410,8 @@ export default {
           },err=>{});
     },
     onetypelist(poleNos,lan){
+      this.polenum = poleNos
+      this.onetypelistlan = lan
       this.workdetailshow = true
       this.$refs.bright.style.overflow = "hidden"
       this.$http.get("res/pole/getPoleDeviceByNo?",{poleNo:poleNos,portName:lan},res=>{
@@ -3169,8 +3425,9 @@ export default {
       this.tabletime = ''
       this.changetimedata = ''
       this.statusdata = false
+      this.worktype = []
        if(i == 1){
-         this.$http.get("/workflow/workflow/findFormListCurrent",{workType:'运维事件'},res=>{
+         this.$http.get("/workflow/workflow/findFormListCurrent",{workType:this.worktype},res=>{
            if(res.data.form){
              this.data1 = res.data.form
              this.totals = res.data.total
@@ -3182,7 +3439,7 @@ export default {
           },err=>{});
          this.statustable = true
        }else if(i == 2){
-         this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'feedback',workType:'运维事件'},res=>{
+         this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'feedback',workType:this.worktype},res=>{
            if(res.data.form){
              this.data1 = res.data.form
              this.totals = res.data.total
@@ -3194,7 +3451,7 @@ export default {
           },err=>{});
          this.statustable = true
        }else if(i == 3){
-         this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'detail',workType:'运维事件'},res=>{
+         this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'detail',workType:this.worktype},res=>{
            if(res.data.form){
              this.data1 = res.data.form
              this.totals = res.data.total
@@ -3210,7 +3467,7 @@ export default {
     //表格分页
     changeliebiaopage(i){
         if(this.totalstype == ''){
-          this.$http.get("/workflow/workflow/findFormListCurrent",{pageNum:i,workType:'运维事件'},res=>{
+          this.$http.get("/workflow/workflow/findFormListCurrent",{pageNum:i,workType:this.worktype},res=>{
             if(res.data){
               this.data1 = res.data.form
               this.totals = res.data.total
@@ -3218,7 +3475,7 @@ export default {
             },err=>{});
           this.statustable = true
         }else if(this.totalstype == 'feedback'){
-          this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'feedback',pageNum:i,workType:'运维事件'},res=>{
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'feedback',pageNum:i,workType:this.worktype},res=>{
            if(res.data){
              this.data1 = res.data.form
              this.totals = res.data.total
@@ -3226,7 +3483,7 @@ export default {
           },err=>{});
          this.statustable = true
         }else if(this.totalstype == 'detail'){
-          this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'detail',pageNum:i,workType:'运维事件'},res=>{
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'detail',pageNum:i,workType:this.worktype},res=>{
            if(res.data){
              this.data1 = res.data.form
              this.totals = res.data.total
@@ -3243,7 +3500,7 @@ export default {
     //表格上的搜索
     serachtable(){
       if(this.totalstype == ''){
-          this.$http.get("/workflow/workflow/findFormListCurrent",{interval:this.changetimedata,param:this.valuetable,workType:'运维事件'},res=>{
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interval:this.changetimedata,param:this.valuetable,workType:this.worktype},res=>{
             if(res.data.form){
                this.data1 = res.data.form
                this.totals = res.data.total
@@ -3253,7 +3510,7 @@ export default {
             }
           },err=>{});
         }else if(this.totalstype == 'feedback'){
-          this.$http.get("/workflow/workflow/findFormListCurrent",{interval:this.changetimedata,param:this.valuetable,interactive:'feedback',workType:'运维事件'},res=>{
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interval:this.changetimedata,param:this.valuetable,interactive:'feedback',workType:this.worktype},res=>{
             if(res.data.form){
                this.data1 = res.data.form
                this.totals = res.data.total
@@ -3263,7 +3520,7 @@ export default {
             }
           },err=>{});
         }else if(this.totalstype == 'detail'){
-          this.$http.get("/workflow/workflow/findFormListCurrent",{interval:this.changetimedata,param:this.valuetable,interactive:'detail',workType:'运维事件'},res=>{
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interval:this.changetimedata,param:this.valuetable,interactive:'detail',workType:this.worktype},res=>{
            if(res.data.form){
                this.data1 = res.data.form
                this.totals = res.data.total
@@ -3279,8 +3536,9 @@ export default {
       this.valuetable = ''
       this.tabletime = ''
       this.changetimedata = ''
+      this.worktype = []
       if(this.totalstype == ''){
-          this.$http.get("/workflow/workflow/findFormListCurrent",{workType:'运维事件'},res=>{
+          this.$http.get("/workflow/workflow/findFormListCurrent",{workType:this.worktype},res=>{
             if(res.data.form){
               this.data1 = res.data.form
               this.totals = res.data.total
@@ -3291,7 +3549,7 @@ export default {
             },err=>{});
           this.statustable = true
         }else if(this.totalstype == 'feedback'){
-          this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'feedback',workType:'运维事件'},res=>{
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'feedback',workType:this.worktype},res=>{
            if(res.data.form){
              this.data1 = res.data.form
              this.totals = res.data.total
@@ -3302,7 +3560,7 @@ export default {
           },err=>{});
          this.statustable = true
         }else if(this.totalstype == 'detail'){
-          this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'detail',workType:'运维事件'},res=>{
+          this.$http.get("/workflow/workflow/findFormListCurrent",{interactive:'detail',workType:this.worktype},res=>{
            if(res.data.form){
              this.data1 = res.data.form
              this.totals = res.data.total
@@ -3353,6 +3611,7 @@ export default {
       this.statustable = false
        this.repoetshow = false
        this.repoetmapshow = false
+       this.wgeachrtsshow = false
        this.reportlist = []
     },
     //分析报告弹窗
@@ -3389,7 +3648,7 @@ export default {
           //表格1
           this.$http.get("gis/gis/getDevicePing?",{ipAddress:list.ipAddr},res=>{
               this.dataone = res.data
-              this.dataone.forEach (el=>{ if(el.status == 0) { el.status = '通' }else{el.status = '不通'}})
+              this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
       }     
     },
@@ -4104,6 +4363,22 @@ export default {
                 },
             ]
          })
+    },
+    see(){
+      this.wgeachrtsshow = true
+      //通讯状况表
+          this.$http.get("gis/gis/getGatewayState?",{gatewayId:this.olddata},res=>{
+              this.drawLines(res.data.gatewayState)
+          },err=>{});
+    },
+    saveeditor(list){
+      console.log(list)
+    },
+    backeditor(index){
+      this.$http.get("res/pole/getPoleDeviceByNo?",{poleNo:this.polenum,portName:this.onetypelistlan},res=>{
+               this.workdetaillist = res.data
+          },err=>{});
+      this.editorshow = true
     }
   }
 };
@@ -4112,13 +4387,13 @@ export default {
 .rightdialog {
   width: 260px;
   height: 340px;
-  background: rgba(0, 0, 0, 0.4);
+  background: url(../../public/img/zzz.png) no-repeat center center/100% 100%;
   position: fixed;
   right: 0;
   top: 60px;
   z-index: 18;
   padding: 30px;
-  border: 1px solid #13C7D9;
+  border: 2px solid #13C7D9;
 }
 .rightdialog div {
   font-size: 15px;
@@ -4147,9 +4422,9 @@ export default {
   min-height: 65%;
   position: absolute;
   top: 150px;
-  left: 0;
+  /* left: 0; */
   right: 0;
-  margin: 0 auto;
+  /* margin: 0 auto; */
   box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
   z-index: 20;
 }
@@ -4171,7 +4446,8 @@ export default {
 }
 .timelinebox {
   padding: 20px;
-  height: calc(100% - 74px);
+  /* height: calc(100% - 74px); */
+  height: 540px;
   overflow: auto;
   padding-left: 150px;
 }
@@ -4210,7 +4486,7 @@ export default {
 }
 
 .bigright{
-  min-width: 1000px;
+  min-width: 1100px;
   width: 62%;
   height: 100%;
   background:#fff;

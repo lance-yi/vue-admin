@@ -548,7 +548,7 @@
       position: absolute;
       right: 3%;
       top: 220px;
-      width: 20%;
+      width: 335px;
       height: 50%;
       box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
       z-index: 22222;

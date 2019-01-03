@@ -185,6 +185,13 @@ export default {
                 })
               },err=>{
               })
+
+        //       map.on("click", function(ev) {
+        //         var lat = Math.round(ev.mapPoint.getLatitude() * 1000) / 1000;
+        //         var lon = Math.round(ev.mapPoint.getLongitude() * 1000) / 1000;
+        //         alert(lat+","+lon);
+        // });
+
              
         },
         createCircle(el) {

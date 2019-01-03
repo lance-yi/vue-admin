@@ -184,6 +184,8 @@ export default {
                 })
               },err=>{
               })
+
+              
              
         },
         createCircle(el) {

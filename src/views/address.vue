@@ -123,8 +123,8 @@
           <div class="content">
             <div>
               <p>原安装地址：{{movedata[1].oldAddress.installAddress}}</p>
-              <p>网关IP地址：{{movedata[1].oldAddress.installAddress}}</p>
-              <p>项目名称：{{movedata[1].oldAddress.installAddress}}</p>
+              <p>网关IP地址：{{movedata[1].oldAddress.gatewayIp}}</p>
+              <p>项目名称：{{movedata[1].oldAddress.projectName}}</p>
             </div>
             <div>
               <p>原经度：{{movedata[1].oldAddress.longitude}}</p>
@@ -161,22 +161,30 @@
             </div>
           </div>
           <div class="content" v-if="rebuildType">
-            <div>
+            <div style="display:flex">
               <span>安装地址</span>&nbsp;&nbsp;&nbsp;
-              <i-input  v-model="installadd" placeholder="" style="width: 300px;margin-left: 10px;" ></i-input>
+               <Cascader :data="cityList" trigger="hover" v-model="installadd" style="width: 200px;margin-left: 10px;"></Cascader>
+               <i-input  v-model="installaddress" placeholder="" style="width: 300px;margin-left: 10px;" ></i-input>
             </div>
           </div>
-          <!-- <div class="content" v-if="rebuildType">
+          <!-- <div class="content" >
             <div>
               <span>网关IP地址</span>&nbsp;&nbsp;&nbsp;
               <i-input  v-model="gatewayip" placeholder="" style="width: 300px" ></i-input>
             </div>
           </div> -->
-          <div class="content">
+          <div class="content" >
+            <div>
+              <span>施工单位</span>&nbsp;&nbsp;&nbsp;
+              <i-input  v-model="company" placeholder="" style="width: 300px;margin-left: 10px;margin-bottom: 10px;" ></i-input>
+            </div>
+          </div>
+          <div class="content" v-if="rebuildType">
             <div style="margin-left:20px;margin-bottom:40px">
-              <span style="font-size:14px;width:210px;display: inline-block">经度：12.1111111</span>
-              <span style="font-size:14px;">纬度：12.1111111</span>&nbsp;&nbsp;<img src="../../public/img/97.png" style="vertical-align: middle;padding-bottom: 1px;"/>
-              <div class="zhuanyixukes" style="width:50px;display:inline-block;margin-left:30px" >切换</div>
+              <span style="font-size:14px;width:210px;display: inline-block">经度：{{lonnum}}</span>
+              <span style="font-size:14px;">纬度：{{latnum}}</span>&nbsp;&nbsp;
+              <!-- <img src="../../public/img/97.png" style="vertical-align: middle;padding-bottom: 1px;"/> -->
+              <div class="zhuanyixukes" style="width:50px;display:inline-block;margin-left:30px" @click="jwmap">切换</div>
             </div>
           </div>
            <div class="zhuanyixukes" style="width: 90px;margin: 0 auto;" @click="allowmove">确认迁移</div>
@@ -249,8 +257,11 @@
           </div>
         </div>      
       </div>
-      
-
+       <div v-if="jwshow" style="position:absolute;top:30%;left: 50%;z-index: 5555;" @click.stop="jwshow = true">
+         <img src="../../public/img/xxx.png" @click.stop="jwshow = false" style="position:absolute;top:5%;left: 95%;z-index: 5556;"/>
+          <ArcgisMapsaddresjw  @lats='lats' @lons='lons'/>
+       </div>
+       
       <!-- 点位详情 -->
       <Modal v-model="modal2" width="450" id="addressdetail">
         <p slot="header" style="height:40px;padding:10px 0px 10px 10px">
@@ -281,20 +292,29 @@
         </div>
     </Modal>
   </div>
-      
+     
 </template>
 <script>
 import ArcgisMapsaddress from "@/components/ArcgisMapsaddress";
 import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
+import ArcgisMapsaddresjw from "@/components/ArcgisMapsaddresjw";
+import city from "../../src/util/city.js";
   export default {
     name: 'address-v',
     components: {
         ArcgisMapsaddress,
-        ArcgisMapsaddressmall
+        ArcgisMapsaddressmall,
+        ArcgisMapsaddresjw
     },
     data () {
       return {
+        installaddress:'',
+        cityList:city,
+        latnum:'',
+        lonnum:'',
+        jwshow:false,
         gatewayip:'',
+        company:'',
         placePosition:'',
         constructionUnit:'',
         detaildata:[],
@@ -303,7 +323,7 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
         contraillist:[],
         contrail:false,
         removecheck:false,
-        installadd:'',
+        installadd:[],
         animal: '异地迁改',
         datalist:[],
         detecheck:false,
@@ -642,9 +662,11 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
       },
       //点位迁移
       addressmove(id){
+            this.latnum = ''
+            this.lonnum = ''
             this.animal='异地迁改'
             this.rebuildType = true
-            this.installadd = ''
+            this.installadd = []
             this.$http.get('res/ponitMove/selectPonitInfo?id='+id,{},res=>{
               this.movedata = res.data
               this.detecheck = true
@@ -653,7 +675,9 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
       changelabel(name){
         if(name == '原地迁改'){
            this.rebuildType = false
-           this.installadd = ''
+           this.installadd = []
+            this.latnum = ''
+            this.lonnum = ''
         }else{
           this.rebuildType = true
         }
@@ -663,13 +687,27 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
         var aa = false
           if(this.animal == '原地迁改'){
             var nn = 0
-            this.installadd = ''
-            var aa = true
-            // this.gatewayip = ''
+            this.installadd = []
+            this.installaddress = ''
+            this.latnum = ''
+            this.lonnum = ''
+            if(this.company == ''){
+              var aa = false
+              this.$Message.error('请填写施工单位');
+            }else{
+              var aa = true
+            }
           }else{
             var nn = 1
-            if(this.installadd == ''){
+            if(this.installadd.length == 0||this.installaddress == ''){
               var aa = false
+              this.$Message.error('请填写安装地址');
+            }else if(this.latnum == ''){
+              var aa = false
+              this.$Message.error('请选择经纬度');
+            }else if(this.company == ''){
+              var aa = false
+              this.$Message.error('请填写施工单位');
             }else{
               var aa = true
             }
@@ -677,10 +715,13 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
           if( aa == true){
             this.$http.post('res/ponitMove/ponintMove',{
             "rebuildType":nn,
-            // "gatewayIp":this.gatewayip,
-            "installAddress":this.installadd,
+            areaName:this.installadd,
+            "constructionUnit":this.company,
+            "installAddress":this.installaddress,
             "resId":this.movedata[0].placePosition.resId,
             "id":this.movedata[0].placePosition.id,
+            "latitude":this.latnum,
+            "longitude":this.lonnum
           },res=>{
                this.$Message.success(res.message);
                this.detecheck = false
@@ -690,8 +731,6 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
               this.serachtable()
 
             },err=>{});
-          }else{
-             this.$Message.error('请填写安装地址');
           }
           
       },
@@ -701,6 +740,17 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
             },err=>{});
         this.modal2 = true
         
+      },
+      jwmap(){
+        this.jwshow = true
+      },
+      lats(data){
+        // console.log(data)
+        this.latnum = data
+      },
+      lons(data){
+        // console.log(data)
+        this.lonnum = data
       }
     },
   }
@@ -731,13 +781,13 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
     .rightdialog {
       width: 220px;
       height: 270px;
-      background: rgba(0, 0, 0, 0.4);
+      background: url(../../public/img/zzz.png) no-repeat center center/100% 100%;
       position: fixed;
       right: 0;
       top: 60px;
       z-index: 18;
       padding: 30px;
-      border: 1px solid #13C7D9;
+      border: 2px solid #13C7D9;
     }
     .rightdialog div {
       font-size: 15px;
@@ -764,9 +814,9 @@ import ArcgisMapsaddressmall from "@/components/ArcgisMapsaddressmall";
       background: #fff;
       position: absolute;
       top: 15%;
-      left: 0%;
+      /* left: 0%; */
       right: 0%;
-      margin: 0 auto;
+      /* margin: 0 auto; */
       box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
       z-index: 30;
       padding-bottom:20px;
