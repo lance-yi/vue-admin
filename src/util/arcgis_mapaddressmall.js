@@ -103,7 +103,7 @@ export default {
                 "esri/symbols/SimpleMarkerSymbol",
                 "esri/geometry/Polyline",
                 "esri/symbols/SimpleLineSymbol",
-                "esri/Color"
+                "esri/Color",
             ], {
                 // url: 'https://js.arcgis.com/3.22/',
             }).then(this.TDTinstance)

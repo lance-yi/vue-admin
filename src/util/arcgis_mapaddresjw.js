@@ -77,7 +77,8 @@ export default {
                 "esri/symbols/SimpleMarkerSymbol",
                 "esri/geometry/Polyline",
                 "esri/symbols/SimpleLineSymbol",
-                "esri/Color"
+                "esri/Color",
+                "esri/dijit/Search",
             ], {
                 // url: 'https://js.arcgis.com/3.22/',
             }).then(this.TDTinstance)
@@ -99,7 +100,8 @@ export default {
                 SimpleMarkerSymbol,
                 Polyline,
                 SimpleLineSymbol,
-                Color
+                Color,
+                Search
             ]
         ) {
             dojo.declare('TDT', TiledMapServiceLayer, {
@@ -136,7 +138,8 @@ export default {
                 SimpleMarkerSymbol,
                 Polyline,
                 SimpleLineSymbol,
-                Color
+                Color,
+                Search
             };
         },
         initMap(obj) {
@@ -156,6 +159,17 @@ export default {
                 var div = document.getElementById("mapjw_zoom_slider").style;
                 div.visibility = "collapse";
              }, 200);
+             
+if(dijit.byId("search")){
+    dijit.byId("search").destroy();
+}
+             setTimeout(() => {
+                var s = new obj.Search({
+                    map: map
+                  },"search");
+             }, 200);
+             //搜索框
+             
             
                   map.on("click", function(ev) {
                 var lat = Math.round(ev.mapPoint.getLatitude() * 1000) / 1000;
@@ -163,7 +177,13 @@ export default {
                 // alert(lat+","+lon);
                 that.$emit('lats',lat)
                 that.$emit('lons',lon)
+
+
+                
         });
+
+
+       
             
              
         },

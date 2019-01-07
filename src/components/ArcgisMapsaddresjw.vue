@@ -1,5 +1,6 @@
 <template>
     <div id = "mapjw" class = "mapjw">
+        <div id="search" style="width:300px;height:50px"></div>
     </div>
 </template>
 
@@ -17,5 +18,7 @@ export default initArcgis;
         margin-top: 10px;
         border: 1px solid #C9C9C9;
         /* background: url("../assets/start.gif") no-repeat center; */
+        background: #fff;
+        z-index:555;
     }
 </style>

@@ -290,20 +290,17 @@ import ArcgisMapbig from "@/components/ArcgisMapbig";
               toolbox: {
                   show: false,
               },
-            //   visualMap: {
-            //       min: 800,
-            //       max: 50000,
-            //       text:['High','Low'],
-            //       realtime: false,
-            //       calculable: true,
-            //       bottom:50,
-            //       textStyle:{
-            //           color:"#00eaff"
-            //       },
-            //       inRange: {
-            //           color: ['lightskyblue','yellow', 'orangered']
-            //       }
-            //   },
+        //    visualMap: {
+        //         min: 50,
+        //         max: 500,
+        //         splitNumber: 1,
+        //         inRange: {
+        //             color: ['#d94e5d','#eac736'].reverse()
+        //         },
+        //         textStyle: {
+        //             color: '#fff'
+        //         }
+        //     },
               series: [
                   {
                       name: '重点人员在汉活动情况',

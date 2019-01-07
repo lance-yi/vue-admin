@@ -83,7 +83,7 @@
                   <p style="top:185px">网关IP地址：{{list.res[0].gatewayIp}}</p>
               </div>
               <div style="position:relative;margin: 0 30px 0 20px">
-                   <p v-if="list.res[1].state == 1" style="top:-15px" class="linebox">类型：迁改</p>
+                   <p v-if="list.res[1].state == 1" style="top:-15px" class="linebox">类型：{{list.res[1].buildTypeName}}</p>
                    <p v-if="list.res[1].state == -1" style="top:-15px" class="linebox">类型：拆除</p>
                    <p style="top:10px" class="linebox">施工单位：{{list.res[1].constructionUnit}}</p>
                    <p style="top:30px" class="linebox">时间：{{list.res[1].createTime}}</p>
@@ -93,7 +93,7 @@
                   <p style="top:127px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:200px" :title="list.res[1].placementPosition">放置地址：{{list.res[1].placementPosition}}</p>
               </div>
               <div style="position:relative;margin: 0 30px 0 20px" v-if="list.res[2]">
-                   <p v-if="list.res[2].state == 1" class="linebox" style="top:-15px">类型：迁改</p>
+                   <p v-if="list.res[2].state == 1" class="linebox" style="top:-15px">类型：{{list.res[2].buildTypeName}}</p>
                    <p v-if="list.res[2].state == -1" class="linebox" style="top:-15px">类型：拆除</p>
                    <p class="linebox" style="top:10px">施工单位：{{list.res[2].constructionUnit}}</p>
                    <p class="linebox" style="top:30px">时间：{{list.res[2].createTime}}</p>
@@ -117,7 +117,7 @@
 
 
       <!-- 点位迁移 -->
-       <div class="deteleaddbox" v-if="detecheck" @click.stop="detebox" style="z-index:3334" >
+       <div class="deteleaddbox" v-if="detecheck" @click.stop="detebox" style="z-index:500" >
           <p style="font-size:14px;border-bottom:1px solid #C9C9C9;padding-bottom:10px;position:relative">点位迁移<img src="../../public/img/xxx.png" style="position:absolute;right:0;top:5px" @click.stop="detecheck = false"/></p>
           <p style="text-align:left;font-size:14px;padding-top:10px;"><img src="../../public/img/101.png" style="width:17px;height:20px;vertical-align:middle"/> 原址</p>
           <div class="content">
@@ -233,7 +233,7 @@
                   <p style="top:185px">网关IP地址：{{list.res[0].gatewayIp}}</p>
               </div>
               <div style="position:relative;margin: 0 30px 0 20px">
-                   <p v-if="list.res[1].state == 1" style="top:-15px" class="linebox">类型：迁改</p>
+                   <p v-if="list.res[1].state == 1" style="top:-15px" class="linebox">类型：{{list.res[1].buildTypeName}}</p>
                    <p v-if="list.res[1].state == -1" style="top:-15px" class="linebox">类型：拆除</p>
                    <p style="top:10px" class="linebox">施工单位：{{list.res[1].constructionUnit}}</p>
                    <p style="top:30px" class="linebox">时间：{{list.res[1].createTime}}</p>
@@ -243,7 +243,7 @@
                   <p style="top:127px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:200px">放置地址：{{list.res[1].placementPosition}}</p>
               </div>
               <div style="position:relative;margin: 0 30px 0 20px" v-if="list.res[2]">
-                   <p v-if="list.res[2].state == 1" class="linebox" style="top:-15px">类型：迁改</p>
+                   <p v-if="list.res[2].state == 1" class="linebox" style="top:-15px">类型：{{list.res[2].buildTypeName}}</p>
                    <p v-if="list.res[2].state == -1" class="linebox" style="top:-15px">类型：拆除</p>
                    <p class="linebox" style="top:10px">施工单位：{{list.res[2].constructionUnit}}</p>
                    <p class="linebox" style="top:30px">时间：{{list.res[2].createTime}}</p>
@@ -257,8 +257,8 @@
           </div>
         </div>      
       </div>
-       <div v-if="jwshow" style="position:absolute;top:30%;left: 50%;z-index: 5555;" @click.stop="jwshow = true">
-         <img src="../../public/img/xxx.png" @click.stop="jwshow = false" style="position:absolute;top:5%;left: 95%;z-index: 5556;"/>
+       <div v-if="jwshow" style="position:absolute;top:30%;left: 50%;z-index: 555;" @click.stop="jwshow = true">
+         <img src="../../public/img/xxx.png" @click.stop="jwshow = false" style="position:absolute;top:5%;left: 95%;z-index: 555;"/>
           <ArcgisMapsaddresjw  @lats='lats' @lons='lons'/>
        </div>
        
@@ -904,7 +904,7 @@ import city from "../../src/util/city.js";
       background:#fff;
       padding: 10px 20px 20px 20px;
       width:50%;
-      z-index:3333;
+      z-index:500;
       box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
     }
     .content{

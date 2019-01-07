@@ -92,7 +92,7 @@
                      <!-- <p  v-if="list.description.length == 0" style="margin-top:10px">故障描述：
                                  <a  class="brspans" @click.stop="ips(list.id)" >无故障</a>
                         </p> -->
-                    <div v-if="list.description.length > 0">
+                    <div v-if="list.description">
                       <div v-for="(aa,index) in list.description" :key="index" style="margin-top: 15px;">
                           <div class="timelinecont" >
                             <p style="min-width:230px">告警类型：<span>{{aa.alertName}}</span></p>
@@ -317,7 +317,7 @@
 
 <transition name="fade">
         <div class="bigright" v-show="bigrightshow" transiton="fade"  @click.stop="fun()">
-           <p class="detailpage" ><span style="color:#1D60FE">详情页面</span>&nbsp;&nbsp;&nbsp;&nbsp;<span  @click.stop="smalltable">小屏秀</span></p>
+           <p class="detailpage" ><span style="color:#1D60FE">详情页面</span>&nbsp;&nbsp;&nbsp;&nbsp;<span  @click.stop="smalltable">网关运行状态总览</span></p>
            <img src="../../public/img/xxx.png" style="position:absolute;right:30px;top:20px"  @click.stop="closebright"/>
             <div class="detail-box" ref="bright">
                 <div class="detail-title">
@@ -489,7 +489,7 @@
                   <img src="../../public/img/66.png"/>
                   <p>信息栏</p>
             </div>
-            <div class="controls msgbox" v-if="wangguanshow">
+            <div class="controls msgbox" v-if="wangguanshow&&msglist.length > 0">
               <p style="min-width:180px">运行状态：
                 <span v-if="msglist.gatewayState==0" style="color:#FF5E5E">离线</span>
                 <span v-if="msglist.gatewayState==1" style="color:#1D60FE">在线</span>
@@ -844,8 +844,10 @@
 
             </Panel>
     </Collapse>
+            <div style="position:fixed;bottom:140px;left:50%">
             <button   class="zhuanyixukes" v-if="entersendwork" @click="aaaa">确认发送</button>
             <button   class="zhuanyixukes closebtn" @click="closedetails">关闭</button>
+            </div>
           </div>
 
 
@@ -853,7 +855,7 @@
 
              
  
-             <!-- 点击ip弹窗 -->
+             
             
 
 
@@ -880,422 +882,8 @@
           </Modal>
      </div>
        
-       <div class="workdetail" v-if="workdetailshow">
-              <Tabs active-key="0" @on-click="editorshow = true">
-                <Tab-pane :label="list.portName ?list.deviceType+'('+list.portName+')':list.deviceType" :key="index" v-for="(list,index) in workdetaillist">
-                  <div class="detail-title" style="margin-top:10px;">
-                    <img src="../../public/img/20.png"/>
-                    <p >基本信息</p>
-                  </div>
-                  <img src="../../public/img/xiaowg.png" style="position:absolute;top:-6px" v-if="list.deviceType == '安全网关'"/>
-                  <img src="../../public/img/dianzi.png" style="position:absolute;top:-6px" v-if="list.deviceType == '电子围栏'"/>
-                  <img src="../../public/img/wifi.png" style="position:absolute;top:-6px" v-if="list.deviceType == 'wifi嗅探'"/>
-                  <img src="../../public/img/shexiang.png" style="position:absolute;top:-6px" v-if="list.deviceType == '摄像机'"/>
-                  <img src="../../public/img/139.png" style="position:absolute;top:-6px" v-if="list.deviceType == '智能电源'"/>
-
-
-                  <div class="content" style="border:none;" v-if="list.deviceType == 'wifi嗅探' || list.deviceType == '电子围栏'">
-                    <div style="min-width:30%">
-                        <p>编码：</p>
-                        <span v-if="editorshow">{{list.entity.snCode}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.snCode" :placeholder="list.entity.snCode" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>品牌：</p>
-                        <span v-if="editorshow">{{list.entity.manufacturer}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.manufacturer" :placeholder="list.entity.manufacturer" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>安装位置：</p>
-                        <span v-if="editorshow">{{list.entity.installAddress}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.installAddress" :placeholder="list.entity.installAddress" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>维护人员：</p>
-                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>管理单位：</p>
-                        <span v-if="editorshow">{{list.entity.managementUnit}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.managementUnit" :placeholder="list.entity.managementUnit" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>IP地址：</p>
-                        <span v-if="editorshow">{{list.entity.ipAddress}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.ipAddress" :placeholder="list.entity.ipAddress" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>MAC地址：</p>
-                        <span v-if="editorshow">{{list.entity.mac}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.mac" :placeholder="list.entity.mac" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>附件：</p>
-                        <span style="border-bottom:1px solid #1D60FE;cursor:pointer;margin-right:20px" @click="download(down)" v-for="(down,index) in list.entity.enclosureUrl" :key="index">{{down}}</span>
-                      </div>
-                      <!-- <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:45%"  @click="editorshow = false" v-if="editorshow">编辑</button>
-                      <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;bottom:10px;left:40%"   v-if="!editorshow" @click="backeditor(index)">返回</button>
-                       <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:60%"   v-if="!editorshow" @click="saveeditor(list)">保存</button> -->
-                  </div>
-
-                  <div class="content" style="border:none;" v-if="list.deviceType == '安全网关'">
-                    <div style="min-width:30%">
-                        <p>中心端地址：</p>
-                        <span v-if="editorshow">{{list.entity.centPortAddress}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.centPortAddress" :placeholder="list.entity.centPortAddress" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>本机地址：</p>
-                        <span v-if="editorshow">{{list.entity.localAddress}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.localAddress" :placeholder="list.entity.localAddress" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>网关序列号：</p>
-                        <span v-if="editorshow">{{list.entity.snCode}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.snCode" :placeholder="list.entity.snCode" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>网关IP：</p>
-                        <span v-if="editorshow">{{list.entity.gatewayIp}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.gatewayIp" :placeholder="list.entity.gatewayIp" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>MAC地址：</p>
-                        <span v-if="editorshow">{{list.entity.mac}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.mac" :placeholder="list.entity.mac" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>经度：</p>
-                        <span v-if="editorshow">{{list.entity.longitude}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>纬度：</p>
-                        <span v-if="editorshow">{{list.entity.latitude}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>地址掩码：</p>
-                        <span v-if="editorshow">{{list.entity.addressMask}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.addressMask" :placeholder="list.entity.addressMask" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>安装地址：</p>
-                        <span v-if="editorshow">{{list.entity.installAddress}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.installAddress" :placeholder="list.entity.installAddress" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>管理单位：</p>
-                        <span v-if="editorshow">{{list.entity.managementUnit}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.managementUnit" :placeholder="list.entity.managementUnit" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>维护人员：</p>
-                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>网关名称：</p>
-                        <span v-if="editorshow">{{list.entity.gatewayName}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.gatewayName" :placeholder="list.entity.gatewayName" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>网关版本号：</p>
-                        <span v-if="editorshow">{{list.entity.gatewayVersion}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.gatewayVersion" :placeholder="list.entity.gatewayVersion" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>系统时间：</p>
-                        <span v-if="editorshow">{{list.entity.systemTime}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.systemTime" :placeholder="list.entity.systemTime" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>出场时间：</p>
-                        <span v-if="editorshow">{{list.entity.factoryTime}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.factoryTime" :placeholder="list.entity.factoryTime" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>设备厂商：</p>
-                        <span v-if="editorshow">{{list.entity.manufacturer}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.manufacturer" :placeholder="list.entity.manufacturer" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <!-- <div style="min-width:30%">
-                        <p>终端状态：</p>
-                        <span v-if="list.entity.gatewayStatus  == 0">异常</span>
-                        <span v-if="list.entity.gatewayStatus  == 1">正常</span>
-                      </div> -->
-                      <!-- <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:45%"  @click="editorshow = false" v-if="editorshow">编辑</button>
-                      <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;bottom:10px;left:40%"   v-if="!editorshow" @click="backeditor(index)">返回</button>
-                       <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:60%"   v-if="!editorshow" @click="saveeditor(list)">保存</button> -->
-                  </div>
-
-                  <div class="content" style="border:none;" v-if="list.deviceType == '智能电源'">
-                    <div style="min-width:30%">
-                        <p>子网掩码：</p>
-                        <span v-if="editorshow">{{list.entity.addressMask}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.addressMask" :placeholder="list.entity.addressMask" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>行政区域：</p>
-                        <span v-if="editorshow">{{list.entity.areaCode}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.areaCode" :placeholder="list.entity.areaCode" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>证书编号：</p>
-                        <span v-if="editorshow">{{list.entity.certNum}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.certNum" :placeholder="list.entity.certNum" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <!-- <div style="min-width:30%">
-                        <p>证书登录密码：</p>
-                        <span>{{list.entity.certPasswd}}</span>
-                      </div> -->
-                      <div style="min-width:30%">
-                        <p>路口名称：</p>
-                        <span v-if="editorshow">{{list.entity.crossVillage}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.crossVillage" :placeholder="list.entity.crossVillage" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>设备型号：</p>
-                        <span v-if="editorshow">{{list.entity.devModel}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.devModel" :placeholder="list.entity.devModel" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>电源IP：</p>
-                        <span v-if="editorshow">{{list.entity.electricIp}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.electricIp" :placeholder="list.entity.electricIp" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>安装地址：</p>
-                        <span v-if="editorshow">{{list.entity.installAddress}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.installAddress" :placeholder="list.entity.installAddress" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>安装地址详情：</p>
-                        <span v-if="editorshow">{{list.entity.installAddressDetail}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.installAddressDetail" :placeholder="list.entity.installAddressDetail" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>端口数量：</p>
-                        <span v-if="editorshow">{{list.entity.lanNum}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.lanNum" :placeholder="list.entity.lanNum" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>纬度：</p>
-                        <span v-if="editorshow">{{list.entity.latitude}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>经度：</p>
-                        <span v-if="editorshow">{{list.entity.longitude}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>MAC地址：</p>
-                        <span v-if="editorshow">{{list.entity.mac}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.mac" :placeholder="list.entity.mac" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>责任人：</p>
-                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>责任人联系方式：</p>
-                        <span v-if="editorshow">{{list.entity.maintenanceUserPhone}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUserPhone" :placeholder="list.entity.maintenanceUserPhone" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>负责单位：</p>
-                        <span v-if="editorshow">{{list.entity.managementUnit}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.managementUnit" :placeholder="list.entity.managementUnit" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>负责单位电话：</p>
-                        <span v-if="editorshow">{{list.entity.managementUnitPhone}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.managementUnitPhone" :placeholder="list.entity.managementUnitPhone" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>设备厂商：</p>
-                        <span v-if="editorshow">{{list.entity.manufacturer}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.manufacturer" :placeholder="list.entity.manufacturer" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>电源类型：</p>
-                        <span v-if="editorshow">{{list.entity.teminalType}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.teminalType" :placeholder="list.entity.teminalType" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <!-- <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:45%"  @click="editorshow = false" v-if="editorshow">编辑</button>
-                      <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;bottom:10px;left:40%"   v-if="!editorshow" @click="backeditor(index)">返回</button>
-                       <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:60%"   v-if="!editorshow" @click="saveeditor(list)">保存</button> -->
-                  </div>
-
-                  <div class="content" style="border:none;" v-if="list.deviceType == '摄像机'">
-                    <div style="min-width:30%">
-                        <p>设备名称：</p>
-                        <span v-if="editorshow">{{list.entity.cameraName}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.cameraName" :placeholder="list.entity.cameraName" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>设备厂商：</p>
-                        <span v-if="editorshow">{{list.entity.manufacturer}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.manufacturer" :placeholder="list.entity.manufacturer" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>设备型号：</p>
-                        <span v-if="editorshow">{{list.entity.model}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.model" :placeholder="list.entity.model" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>安装地址：</p>
-                        <span v-if="editorshow">{{list.entity.installAddress}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.installAddress" :placeholder="list.entity.installAddress" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>行政区域：</p>
-                        <span v-if="editorshow">{{list.entity.areaCode}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.areaCode" :placeholder="list.entity.areaCode" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>国标编码：</p>
-                        <span v-if="editorshow">{{list.entity.nationnalId}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.nationnalId" :placeholder="list.entity.nationnalId" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>摄像机编码格式：</p>
-                        <span v-if="editorshow">{{list.entity.cameraCode}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.cameraCode" :placeholder="list.entity.cameraCode" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>安装时间：</p>
-                        <span v-if="editorshow">{{list.entity.installTime}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.installTime" :placeholder="list.entity.installTime" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>补光类型：</p>
-                        <span v-if="editorshow">{{list.entity.lightingType}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.lightingType" :placeholder="list.entity.lightingType" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>摄像机类型：</p>
-                        <span v-if="editorshow">{{list.entity.cameraType}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.cameraType" :placeholder="list.entity.cameraType" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>录像保存天数：</p>
-                        <span v-if="editorshow">{{list.entity.videoSaveDays}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.videoSaveDays" :placeholder="list.entity.videoSaveDays" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>联网属性：</p>
-                        <span v-if="editorshow">{{list.entity.networkProperties?'未联网':'已联网'}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.networkProperties" :placeholder="list.entity.networkProperties" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>IPv4地址：</p>
-                        <span v-if="editorshow">{{list.entity.ipAddress}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.ipAddress" :placeholder="list.entity.ipAddress" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>MAC地址：</p>
-                        <span v-if="editorshow">{{list.entity.mac}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.mac" :placeholder="list.entity.mac" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>IPv6地址：</p>
-                        <span v-if="editorshow">{{list.entity.ipv6Address}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.ipv6Address" :placeholder="list.entity.ipv6Address" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>设备状态：</p>
-                        <span v-if="editorshow">{{list.entity.deviceStatus?'异常':'正常'}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.deviceStatus" :placeholder="list.entity.deviceStatus" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>监控点位类型：</p>
-                        <span v-if="editorshow">{{list.entity.pointType}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.pointType" :placeholder="list.entity.pointType" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>监控方位：</p>
-                        <span v-if="editorshow">{{list.entity.cameraPosition}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.cameraPosition" :placeholder="list.entity.cameraPosition" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>点位名称：</p>
-                        <span v-if="editorshow">{{list.entity.pointName}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.pointName" :placeholder="list.entity.pointName" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>维护人员：</p>
-                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
-                      </div>
-                  </div>
-
-                  <div class="detail-title" style="margin-top:10px;" v-if="list.deviceType == '摄像机'">
-                    <img src="../../public/img/position.png"/>
-                    <p >位置属性</p>
-                  </div>
-                  <div class="content" style="border:none;" v-if="list.deviceType == '摄像机'">
-                      <div style="min-width:30%">
-                        <p>经度：</p>
-                        <span v-if="editorshow">{{list.entity.longitude}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>纬度：</p>
-                        <span v-if="editorshow">{{list.entity.latitude}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>管理单位：</p>
-                        <span v-if="editorshow">{{list.entity.managementUnit}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.managementUnit" :placeholder="list.entity.managementUnit" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>是否上报：</p>
-                        <span v-if="editorshow">{{list.entity.isReport?"否":"是"}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.isReport" :placeholder="list.entity.isReport" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>所属辖区公安机关：</p>
-                        <span v-if="editorshow">{{list.entity.deptId}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.deptId" :placeholder="list.entity.deptId" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
-                        <p>管理单位联系方式：</p>
-                        <span v-if="editorshow">{{list.entity.managementPhone}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.managementPhone" :placeholder="list.entity.managementPhone" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:100%">
-                        <p>摄像机功能类型：</p>
-                        <span v-if="editorshow">{{list.entity.cameraFunctionType}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.cameraFunctionType" :placeholder="list.entity.cameraFunctionType" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:100%">
-                        <p>摄像机位置类型：</p>
-                        <span v-if="editorshow">{{list.entity.cameraPositionType}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.cameraPositionType" :placeholder="list.entity.cameraPositionType" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:100%">
-                        <p>所属部门行业：</p>
-                        <span v-if="editorshow">{{list.entity.industry}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.industry" :placeholder="list.entity.industry" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <!-- <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:45%"  @click="editorshow = false" v-if="editorshow">编辑</button>
-                      <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;bottom:10px;left:40%"   v-if="!editorshow" @click="backeditor(index)">返回</button>
-                       <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;bottom:10px;left:60%"   v-if="!editorshow" @click="saveeditor(list)">保存</button> -->
-                  </div>
-
-
-
-                </Tab-pane>
-                <!-- <Tab-pane label="标签二" key="key2">标签二的内容</Tab-pane> -->
-            </Tabs>
-            <img src="../../public/img/xxx.png" style="position:absolute;right:20px;top:10px" @click="closecard"/>
-            <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
-            </div>
+      <!-- 点击ip弹窗 -->
+             <ipDevice :workdetailshow="workdetailshow" :workdetaillist="workdetaillist" @closeworkdetailshow="closeworkdetailshow" @oldworkdata="oldworkdata"/>
       <!-- 点击工单详情弹窗 -->
             <div class="workdetail" v-if="workdetail">
                 <div class="detail-title" style="margin-top:10px;">
@@ -1412,9 +1000,11 @@
                     <span>{{list.content}}</span>
                   </div>
                  </div>
+                 <div style="position:fixed;bottom:140px;left:50%">
                  <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="closetowork(formlists)">确认关闭工单</button>
                  <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="backtowork(formlists)">退回</button>
                 <button   class="zhuanyixukes closebtn" @click="closedetail">关闭</button>
+                 </div>
             </div>
 
             <!-- 点击责任人弹窗 -->
@@ -1626,6 +1216,7 @@
 <script>
 import ArcgisMap from "@/components/ArcgisMap";
 import ArcgisMapsmall from "@/components/ArcgisMapsmall";
+import ipDevice from "@/components/ipDevice";
 import Vue from "vue";
 // let echarts = require('echarts/lib/echarts');
 export default {
@@ -1633,6 +1224,7 @@ export default {
   components: {
     ArcgisMap,
     ArcgisMapsmall,
+    ipDevice
   },
   data() {
     return {
@@ -2044,7 +1636,7 @@ export default {
       // console.log(this.timelinelist)
       this.timelinelist.forEach(el => {
         if (el.isAlert == 4) {
-          this.iplist = this.iplist.concat(el.alertId);
+          el.description.forEach(data => { this.iplist = this.iplist.concat(data.id);})
         }
       });
       if(this.iplist.length > 0){
@@ -3125,6 +2717,10 @@ export default {
       this.workdetailshow = false
       this.$refs.bright.style.overflow = "auto"
     },
+    closeworkdetailshow(data){
+      this.workdetailshow = false
+      this.$refs.bright.style.overflow = "auto"
+    },
     aaaa(){
       if(this.sendparam.length == this.newlists.length){
            this.$http.post("workflow/workflow/startProcess",{param:this.sendparam},res=>{
@@ -4073,11 +3669,8 @@ export default {
               this.drawLines(res.data.gatewayState)
           },err=>{});
     },
-    saveeditor(list){
-      console.log(list)
-    },
-    backeditor(index){
-      if(this.onetypelistlan == 1){
+    oldworkdata(data){
+       if(this.onetypelistlan == 1){
         this.$http.get("res/pole/getPoleDeviceByNo?",{poleNo:this.polenum,portName:'LAN'+this.deviceValue},res=>{
                this.workdetaillist = res.data
           },err=>{});
@@ -4086,7 +3679,6 @@ export default {
                this.workdetaillist = res.data
           },err=>{});
       }
-      this.editorshow = true
     }
   }
 };
