@@ -353,6 +353,7 @@
                   <div style="display: flex;min-width:205px;margin-left: 10px">
                     <p>用电统计：</p>
                     <span style="text-align:left;flex: 1">{{list.electricStatistics}}度/每天</span>
+                    <img src="../../public/img/xq.png" style="height: 17px;cursor:pointer" @click.stop="electricdetail"/>
                  </div>
                 </div>
             </div>
@@ -361,6 +362,22 @@
         
       </div>
     
+
+     <div class="statusbox" style="width:80%;top:20px;z-index:1002;margin:0 auto;min-width:1200px;padding-bottom:20px;min-height:95%" v-if="electricdetailshow">
+        <p class="detailpage" style="border-bottom: 1px solid #DDDDDD;">智能电源用电计数统计<img src="../../public/img/xxx.png"  style="float:right;margin-top: 5px" @click="electricdetailshow = false"/></p>
+        <div class="detail-top">
+          <p>安装地址：<span>湖北武汉光谷大道光谷企业天地2号楼806</span></p>
+          <p>IP地址：<span>168.195.123.123</span></p>
+          <p>责任人：<span>是可敬的</span></p>
+          <p>责任单位：<span>是可敬的返回数据肯定会福</span></p>
+          <p>项目名称：<span>多级反馈接口都附件</span></p>
+        </div>
+        <div style="height:500px;width:100%;margin-top:50px" id="myChartkb"></div>
+        <img src="../../public/img/146.png" style="position:absolute;left:20px;top:365px;cursor:pointer"  @click.stop="lastelect"/>
+        <img src="../../public/img/147.png" style="position:absolute;right:20px;top:365px;cursor:pointer"  @click.stop="nextelect"/>
+        <img src="../../public/img/145.png" style="position:absolute;left:20px;top:365px;cursor:pointer" v-if="chekcimg == 2"/>
+        <img src="../../public/img/144.png" style="position:absolute;right:20px;top:365px;cursor:pointer" v-if="chekcimg == 3"/>
+     </div>
     
     
     </div>
@@ -378,6 +395,8 @@ import ipDevice from "@/components/ipDevice";
     },
     data () {
       return {
+        chekcimg:1,
+        electricdetailshow:false,
         electricId:'',
         polenum:'',
         editorshow:true,
@@ -891,7 +910,115 @@ import ipDevice from "@/components/ipDevice";
         this.$http.get("res/socElectrical/getAlldevice?",{electricId:this.electricId},res=>{
           this.workdetaillist = res.data
           },err=>{});
-    }
+    },
+    electricdetail(){
+      this.electricdetailshow = true
+      this.chekcimg = 1
+      setTimeout(() => {
+           this.devicekb(123)
+        },200)
+     
+    },
+    nextelect(){
+     this.chekcimg = 3
+    },
+    lastelect(){
+     this.chekcimg = 2
+    },
+    devicekb(data){
+      let myChart = this.$echarts.init(document.getElementById('myChartkb'))
+        window.addEventListener("resize", function () {
+          myChart.resize();
+        });
+        var time = '2018年11月'
+         myChart.setOption({
+           title: {
+              text: time+'每日耗电量统计',
+              textStyle: {
+                  fontSize: 14,
+                  color:'#1d60fe',
+              },
+              x: 'center'
+          },
+           symbol: '度',
+           color: ['#F55959'],
+            tooltip : {
+                trigger: 'axis',
+                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                },
+                formatter: time+'{b}日<br />{a}: {c}/度'
+            },
+            grid: {
+                left: '80',
+                right: '80',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis : [
+                {
+                    type : 'category',
+                    name: '(日)',
+                    axisLine: {
+                        lineStyle: {
+                            color: '#C1C1C1'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#C1C1C1',
+                        // fontSize: 14
+                    },
+                    data : [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
+                    // data : ['刑事犯罪\n前科','刑事犯罪\n前科','LAN3\n电子围栏','LAN4\n电子围栏','LAN5\n电子围栏','LAN6\n电子围栏','LAN7\n电子围栏','LAN8\n电子围栏',],
+                    axisTick: {
+                        alignWithLabel: true
+                    }
+                }
+            ],
+            yAxis : [
+                {   name: '(度)',
+                    type : 'value',
+                    scale: false,
+                    nameTextStyle: {
+                        color: '#C1C1C1',
+                        // fontSize: 16
+                    },
+                    axisLine: {
+                        show:false
+                    },
+                    min: 0,
+                    max: function(value) { //设置y轴最大值
+                    return value.max;
+                    },
+                    splitNumber: 5,
+                    splitLine:{//去掉网格线
+                        show:true
+                    },
+                    axisTick: {//去掉刻度
+                        show: false
+                    }
+                }
+            ],
+            series : [
+                {
+                    name:'用电统计',
+                    type:'bar',
+                    barWidth: '60%',
+                    itemStyle: {
+                          normal: {
+                              label: {
+                                  show: true,
+                                  color:'#696C6F',
+                                  position: 'top',
+                                  formatter: '{c}'
+                              }
+                          }
+                      },
+                    data:[100,200,300,400,500,600,700,800,152,231,564,512,67,852,123,123,123,123,123,123,123,123,123,123,123,123,123,123,123,222,210]
+                }
+            ]
+         })
+    },
     },
   }
 </script>
@@ -1271,8 +1398,23 @@ import ipDevice from "@/components/ipDevice";
     margin-bottom: 10px;
     }
     .timego{
-  position: absolute;
-  left:845px;
-  top:8px;
-}
+    position: absolute;
+    left:845px;
+    top:8px;
+  }
+  .detail-top{
+    display: flex;
+    padding:20px;
+  }
+  .detail-top p{
+    margin-right: 20px;
+    font-size: 14px
+  }
+  .detail-top p:last-child{
+    margin-right: 0px;
+    font-size: 14px
+  }
+  .detail-top p span{
+    color: #1d60fe;
+  }
 </style>

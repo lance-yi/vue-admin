@@ -209,7 +209,10 @@
             <div>
               <div>
                 <span>放置地址</span>&nbsp;&nbsp;&nbsp;
-              <i-input  v-model="placePosition" placeholder="" style="width: 200px" ></i-input>
+              <!-- <i-input  v-model="placePosition" placeholder="" style="width: 200px" ></i-input> -->
+              <Select v-model="placePosition" style="width:200px">
+                <Option v-for="item in placementposition" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
               </div>
               <div style="margin-top:20px">
                 <span>施工单位</span>&nbsp;&nbsp;&nbsp;
@@ -308,6 +311,7 @@ import city from "../../src/util/city.js";
     },
     data () {
       return {
+        placementposition:[],
         installaddress:'',
         cityList:city,
         latnum:'',
@@ -630,6 +634,9 @@ import city from "../../src/util/city.js";
         this.modal2 = false
         this.$http.get("res/ponitMove/selectResDetail",{resId:data},res=>{
             this.detaildata = res.data
+            },err=>{});
+          this.$http.get("res/ponitMove/selectByDictCode",{dictCodes:'placementPosition'},res=>{
+              this.placementposition = res.data
             },err=>{});
       },
       //查看轨迹

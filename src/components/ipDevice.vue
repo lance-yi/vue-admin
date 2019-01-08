@@ -190,8 +190,8 @@
                       </div>
                       <div style="min-width:30%">
                         <p>电源IP：</p>
-                        <span v-if="editorshow">{{list.entity.electricIp}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.electricIp" :placeholder="list.entity.electricIp" style="width: 160px;margin-top: 0" />
+                        <span >{{list.entity.electricIp}}</span>
+                        <!-- <Input v-if="!editorshow" v-model="list.entity.electricIp" :placeholder="list.entity.electricIp" style="width: 160px;margin-top: 0" /> -->
                       </div>
                       <div style="min-width:30%">
                         <p>安装地址：</p>
@@ -543,7 +543,16 @@ export default {
 
           
       }else if(list.deviceType == '电子围栏'){
-        this.$http.post("rres/ElectronicFence/edit",list.entity,res=>{
+        this.$http.post("res/ElectronicFence/edit",list.entity,res=>{
+          this.$Message.info(res.message);
+          setTimeout(() => {
+              this.$emit('oldworkdata',this.olddata);
+           }, 200);
+          },err=>{});
+             
+
+      }else if(list.deviceType == '智能电源'){
+        this.$http.post("res/socElectrical/editElectrical",list.entity,res=>{
           this.$Message.info(res.message);
           setTimeout(() => {
               this.$emit('oldworkdata',this.olddata);

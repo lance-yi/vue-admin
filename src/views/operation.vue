@@ -518,6 +518,7 @@
                   <img src="../../public/img/gx.png"/>
                   <p>安全事件</p>
                 </div>
+                <p v-if="descriptiondata.length == 0&&wangguanshow" style="font-size:15px">暂无安全事件</p>
                 <div  class="hadpro"  style="margin-top:40px;padding-left:40px" v-if="wangguanshow">
                   <div v-for="(aa,index) in descriptiondata" :key="index" style="margin-top: 15px;">
                       <div class="timelinecont" >
@@ -1102,21 +1103,43 @@
 
             <!-- 点击工单详情弹窗 -->
             <div class="workdetail" v-if="workdetail">
-                <div class="detail-title" style="margin-top:10px;">
+                <div class="detail-title" style="position: fixed;width: calc(70% - 50px);background: #fff;height:50px;margin-top:0">
                   <p>工单详情</p>
                 </div>
-
-                <div class="workdetail-top">
-                  <div class="workdetail-head" v-if="this.remindlist">
+                 <div style="margin-top:70px">
+                 <div class="workdetail-top" v-for="(aaa,num) in remindlist" style="padding:5px 20px" :key="num">
+                  <div class="workdetail-head"  >
                     <img src="../../public/img/ct.png" style="margin-right:5px"/>
-                    <p v-if="this.remindlist">催单时间：<span style="color:#1D60FE">{{remindlist.remindTime}}</span></p>
+                    <p >催单时间：<span style="color:#1D60FE">{{aaa.remindTime}}</span></p>
                   </div>
                   <div class="workdetail-head">
-                    <p v-if="this.remindlist">催单内容：<span style="color:#1D60FE">{{remindlist.content}}</span></p>
+                    <p >催单内容：<span style="color:#1D60FE">{{aaa.content}}</span></p>
                   </div>
-                </div>
-                 <p class="workdetailtitle">工单状态：<span style="color:#1D60FE">{{formlists.processStatus}}</span></p>
-
+                 </div>
+                 </div>
+                 <!-- <p class="workdetailtitle" style="margin-top: 10px">工单状态：<span style="color:#1D60FE">{{formlists.processStatus}}</span></p> -->
+                  <div class="sendbox"  >
+                   <img src="../../public/img/141.png"/>
+                    流程信息
+                 </div>
+                 <div class="content" style="border:none;" >
+                  <div style="min-width:20%">
+                    <p>工单状态：</p>
+                    <span>{{processlist.processStatus}}</span>
+                  </div>
+                  <div style="min-width:30%">
+                    <p>处理人：</p>
+                    <span>{{processlist.auditer}}</span>
+                  </div>
+                  <div style="min-width:40%">
+                    <p>处理时间：</p>
+                    <span>{{processlist.startTime}}</span>
+                  </div>
+                  <div style="min-width:100%">
+                    <p>处理具体内容：</p>
+                    <span>{{processlist.content}}</span>
+                  </div>
+                 </div>
                  <div class="sendbox" >
                    <img src="../../public/img/num.png"/>
                     派单信息
@@ -1193,7 +1216,7 @@
                       </div>
                       <input type="file" multiple name="file"  style="margin:10px 30px" ref="closefile" @change="flieupload" v-if="formlists.processStatus == '待确认'"/> 
                   </div>
-
+                
                  <div class="sendbox"  v-if="feebacklist.length>0">
                    <img src="../../public/img/fg.png"/>
                     反馈信息
@@ -1216,7 +1239,8 @@
                     <span>{{list.content}}</span>
                   </div>
                  </div>
-                 <div style="position:fixed;bottom:140px;left:50%">
+                
+                 <div style="position:fixed;top:6%;right:12%">
                  <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="closetowork(formlists)">确认关闭工单</button>
                  <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="backtowork(formlists)">退回</button>
                 <button   class="zhuanyixukes closebtn" @click.stop="closedetail">关闭</button>
@@ -1272,6 +1296,7 @@ export default {
   },
   data() {
     return {
+      processlist:[],
       datades:{},
       wgeachrtsshow:false,
       descriptiondata:[],
@@ -2890,11 +2915,13 @@ export default {
             //反馈信息
               this.feebacklist = res.data[0].feedback
             //催单信息
-              this.remindlist = res.data[0].remind[0]
+              this.remindlist = res.data[0].remind
             //派单信息故障
               this.devicelist = res.data[0].device
             //派单信息公有
               this.formlists = res.data[0].form
+            //流程信息
+            this.processlist = res.data[0].process
           },err=>{});
    
     },
