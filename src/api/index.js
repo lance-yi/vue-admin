@@ -41,7 +41,7 @@ function apiAxios (method, url, params, success, failure) {
     baseURL: root,
     withCredentials: false
   }).then(function (res) {
-    if (res.data.rel === true ) {
+    if (res.data.rel === true || res.data != '') {
       if (success) {
         success(res.data)
       }

@@ -7,9 +7,11 @@ import operation from '@/views/operation.vue'
 import personmanagedetail from '@/subpage/personmanagedetail.vue'
 import book from '@/subpage/book.vue'
 import role from '@/subpage/role.vue'
+import administrativearea from '@/subpage/administrativearea.vue'
 import menu from '@/subpage/menu.vue'
 import echartstime from '@/subpage/echartstime.vue'
 import log from '@/views/log.vue'
+import videomanage from '@/views/video.vue'
 import analysis from '@/views/analysis.vue'
 import bigscreenshow from '@/views/bigscreenshow.vue'
 import update from '@/views/update.vue'
@@ -60,6 +62,11 @@ const router = new Router({
       component: log
     },
     {
+      path: '/videomanage',
+      name: 'videomanage',
+      component: videomanage
+    },
+    {
       path: '/bigscreenshow',
       name: 'bigscreenshow',
       component: bigscreenshow
@@ -103,6 +110,10 @@ const router = new Router({
           path: '/system/echartstime',
           name: 'system',
           component: echartstime
+        },{
+          path: '/system/administrativearea',
+          name: 'system',
+          component: administrativearea
         }
       ]
     }

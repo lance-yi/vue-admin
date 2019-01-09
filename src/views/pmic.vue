@@ -353,7 +353,7 @@
                   <div style="display: flex;min-width:205px;margin-left: 10px">
                     <p>用电统计：</p>
                     <span style="text-align:left;flex: 1">{{list.electricStatistics}}度/每天</span>
-                    <img src="../../public/img/xq.png" style="height: 17px;cursor:pointer" @click.stop="electricdetail"/>
+                    <img src="../../public/img/xq.png" style="height: 17px;cursor:pointer" @click.stop="electricdetail(list.electricalId)"/>
                  </div>
                 </div>
             </div>
@@ -366,17 +366,17 @@
      <div class="statusbox" style="width:80%;top:20px;z-index:1002;margin:0 auto;min-width:1200px;padding-bottom:20px;min-height:95%" v-if="electricdetailshow">
         <p class="detailpage" style="border-bottom: 1px solid #DDDDDD;">智能电源用电计数统计<img src="../../public/img/xxx.png"  style="float:right;margin-top: 5px" @click="electricdetailshow = false"/></p>
         <div class="detail-top">
-          <p>安装地址：<span>湖北武汉光谷大道光谷企业天地2号楼806</span></p>
-          <p>IP地址：<span>168.195.123.123</span></p>
-          <p>责任人：<span>是可敬的</span></p>
-          <p>责任单位：<span>是可敬的返回数据肯定会福</span></p>
-          <p>项目名称：<span>多级反馈接口都附件</span></p>
+          <p>安装地址：<span>{{toplist.installAddress}}</span></p>
+          <p>IP地址：<span>{{toplist.electricalIp}}</span></p>
+          <p>责任人：<span>{{toplist.maintenanceUser}}</span></p>
+          <p>责任单位：<span>{{toplist.managementUnit}}</span></p>
+          <p>项目名称：<span>{{toplist.projectName}}</span></p>
         </div>
         <div style="height:500px;width:100%;margin-top:50px" id="myChartkb"></div>
         <img src="../../public/img/146.png" style="position:absolute;left:20px;top:365px;cursor:pointer"  @click.stop="lastelect"/>
         <img src="../../public/img/147.png" style="position:absolute;right:20px;top:365px;cursor:pointer"  @click.stop="nextelect"/>
-        <img src="../../public/img/145.png" style="position:absolute;left:20px;top:365px;cursor:pointer" v-if="chekcimg == 2"/>
-        <img src="../../public/img/144.png" style="position:absolute;right:20px;top:365px;cursor:pointer" v-if="chekcimg == 3"/>
+        <img src="../../public/img/145.png" style="position:absolute;left:20px;top:365px;cursor:pointer" v-if="chekcimg == 2" @click.stop="lastelect"/>
+        <img src="../../public/img/144.png" style="position:absolute;right:20px;top:365px;cursor:pointer" v-if="chekcimg == 3"  @click.stop="nextelect"/>
      </div>
     
     
@@ -395,6 +395,8 @@ import ipDevice from "@/components/ipDevice";
     },
     data () {
       return {
+        mounthdata:1,
+        electricalId:'',
         chekcimg:1,
         electricdetailshow:false,
         electricId:'',
@@ -513,6 +515,8 @@ import ipDevice from "@/components/ipDevice";
         electro:[],
         countmaindata:[],
         workdetailshow:false,
+        mounthlist:[],
+        toplist:[],
         timeList:[{
                 value: '两分钟',
                 label: '两分钟'
@@ -536,14 +540,11 @@ import ipDevice from "@/components/ipDevice";
     mounted() {
     // this.drawLine();
     // this.drawLines();
-      this.$http.get(
-        "res/socElectrical/selectElectricCnt",
-        {},
-        res => {
+      this.$http.get("res/socElectrical/selectElectricCnt",{},res => {
           this.statuslist = res.data;
-        },
-        err => {}
+        },err => {}
       );
+      
       if(localStorage.getItem('breaktime')){
         this.model1 = localStorage.getItem('breaktime')
         if(localStorage.getItem('breaktime') == '两分钟'){
@@ -756,13 +757,13 @@ import ipDevice from "@/components/ipDevice";
         }
       },
       switchchange(i,val){
-      if(val == false){
-        var aa = 0
-      }else if(val == true){
-        var aa = 1
-      }
-      this.$set(this.changeobj, 'PORT'+i, aa)
-    },
+        if(val == false){
+          var aa = 0
+        }else if(val == true){
+          var aa = 1
+        }
+        this.$set(this.changeobj, 'PORT'+i, aa)
+      },
       allowchangetype(){
         // console.log(this.changeobj)
         this.$http.put("res/socElectrical/updateControlbarState",{id:this.oldid,portMap:this.changeobj},res=>{
@@ -911,26 +912,64 @@ import ipDevice from "@/components/ipDevice";
           this.workdetaillist = res.data
           },err=>{});
     },
-    electricdetail(){
+    //智能电源统计图表
+    electricdetail(id){
+      this.$http.get("res/socElectrical/getPreMonthList",{electricalId:id},res => {
+        this.mounthlist = res.data
+           this.$http.get("res/socElectrical/selectElectricStatisticsMonth",{electricalId:id,yyyymm:this.mounthlist[this.mounthlist.length - this.mounthdata]},res=>{
+             this.toplist = res.data
+             setTimeout(() => {
+                this.devicekb(res.data)
+              },200)
+          },err=>{});
+        },err => {}
+      );
+      this.mounthdata = 1
+      this.electricalId = id
+     
       this.electricdetailshow = true
       this.chekcimg = 1
-      setTimeout(() => {
-           this.devicekb(123)
-        },200)
+      
      
     },
     nextelect(){
      this.chekcimg = 3
+     this.mounthdata--
+     if(this.mounthdata < 1){
+         this.$Message.info('已经是最新了');
+         this.mounthdata = 1
+     }else{
+       this.$http.get("res/socElectrical/selectElectricStatisticsMonth",{electricalId:this.electricalId,yyyymm:this.mounthlist[this.mounthlist.length - this.mounthdata]},res=>{
+             this.toplist = res.data
+             setTimeout(() => {
+                this.devicekb(res.data)
+              },200)
+          },err=>{});
+     }
+
     },
     lastelect(){
      this.chekcimg = 2
+     this.mounthdata++
+     if(this.mounthdata > this.mounthlist.length){
+         this.$Message.info('已经到底了');
+         this.mounthdata = this.mounthlist.length
+     }else{
+       this.$http.get("res/socElectrical/selectElectricStatisticsMonth",{electricalId:this.electricalId,yyyymm:this.mounthlist[this.mounthlist.length - this.mounthdata]},res=>{
+             this.toplist = res.data
+             setTimeout(() => {
+                this.devicekb(res.data)
+              },200)
+          },err=>{});
+     }
+     
     },
     devicekb(data){
       let myChart = this.$echarts.init(document.getElementById('myChartkb'))
         window.addEventListener("resize", function () {
           myChart.resize();
         });
-        var time = '2018年11月'
+        var time = data.yyyymm
          myChart.setOption({
            title: {
               text: time+'每日耗电量统计',
@@ -968,8 +1007,8 @@ import ipDevice from "@/components/ipDevice";
                         color: '#C1C1C1',
                         // fontSize: 14
                     },
-                    data : [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
-                    // data : ['刑事犯罪\n前科','刑事犯罪\n前科','LAN3\n电子围栏','LAN4\n电子围栏','LAN5\n电子围栏','LAN6\n电子围栏','LAN7\n电子围栏','LAN8\n电子围栏',],
+                    data:data.totalDay,
+                    // data : [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
                     axisTick: {
                         alignWithLabel: true
                     }
@@ -1014,7 +1053,8 @@ import ipDevice from "@/components/ipDevice";
                               }
                           }
                       },
-                    data:[100,200,300,400,500,600,700,800,152,231,564,512,67,852,123,123,123,123,123,123,123,123,123,123,123,123,123,123,123,222,210]
+                      data:data.statisticsDay
+                    // data:[100,200,300,400,500,600,700,800,152,231,564,512,67,852,123,123,123,123,123,123,123,123,123,123,123,123,123,123,123,222,210]
                 }
             ]
          })

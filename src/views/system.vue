@@ -573,6 +573,8 @@ import TreeGrid from '@/components/treeGrid2.0'
             //  },err=>{});
          }else if(name == '报表生成策略'){
               this.$router.push({path:'/system/echartstime'})
+         }else if(name == '行政区划'){
+              this.$router.push({path:'/system/administrativearea'})
          }
       },
       checkbook(list){
