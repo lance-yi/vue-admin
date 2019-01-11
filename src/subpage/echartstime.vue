@@ -53,16 +53,23 @@
           <Col span="8" style="box-shadow: 0px 2px 4px rgba(0,0,0,0.2);height:99%;">
               <div class="titletop">系统将在以下配置的时间自动生成考核报表</div>
 
-
-              <div class="timelinebox">
-                <Timeline>
-              <Timeline-item v-for="(list,index) in selectAlldata" style="padding-bottom:40px;" :key="index">
-                <img src="../../public/img/z1.png" slot="dot" />
-                  <div class="timelinecont">
-                    <p >{{list.translate}}</p>
-                    <div class="exj3" @click="detelenum(list.id)">
+              <div class="exj3" @click="detelenum()" v-if="movealert">
                         删除
                     </div>
+                <div class="exj3" @click="movewarns()" v-if="!movealert">
+                        确认删除
+                    </div>
+                 <div class="exj4" v-if="!movealert"  @click="backs">
+                       返回
+                    </div>
+              <div class="timelinebox">
+                <Timeline >
+              <Timeline-item v-for="(list,index) in selectAlldata" style="padding-bottom:40px;" :key="index">
+                <img src="../../public/img/z1.png" slot="dot" v-if="list.isAlert == 1"/>
+                 <img src="../../public/img/nono.png" slot="dot" v-if="list.nono"  @click="checknonos(list.id)"/>
+                      <img src="../../public/img/19.png" slot="dot" v-if="list.isAlert == 4"  @click="checkicons(list.id)"/>
+                  <div class="timelinecont">
+                    <p >{{list.translate}}</p>
                   </div>
                  
 
@@ -95,6 +102,7 @@
     },
     data () {
       return {
+          movealert:true,
           deteleid:'',
           modal2:false,
          selectAlldata:[],
@@ -167,7 +175,7 @@
         var h = document.documentElement.clientHeight || document.body.clientHeight;
       // console.log(h)
          document.getElementsByClassName("divbox")[0].style.height = (h-180)+'px'
-          this.$http.get("res/reportTaskCron/selectAll",{},res=>{
+          this.$http.get("res/reportTaskCron/selectAll",{state:1},res=>{
                       this.selectAlldata = res.data
                     },err=>{});
     },
@@ -181,15 +189,54 @@
            this.mounthdate = ''
          }
        },
-       detelenum(id){
-        this.deteleid = id
-        this.modal2 = true
+       detelenum(){
+           this.movealert = false
+        this.selectAlldata.forEach(el => {
+            el.isAlert = 5
+         this.$set(el, 'nono', true)
+       });
        },
+       checknonos(ip) {
+            this.selectAlldata.forEach(el => {
+                if (el.id == ip) {
+                (el.nono = false), (el.isAlert = 4);
+                }
+            });
+        },
+        checkicons(ip) {
+            this.selectAlldata.forEach(el => {
+                if (el.id == ip ) {
+                (el.nono = true), (el.isAlert = 5);
+                }
+            });
+        },
+        movewarns(){
+            this.iplist = [];
+            this.selectAlldata.forEach(el => {
+                if (el.isAlert == 4) {
+                this.iplist = this.iplist.concat(el.id);
+                }
+            });
+    
+            if(this.iplist.length == 0){
+                    this.$Message.error('请选择需要删除的条目');
+                }else{
+                this.modal2 = true
+                }
+        },
+        backs(){
+          this.movealert = true
+          this.$http.get("res/reportTaskCron/selectAll",{state:1},res=>{
+                      this.selectAlldata = res.data
+                    },err=>{});
+        },
        deteleplot(){
-         this.$http.delete("res/reportTaskCron/deleteCron?id="+this.deteleid,{},res=>{
+                   console.log(this.iplist)
+         this.$http.delete("res/reportTaskCron/deleteCron",this.iplist,res=>{
                      this.$Message.info(res.message);
                      this.modal2 = false
-                     this.$http.get("res/reportTaskCron/selectAll",{},res=>{
+                     this.movealert = true
+                     this.$http.get("res/reportTaskCron/selectAll",{state:1},res=>{
                       this.selectAlldata = res.data
                     },err=>{});
                     },err=>{});
@@ -199,7 +246,7 @@
                 if(this.weektime&&this.days){
                   this.$http.post("res/reportTaskCron/saveCron",{cronType:'week',startDateStr:this.weektime,value:this.days},res=>{
                        this.$Message.info(res.message);
-                       this.$http.get("res/reportTaskCron/selectAll",{},res=>{
+                       this.$http.get("res/reportTaskCron/selectAll",{state:1},res=>{
                       this.selectAlldata = res.data
                     },err=>{});
                     },err=>{});
@@ -211,7 +258,7 @@
                     var time = this.mounthdate.toLocaleDateString()
                 this.$http.post("res/reportTaskCron/saveCron",{cronType:'month',startDateStr:this.mounthtime,value:time},res=>{
                        this.$Message.info(res.message);
-                       this.$http.get("res/reportTaskCron/selectAll",{},res=>{
+                       this.$http.get("res/reportTaskCron/selectAll",{state:1},res=>{
                       this.selectAlldata = res.data
                     },err=>{});
                     },err=>{});
@@ -257,8 +304,26 @@
         margin-right: 20px;
         cursor:pointer;
         position: absolute;
-        right: 10px;
-        top:0;
+        left: 20px;
+        top: 55px;
+    }
+    .exj4{
+        border: 1px solid #1D60FE;
+        color: #1D60FE;
+        border-radius: 4px;
+        padding: 0 8px;
+        display:-webkit-box;
+        display: -moz-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        align-items: center;
+        height: 25px;
+        margin-right: 20px;
+        cursor:pointer;
+        left: 100px;
+        top: 55px;
+        position: absolute;
     }
     .allow{
       padding: 5px 20px;

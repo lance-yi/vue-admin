@@ -11,10 +11,13 @@
                       <Row>
                        <Col span="7" style="margin-right: 20px;">
                            <div class="head-left">行政区划管理</div>
-                            <Tree :data="data3"  show-checkbox @on-select-change="checkrole" :scheck-strictly="true" @on-check-change="getCheckedNodes"></Tree>
+                           <div style="border:1px solid  #e8eaec;padding-left:20px">
+                              <Tree :data="data3"  show-checkbox @on-select-change="checkrole" :scheck-strictly="true" @on-check-change="getCheckedNodes"></Tree>
+                           </div>
                        </Col>
                         <Col span="16">
                            <i-table border  :columns="roletablehead" :data="roletabledata" id="wordbook" @on-selection-change="checkbookchange" ></i-table>
+                           <Page :total="totals" show-total @on-change="changemodal6page" :current.sync="pages"/>
                        </Col>
                       </Row>
                  </div>
@@ -26,12 +29,14 @@
             @on-ok="okrole('formrole')"
             >
              <Form ref="formrole" :model="formrole" :rules="rulerole" :label-width="100" >
-                <FormItem label="名称" prop="name" >
+                <p style="padding-left: 16px;font-size: 13px;margin-bottom: 10px;" v-if="this.clickarea.length>0&&this.addrolenum == 0">父节点 ：<span style="margin-left: 29px;" v-if="modal4 == true">{{clickarea[0].areaName}}</span></p>
+                <FormItem label="行政区划名称" prop="name" >
                     <Input v-model="formrole.name" />
                 </FormItem>
-                <FormItem label="编码" prop="num" >
+                <FormItem label="行政区划编码" prop="num" >
                     <Input v-model="formrole.num" />
                 </FormItem>
+
              </Form>
         </Modal>       
           
@@ -56,7 +61,7 @@
                 <i-button type="primary" class="sure" @click="serachuser">搜索</i-button>
             </div>
             <i-table highlight-row stripe border :columns="columns1" :data="data1" @on-selection-change="checkuserchange"></i-table>
-            <Page :total='searchUsertotla' show-total style="text-align:center;margin-top:20px" @on-change="changemodal6page"></Page>
+              <Page :total='searchUsertotla' show-total  ></Page>
         </Modal>
 
 
@@ -71,6 +76,7 @@
 </template>
 <script>
 // import TreeGrid from '@/components/treeGrid2.0'
+import axios from 'axios'
   export default {
     name: 'administrativearea',
     components: {
@@ -78,6 +84,7 @@
     },
     data () {
       return {
+          totals:0,
           data1:[],
           data2:[],
           userlist:[],
@@ -108,7 +115,7 @@
           attrlist:[],
           modal1:false,
           modal2:false,
-          roletablehead:[{title: '用户名',key: 'account',align: 'center'},
+          roletablehead:[{title: '用户名',key: 'personName',align: 'center'},
             // {title: '姓名',key: 'person_name',align: 'center'},
             {title: '部门',key: 'titile',align: 'center',
                render:(h,params)=>{
@@ -117,7 +124,7 @@
                                  'color':'#696C6F',
                                  'cursor':'default'
                                 },
-                           },params.row.titile)
+                           },params.row.department.deptName)
                           }
             }
             ],
@@ -127,10 +134,10 @@
           },
             rulerole:{
               name: [
-                    { required: true, message: '名称不能为空', trigger: 'blur' }
+                    { required: true, message: '行政区划名称不能为空', trigger: 'blur' }
                 ],
                 num: [
-                    { required: true, message: '编码不能为空', trigger: 'blur' }
+                    { required: true, message: '行政区划编码不能为空', trigger: 'blur' }
                 ],
           },
           columns1:[
@@ -150,46 +157,27 @@
           passid:'',
           clickarea:[],
           detelearealist:[],
-          data3:[
-                    {
-                        title: 'parent 1',
-                        // expand: true,
-                        children: [
-                            {
-                                title: 'parent 1-1',
-                                // expand: true,
-                                children: [
-                                    {
-                                        title: 'leaf 1-1-1'
-                                    },
-                                    {
-                                        title: 'leaf 1-1-2'
-                                    }
-                                ]
-                            },
-                            {
-                                title: 'parent 1-2',
-                                // expand: true,
-                                children: [
-                                    {
-                                        title: 'leaf 1-2-1'
-                                    },
-                                    {
-                                        title: 'leaf 1-2-1'
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
+          data3:[],
       }
     },
     created(){
     },
     mounted(){
-        this.$http.get("oauth/baseArea/getAllArea",{},res=>{
-            
-            },err=>{});
+        // this.$http.get("oauth/baseArea/getAllArea",{},res=>{
+        //     console.log(res)
+        //     },err=>{});
+        axios({
+            method: 'get',
+            url: 'oauth/baseArea/getAllArea',
+            baseURL: window.g.ApiUrl,
+            dataType: 'json',
+            headers:{
+             Authorization:localStorage.getItem('token'),
+            },
+            data:{}
+          }).then(res=>{
+             this.data3 = res.data
+          })
     },
     methods: {
        changerole(){
@@ -198,37 +186,55 @@
               this.$Message.error('请选择想要修改的行政区划！');
           }else{
               this.modal4 = true
-              this.formrole.name = '123'
-              this.formrole.num = 'sdfkj'
+              this.formrole.name = this.clickarea[0].areaName
+              this.formrole.num = this.clickarea[0].areaCode
           }
       },
       okrole(name){
         this.$refs[name].validate((valid) => {
             if (valid) {
                 if(this.addrolenum == 0){
-                    this.$http.post("oauth/group/add",{
-                    code:this.formrole.num,
-                    name:this.formrole.name,
-                    id:''
+                    var aa = -1
+                    if(this.clickarea.length == 1){
+                        var aa = this.clickarea[0].areaCode
+                    }
+                    this.$http.post("oauth/baseArea/addArea",{
+                    areaCode:this.formrole.num,
+                    areaName:this.formrole.name,
+                    parentCode:aa,
                     },res=>{
                         this.$Message.info(res.message);
-                        this.$http.get("oauth/group/all",{},res=>{
-                        this.rolelist = res.data
-                        this.roledata = []
-                        },err=>{});
+                        axios({
+                            method: 'get',
+                            url: 'oauth/baseArea/getAllArea',
+                            baseURL: window.g.ApiUrl,
+                            dataType: 'json',
+                            headers:{
+                            Authorization:localStorage.getItem('token'),
+                            },
+                            data:{}
+                        }).then(res=>{
+                            this.data3 = res.data
+                            this.clickarea = []
+                        })
                     },err=>{
                     })
                 }else if(this.addrolenum == 1){
-                      this.$http.put("oauth/group/"+this.roledata,{
-                    code:this.formrole.num,
-                    name:this.formrole.name,
-                    id:this.roledata.toString()
-                    },res=>{
-                        this.$Message.info('修改成功');
-                        this.$http.get("oauth/group/all",{},res=>{
-                        this.rolelist = res.data
-                        this.roledata = []
-                        },err=>{});
+                      this.$http.put("oauth/baseArea/editArea",{areaCode:this.formrole.num,areaName:this.formrole.name,id:this.clickarea[0].id},res=>{
+                        this.$Message.info(res.message);
+                        axios({
+                            method: 'get',
+                            url: 'oauth/baseArea/getAllArea',
+                            baseURL: window.g.ApiUrl,
+                            dataType: 'json',
+                            headers:{
+                            Authorization:localStorage.getItem('token'),
+                            },
+                            data:{}
+                        }).then(res=>{
+                            this.data3 = res.data
+                            this.clickarea = []
+                        })
                     },err=>{
                     })
                 }
@@ -249,19 +255,34 @@
           if(this.detelearealist.length == 0){
              this.$Message.error('请选择想要删除的行政区划！');
           }else{
-              console.log(this.detelearealist)
+              var datalist = []
+              this.detelearealist.forEach(data => { datalist = datalist.concat(data.id);})
+              this.$http.delete("oauth/baseArea/deleteArea",datalist,res => {
+                      this.$Message.info(res.message);
+                        axios({
+                            method: 'get',
+                            url: 'oauth/baseArea/getAllArea',
+                            baseURL: window.g.ApiUrl,
+                            dataType: 'json',
+                            headers:{
+                            Authorization:localStorage.getItem('token'),
+                            },
+                            data:{}
+                        }).then(res=>{
+                            this.data3 = res.data
+                        })
+                    },
+                    err => {}
+                    );
           }
       },
       checkrole(val){
+          this.pages = 1
           this.clickarea = val
-          console.log(val)
-        // this.colornum = index
-        // this.$http.get("oauth/group/"+list.id+'/UserAndAuthorityByGroupId',{},res=>{
-        //                 this.roletabledata = res.data
-        //                 if(this.roletabledata.length == 0){
-        //                     this.$Message.info('该角色下没有用户！');
-        //                 }
-        //                 },err=>{});
+        this.$http.get("oauth/baseArea/selectrMaintainUserByCodes",{areaCodes:this.clickarea[0].areaCode},res=>{
+                        this.roletabledata = res.data.list
+                        this.totals = res.data.total
+                        },err=>{});
       },
       power(){
           this.treevalue = 0
@@ -360,10 +381,10 @@
           list.forEach (el=>{this.treelist.push(el.id)})
       },
       changemodal6page(i){
-          this.$http.get("oauth/user/searchUser?",{param:this.value,current:i},res=>{
-                this.searchUsertotla = res[0].total
-                this.data1 = res[0].user
-          },err=>{});
+          this.$http.get("oauth/baseArea/selectrMaintainUserByCodes",{areaCodes:this.clickarea[0].areaCode,current:i},res=>{
+                        this.roletabledata = res.data.list
+             
+                        },err=>{});
       },
       serachuser(){
           this.$http.get("oauth/user/searchUser?",{param:this.value,current:1},res=>{
@@ -432,5 +453,8 @@
 ivu-icon ivu-icon-plus-circled{
     width: 12px;
     height: 12px;
+}
+.ivu-page{
+   text-align: center;
 }
 </style>

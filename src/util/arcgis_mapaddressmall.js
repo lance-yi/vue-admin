@@ -19,19 +19,19 @@ export default {
     },
     mounted() {
         this.init();
-        if(localStorage.getItem('breaktime')){
-            if(localStorage.getItem('breaktime') == '两分钟'){
-               this.timers(2)
-            }else if(localStorage.getItem('breaktime') == '五分钟'){
-                this.timers(5)
-            }else if(localStorage.getItem('breaktime') == '十分钟'){
-                this.timers(10)
-            }else if(localStorage.getItem('breaktime') == '半小时'){
-                this.timers(30)
-            }
-        }else{
-            this.timers(2)
-        }
+        // if(localStorage.getItem('breaktime')){
+        //     if(localStorage.getItem('breaktime') == '两分钟'){
+        //        this.timers(2)
+        //     }else if(localStorage.getItem('breaktime') == '五分钟'){
+        //         this.timers(5)
+        //     }else if(localStorage.getItem('breaktime') == '十分钟'){
+        //         this.timers(10)
+        //     }else if(localStorage.getItem('breaktime') == '半小时'){
+        //         this.timers(30)
+        //     }
+        // }else{
+        //     this.timers(2)
+        // }
         // console.log(localStorage.getItem('breaktime'))
         // console.log(this.maptime)
         
@@ -69,12 +69,12 @@ export default {
         // }
       },
     methods: {
-        timers(i){
-            clearInterval(this.timer)
-            this.timer =  setInterval(() => { 
-                    this.init();
-                }, this.mintime*i)
-        },
+        // timers(i){
+        //     clearInterval(this.timer)
+        //     this.timer =  setInterval(() => { 
+        //             this.init();
+        //         }, this.mintime*i)
+        // },
         init() {
             // 加载js;
             // loadScript({
@@ -178,7 +178,7 @@ export default {
             this.mapObj.map = map;
             
             this.$http.get("res/ponitMove/selectMapLocusList",{resId:this.propsmaps},res=>{
-                let pt = new obj.Point(res.data.new[0][0], res.data.new[0][1]); // 设置中心点
+                let pt = new obj.Point(res.data.new[res.data.new.length-1][0], res.data.new[res.data.new.length-1][1]); // 设置中心点
                 map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
                 this.point = res.data.all
                 var that = this
@@ -187,21 +187,28 @@ export default {
                 this.point.forEach ((el,index)=>{
                     if(index == ll){
                         that.createCircles(el,index)
-                    }else{
+                    }else if(index == 0){
                         that.createCircle(el,index)
+                    }else{
+                      if(el.placeStatus == "1"){
+                        that.createcangku(el,index)
+                      }else{
+                        that.creategan(el,index)
+                      }
                     }
                         
                 })
-                var polyline = new esri.geometry.Polyline(res.data.new);
-                var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([29,96,254]), 2);
-                var graphic = new esri.Graphic(polyline, symbol);
+                // var polyline = new esri.geometry.Polyline(res.data.new);
+                // var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([29,96,254]), 2);
+                // var graphic = new esri.Graphic(polyline, symbol);
 
-                var polylineold = new esri.geometry.Polyline(res.data.old);
-                var symbolold = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASHDOTDOT, new dojo.Color([169,168,166]), 2);
+                var polylineold = new esri.geometry.Polyline(res.data.new);
+                // var symbolold = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASHDOTDOT, new dojo.Color([169,168,166]), 2);
+                var symbolold = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([29,96,254]), 2);
                 var graphicold = new esri.Graphic(polylineold, symbolold);
 
                 setTimeout(function(){
-                    map.graphics.add(graphic)
+                    // map.graphics.add(graphic)
                     map.graphics.add(graphicold)
                 },3000);
                     
@@ -219,7 +226,57 @@ export default {
             this.mapObj.map.addLayer(gl);
             var labelPoint=new esri.geometry.Point(el.longitude,el.latitude);
             var labelSymbol =  new esri.symbol.PictureMarkerSymbol({
-                url:require('../../public/img/x1.png'),
+                url:require('../../public/img/155.png'),
+                "height":28,
+                "width":22,
+                "type":"esriPMS",
+                "angle": 0,
+              });
+            // var labelSymbol=new esri.symbol.SimpleMarkerSymbol();
+            var labelGraphic=new this.mapObj.Graphic(labelPoint,labelSymbol);
+
+            //添加到地图 
+            gl.add(labelGraphic);
+            // gl.onClick = function(evt){
+            // that.$emit('ip',el.id)
+            // }
+
+
+            
+        },
+        createcangku(el,dd) {
+            var that = this
+            var c = dd+'xxxx'
+            let gl = new this.mapObj.GraphicsLayer({id:c});
+            this.mapObj.map.addLayer(gl);
+            var labelPoint=new esri.geometry.Point(el.longitude,el.latitude);
+            var labelSymbol =  new esri.symbol.PictureMarkerSymbol({
+                url:require('../../public/img/157.png'),
+                "height":28,
+                "width":22,
+                "type":"esriPMS",
+                "angle": 0,
+              });
+            // var labelSymbol=new esri.symbol.SimpleMarkerSymbol();
+            var labelGraphic=new this.mapObj.Graphic(labelPoint,labelSymbol);
+
+            //添加到地图 
+            gl.add(labelGraphic);
+            // gl.onClick = function(evt){
+            // that.$emit('ip',el.id)
+            // }
+
+
+            
+        },
+        creategan(el,zz) {
+            var that = this
+            var c = zz+'rrrr'
+            let gl = new this.mapObj.GraphicsLayer({id:c});
+            this.mapObj.map.addLayer(gl);
+            var labelPoint=new esri.geometry.Point(el.longitude,el.latitude);
+            var labelSymbol =  new esri.symbol.PictureMarkerSymbol({
+                url:require('../../public/img/158.png'),
                 "height":28,
                 "width":22,
                 "type":"esriPMS",
@@ -244,7 +301,7 @@ export default {
             this.mapObj.map.addLayer(gl);
             var labelPoint=new esri.geometry.Point(el.longitude,el.latitude);
             var labelSymbol =  new esri.symbol.PictureMarkerSymbol({
-                url:require('../../public/img/x2.png'),
+                url:require('../../public/img/156.png'),
                 "height":28,
                 "width":22,
                 "type":"esriPMS",

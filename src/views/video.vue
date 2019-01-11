@@ -60,15 +60,25 @@
                         <p>2018/11/12 06:00:00-09:00:00</p>
                         <p style="color:#999" v-if="index != 7">|</p>
                     </div>
-                    <p style="margin-top:15px">总计缺失时长：<span style="color:#5386FE">20小时10份30秒</span></p>
+                    <p style="margin-top:15px">总计缺失时长：<span style="color:#5386FE">20小时10分30秒</span></p>
                 </div>
             </div>
             <div class="detail-title">
                   <img src="../../public/img/151.png"/>
                   <p>备录视频统计</p>
             </div>
-            <div style="height:300px">
+            <div style="height:300px;display:flex">
                 <div id="echartstwo" ></div>
+                <div class="rightmain">
+                    <img src="../../public/img/153.png" class="topimg" @click="bottomt"/>
+                    <img src="../../public/img/154.png" class="bottomimg" @click="bottomb"/>
+                    <p style="margin-bottom:15px">缺失统计</p>
+                    <div class="maintext" v-for="(aa,index) in bottommainlist" :key="index" v-if="index >= (currentnew - 1) * 8 && index+1 <= (currentnew) * 8">
+                        <span style="color:#999" v-if="!(index == 0 || index == (currentnew - 1)*8)">|</span>
+                        <p >{{aa.finalTime}}</p>
+                    </div>
+                    <p style="position:absolute;bottom:-35px;left:80px">总计缺失时长：<span style="color:#5386FE">{{bottomlist.hour}}小时{{bottomlist.min}}分{{bottomlist.second}}秒</span></p>
+                </div>
             </div>
         </div>
     </div>
@@ -82,6 +92,8 @@
     },
     data () {
       return {
+          totalPages:0,
+          currentnew:1,
           data2:[1,2,3,4],
           data1:[{userName:'大范甘迪发',name1:'1',name2:'1',name3:'0'},{userName:'但是',name1:'0',name2:'1',name3:'0'}],
           columns1:[],
@@ -109,6 +121,8 @@
           indeterminate: false,
           checkAll: false,
           echartsshow:false,
+          bottomlist:[],
+          bottommainlist:[],
       }
     },
     created(){
@@ -141,7 +155,7 @@
        this.$http.get("oauth/baseArea/selectAreaByParentCode?parentCode=420100",{},res=>{
               this.addcodelist = res.data
             },err=>{});
-        this.$http.get("/report/report/selectManagementUnit?",{dictCodes:'managementUnit'},res=>{
+        this.$http.get("/oauth/dict/selectManagementUnit?",{dictCodes:'managementUnit'},res=>{
               this.cityList = res.data
             },err=>{});
     },
@@ -225,12 +239,37 @@
             
         },
         gotodetal(name){
+          this.currentnew=1
           this.echartsshow = true
           console.log(name)
-          setTimeout(() => {
-              this.echartscamera()
-              this.echartscamera2()
+          this.$http.get("res/ftpVideo/cameraVideoCoordinate?",{day:'2019-01-09',ipAddress:'192.168.8.63'},res=>{
+              this.bottomlist = res.data
+              this.bottommainlist = res.data.time.content
+              this.totalPages = res.data.time.totalPages
+            },err=>{});
+        this.$http.get("res/ftpVideo/backupCameraVideo?",{day:'2019-01-09',ipAddress:'192.168.8.63'},res=>{
+              setTimeout(() => {
+            //   this.echartscamera()
+              this.echartscamera2(res.data)
            }, 200);
+            },err=>{});
+          
+        },
+        //备录上一页
+        bottomt(){
+          if(this.currentnew == 1){
+              this.$Message.info('已经是第一页了');
+          }else{
+             this.currentnew-- 
+          }
+        },
+        //备录下一页
+        bottomb(){
+          if(this.currentnew == this.totalPages){
+              this.$Message.info('已经是最后一页了');
+          }else{
+              this.currentnew++
+          }
         },
         echartscamera(){
             let myChart = this.$echarts.init(document.getElementById('echartsone'))
@@ -325,18 +364,19 @@
                 series:aa
                         })
         },
-        echartscamera2(){
+        echartscamera2(data){
             let myChart = this.$echarts.init(document.getElementById('echartstwo'))
             window.addEventListener("resize", function () {
             myChart.resize();
             });
-            var date = '2016-08-09';
+            var date = '2019-01-09'
+            // var date = '2016-08-09';
             var aa =  [
                 {
                         type: 'line',
                         // symbol: "roundRect",
-                        lineStyle:{color:'#C1C1C1',type:'dashed'},
-                        itemStyle:{opacity:'0'},
+                        lineStyle:{color: "#C1C1C1", type: "dashed"},
+                        itemStyle:{opacity:"0"},
                         data: [{
                             name: '均值1',
                             value: ["2016-08-09 00:00:00", '备录']
@@ -352,7 +392,7 @@
                         lineStyle:{color:'#00E115'},
                         data: [{
                             name: '均值1',
-                            value: ["2016-08-09 10:05:22", '备录']
+                            value: ["2016-08-09 6:05:22", '备录']
                         }, {
                             name: '均值2',
                             value: ["2016-08-09 15:05:22", '备录']
@@ -419,7 +459,7 @@
                         data:['', '备录','']
                     }
                 ],
-                series:aa
+                series:data
                         })
         }
 

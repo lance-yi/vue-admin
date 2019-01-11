@@ -368,8 +368,8 @@
                     <img src="../../public/img/1.gif" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 2" @click="checklanone"/>
                     <img src="../../public/img/2.gif" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 1" @click="checklanone"/>
                     <img src="../../public/img/gg2.png" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 0" @click="checklanone"/>
-                    <img src="../../public/img/gg2.png" style="left:520px;" class="fixedimg"  v-if="devicetype.Wan == 1"/>
-                    <img src="../../public/img/1.gif" style="left:520px;" class="fixedimg"  v-if="devicetype.Wan == 0"/>
+                    <img src="../../public/img/gg2.png" style="left:515px;" class="fixedimg"  v-if="devicetype.Wan == 1"/>
+                    <img src="../../public/img/1.gif" style="left:515px;" class="fixedimg"  v-if="devicetype.Wan == 0"/>
                    
                    
                   <img src="../../public/img/wg.png"/>
@@ -3903,7 +3903,7 @@ export default {
 .detail-textbox{
   text-align: left;
   font-size: 14px;
-  margin-left: 15px;
+  margin-left: 30px;
   width: calc(100% - 620px);
 }
 .detail-textbox div{
@@ -4168,4 +4168,5 @@ export default {
     position: absolute;
     bottom: 75px;
 }
+
 </style>

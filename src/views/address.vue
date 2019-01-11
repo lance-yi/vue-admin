@@ -406,7 +406,7 @@ import city from "../../src/util/city.js";
                       ]);
                     }
                   }],
-        pages:'',
+        pages:1,
         data1:[],
         valuetable:'',
         statustable:false,
@@ -560,17 +560,23 @@ import city from "../../src/util/city.js";
       //表格分页
     changeliebiaopage(i){
         if(this.checknum = 'name2'){
-          
+          // this.$http.get("res/ponitMove/selectMoveRebuildList",{state:'-1',current:i,pageSize:10},res=>{
+          //     this.datalist = res.data
+          //   },err=>{});
          
         }else if(this.checknum = 'name3'){
-            
+            // this.$http.get("res/ponitMove/selectMoveRebuildList",{state:'1',rebuildType:'0',current:i,pageSize:10},res=>{
+            //   this.datalist = res.data
+            // },err=>{});
           
         }else if(this.checknum = 'name4'){
+          // this.$http.get("res/ponitMove/selectMoveRebuildList",{state:'1',rebuildType:'1',current:i,pageSize:10},res=>{
+          //     this.datalist = res.data
+          //   },err=>{});
              
         }else if(this.checknum = 'name1'){
             this.$http.get("res/ponitMove/selectAllPoint",{current:i,pageSize:10},res=>{
                 this.data1 = res.data.list
-                this.totals = res.data.total
             },err=>{});
         }  
     },

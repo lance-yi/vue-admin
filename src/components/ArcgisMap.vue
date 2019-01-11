@@ -17,4 +17,5 @@ export default initArcgis;
         height:100vh; 
         /* background: url("../assets/start.gif") no-repeat center; */
     }
+    
 </style>
