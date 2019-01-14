@@ -4,20 +4,20 @@
         <div style="padding:0 20px;text-align:left" >
                   
                   <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" @click="addrole">新增</button>
-                  <button   class="zhuanyixuke" @click="changerole">修改</button>
+                  <!-- <button   class="zhuanyixuke" @click="changerole">修改</button> -->
                   <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" @click="detelerole">删除</button>
                    <!-- <button   class="zhuanyixukes" @click="power">分配权限</button>
                   <button   class="zhuanyixukes" @click="allotuser">分配用户</button> -->
                       <Row>
                        <Col span="7" style="margin-right: 20px;">
-                           <div class="head-left">行政区划管理</div>
+                           <div class="head-left">告警类型管理</div>
                            <div style="border:1px solid  #e8eaec;padding-left:20px">
                               <Tree :data="data3"  show-checkbox @on-select-change="checkrole" :scheck-strictly="true" @on-check-change="getCheckedNodes"></Tree>
                            </div>
                        </Col>
                         <Col span="16">
-                           <i-table border  :columns="roletablehead" :data="roletabledata" id="wordbook" @on-selection-change="checkbookchange" ></i-table>
-                           <Page :total="totals" show-total @on-change="changemodal6page" :current.sync="pages"/>
+                           <!-- <i-table border  :columns="roletablehead" :data="roletabledata" id="wordbook" @on-selection-change="checkbookchange" ></i-table>
+                           <Page :total="totals" show-total @on-change="changemodal6page" :current.sync="pages"/> -->
                        </Col>
                       </Row>
                  </div>
@@ -25,7 +25,7 @@
                  
           <Modal
             v-model="modal4"
-            title="编辑行政区划"
+            :title="titledata"
             @on-ok="okrole('formrole')"
             >
              <Form ref="formrole" :model="formrole" :rules="rulerole" :label-width="100" >
@@ -36,7 +36,6 @@
                 <FormItem label="行政区划编码" prop="num" >
                     <Input v-model="formrole.num" />
                 </FormItem>
-
              </Form>
         </Modal>       
           
@@ -78,12 +77,13 @@
 // import TreeGrid from '@/components/treeGrid2.0'
 import axios from 'axios'
   export default {
-    name: 'administrativearea',
+    name: 'alarmconfiguratioan',
     components: {
         // TreeGrid
     },
     data () {
       return {
+          titledata:"新增告警类型分组",
           totals:0,
           data1:[],
           data2:[],
@@ -245,6 +245,11 @@ import axios from 'axios'
         })
       },
       addrole(){
+          if(this.clickarea.length == 0){
+              this.titledata="新增告警类型分组"
+          }else{
+              this.titledata="新增告警类型"
+          }
           this.formrole.name = ''
           this.formrole.num = ''
           this.roledata = []

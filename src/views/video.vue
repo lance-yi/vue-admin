@@ -95,7 +95,7 @@
           totalPages:0,
           currentnew:1,
           data2:[1,2,3,4],
-          data1:[{userName:'大范甘迪发',name1:'1',name2:'1',name3:'0'},{userName:'但是',name1:'0',name2:'1',name3:'0'}],
+          data1:[{userName:'大范甘迪发',name1:'0',name2:'0',name3:'0'},{userName:'但是',name1:'0',name2:'1',name3:'0'}],
           columns1:[],
           persontime:'',
           startTimeOptions: {
@@ -123,6 +123,7 @@
           echartsshow:false,
           bottomlist:[],
           bottommainlist:[],
+          list:[],
       }
     },
     created(){
@@ -132,26 +133,17 @@
           {title: 'IP地址',key: 'userName',width:110,},
           {title: '项目名称',key: 'userName',width:100},
           {title: '行政区域',key: 'userName',width:80,},
-          {title: '1',key: 'name1',width:30,
-          render:(h,params)=>{
-              return h('img',
-              {attrs: 
-              {src: (params.row.name1 == 1)?require('../../public/img/149.png'):require('../../public/img/150.png')},
-              style:{'vertical-align':'middle',cursor:'pointer'},
-              on: (params.row.name1 == 0)?{
-                  click: () => {this.gotodetal(params.row.userName)}}:''
-              },'img')}
-              },
-          {title: '2',key: 'name2',width:30,
-          render:(h,params)=>{
-              return h('img',{
-                  attrs: 
-                  {src: (params.row.name2 == 1)?require('../../public/img/149.png'):require('../../public/img/150.png')},style:{'vertical-align':'middle',cursor:'pointer'},
-                   on: (params.row.name2 == 0)?{
-                  click: () => {this.gotodetal(params.row.userName)}}:''
-                 },'img')}
-                  }
           ],
+          this.list = [{title: '1',key: 'name1',width:30},{title: '2',key: 'name2',width:30}]
+           this.list.forEach(data => { this.$set(data,'render',
+                    (h,params)=>{
+                    return h('img',{
+                        attrs: 
+                        {src: (params.row[params.column.key]  == 1)?require('../../public/img/149.png'):require('../../public/img/150.png')},style:{'vertical-align':'middle',cursor:'pointer'},
+                        on: (params.row[params.column.key]  == 0)?{
+                        click: () => {this.gotodetal(params)}}:''
+                        },'img')})})
+                 this.list.forEach(data => {this.columns1.push(data) })  
        this.$http.get("oauth/baseArea/selectAreaByParentCode?parentCode=420100",{},res=>{
               this.addcodelist = res.data
             },err=>{});
@@ -227,21 +219,27 @@
                 }
                 
             }
-            
             this.columns1 = [ {title: '安装地址',key: 'userName'},
           {title: 'IP地址',key: 'userName',width:110,},
           {title: '项目名称',key: 'userName',width:100},
           {title: '行政区域',key: 'userName',width:80,},
-          {title: '1',key: 'name1',width:30,render:(h,params)=>{return h('img',{attrs: {src: (params.row.name1 == 1)?require('../../public/img/149.png'):require('../../public/img/150.png')},style:{'vertical-align':'middle'},on: {click: () => {this.gotodetal(params.row.id)}}},'img')}},
-          {title: '2',key: 'name2',width:30,render:(h,params)=>{return h('img',{attrs: {src: (params.row.name2 == 1)?require('../../public/img/149.png'):require('../../public/img/150.png')},style:{'vertical-align':'middle'},on: {click: () => {this.gotodetal(params.row.id)}}},'img')}},
-           {title: '3',key: 'name3',width:30,render:(h,params)=>{return h('img',{attrs: {src: (params.row.name3 == 1)?require('../../public/img/149.png'):require('../../public/img/150.png')},style:{'vertical-align':'middle'},on: {click: () => {this.gotodetal(params.row.id)}}},'img')}}
-          ]
+          ],
+           this.list = [{title: '1',key: 'name1',width:30},{title: '2',key: 'name2',width:30},{title: '3',key: 'name3',width:30}]
+           this.list.forEach(data => { this.$set(data,'render',
+                    (h,params)=>{
+                    return h('img',{
+                        attrs: 
+                        {src: (params.row[params.column.key]  == 1)?require('../../public/img/149.png'):require('../../public/img/150.png')},style:{'vertical-align':'middle',cursor:'pointer'},
+                        on: (params.row[params.column.key]  == 0)?{
+                        click: () => {this.gotodetal(params)}}:''
+                        },'img')})})
+                 this.list.forEach(data => {this.columns1.push(data) })   
+           
             
         },
         gotodetal(name){
           this.currentnew=1
           this.echartsshow = true
-          console.log(name)
           this.$http.get("res/ftpVideo/cameraVideoCoordinate?",{day:'2019-01-09',ipAddress:'192.168.8.63'},res=>{
               this.bottomlist = res.data
               this.bottommainlist = res.data.time.content

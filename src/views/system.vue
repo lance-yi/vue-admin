@@ -575,6 +575,8 @@ import TreeGrid from '@/components/treeGrid2.0'
               this.$router.push({path:'/system/echartstime'})
          }else if(name == '行政区划'){
               this.$router.push({path:'/system/administrativearea'})
+         }else if(name == '告警配置'){
+              this.$router.push({path:'/system/alarmconfiguratioan'})
          }
       },
       checkbook(list){

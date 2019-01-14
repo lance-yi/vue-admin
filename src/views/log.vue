@@ -218,7 +218,7 @@ import ArcgisMaplog from "@/components/ArcgisMaplog";
        },
        ip(data){
            this.oldip = data
-           this.$http.get("gis/gis/getGatewayById?",{gatewayId:data},res=>{
+           this.$http.get("res/gis/getGatewayById?",{gatewayId:data},res=>{
              this.serachvalues = res.data.installAddress
           },err=>{});
         //   this.$http.get("log/logOverView/findAll",{gatewayId:data},res=>{

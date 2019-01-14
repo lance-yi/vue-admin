@@ -1,16 +1,20 @@
 <template>
   <div class="workdetail" v-if="workdetailshow" @click.stop="workdetailshow = true">
-              <Tabs active-key="0" @on-click="editorshow = true">
+    <div v-if="jwshow" style="position:absolute;top:43%;right: 0%;z-index: 555;" @click.stop="jwshow = true">
+         <img src="../../public/img/xxx.png" @click.stop="jwshow = false" style="position:absolute;top:5%;left: 95%;z-index: 555;"/>
+          <ArcgisMapsaddresjw  @lats='lats' @lons='lons'/>
+       </div>
+              <Tabs active-key="0" @on-click="editorshow = true,jwshow = false">
                 <Tab-pane :label="list.portName ?list.deviceType+'('+list.portName+')':list.deviceType" :key="index" v-for="(list,index) in workdetaillist">
                   <div class="detail-title" style="margin-top:10px;">
                     <img src="../../public/img/20.png"/>
                     <p >基本信息</p>
                   </div>
-                  <img src="../../public/img/xiaowg.png" style="position:absolute;top:-6px" v-if="list.deviceType == '安全网关'"/>
+                  <img src="../../public/img/xiaowg.png" style="position:absolute;top:-10px;width: 120px;" v-if="list.deviceType == '安全网关'"/>
                   <img src="../../public/img/dianzi.png" style="position:absolute;top:-6px" v-if="list.deviceType == '电子围栏'"/>
                   <img src="../../public/img/wifi.png" style="position:absolute;top:-6px" v-if="list.deviceType == 'wifi嗅探'"/>
                   <img src="../../public/img/shexiang.png" style="position:absolute;top:-6px" v-if="list.deviceType == '摄像机'"/>
-                  <img src="../../public/img/139.png" style="position:absolute;top:-6px" v-if="list.deviceType == '智能电源'"/>
+                  <img src="../../public/img/139.png" style="position:absolute;top:-6px;width: 100px;" v-if="list.deviceType == '智能电源'"/>
 
 
                   <div class="content" style="border:none;" v-if="list.deviceType == 'wifi嗅探' || list.deviceType == '电子围栏'">
@@ -34,7 +38,9 @@
                       <div style="min-width:30%">
                         <p>维护人员：</p>
                         <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
+                        <Select v-model="list.entity.maintenanceUserId" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
+                          <Option v-for="item in userlist.maintenanceUser" :value="item.value" :key="item.value">{{item.label}}</Option>
+                        </Select>
                       </div>
                       <div style="min-width:30%">
                         <p>管理单位：</p>
@@ -89,12 +95,12 @@
                       <div style="min-width:30%">
                         <p>经度：</p>
                         <span v-if="editorshow">{{list.entity.longitude}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" />
+                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" @on-focus="jwmap(index)"/>
                       </div>
                       <div style="min-width:30%">
                         <p>纬度：</p>
                         <span v-if="editorshow">{{list.entity.latitude}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" />
+                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" @on-focus="jwmap(index)"/>
                       </div>
                       <div style="min-width:30%">
                         <p>地址掩码：</p>
@@ -114,7 +120,9 @@
                       <div style="min-width:30%">
                         <p>维护人员：</p>
                         <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
+                        <Select v-model="list.entity.maintenanceUserId" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
+                          <Option v-for="item in userlist.maintenanceUser" :value="item.value" :key="item.value">{{item.label}}</Option>
+                        </Select>
                       </div>
                       <div style="min-width:30%">
                         <p>网关名称：</p>
@@ -167,7 +175,9 @@
                       <div style="min-width:30%">
                         <p>行政区域：</p>
                         <span v-if="editorshow">{{list.entity.areaCode}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.areaCode" :placeholder="list.entity.areaCode" style="width: 160px;margin-top: 0" />
+                        <Select v-model="list.entity.areaCode" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
+                          <Option v-for="item in arealist.areaCode" :value="item.value" :key="item.value">{{item.label}}</Option>
+                        </Select>
                       </div>
                       <div style="min-width:30%">
                         <p>证书编号：</p>
@@ -211,12 +221,12 @@
                       <div style="min-width:30%">
                         <p>纬度：</p>
                         <span v-if="editorshow">{{list.entity.latitude}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" />
+                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" @on-focus="jwmap(index)"/>
                       </div>
                       <div style="min-width:30%">
                         <p>经度：</p>
                         <span v-if="editorshow">{{list.entity.longitude}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" />
+                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" @on-focus="jwmap(index)"/>
                       </div>
                       <div style="min-width:30%">
                         <p>MAC地址：</p>
@@ -226,7 +236,9 @@
                       <div style="min-width:30%">
                         <p>责任人：</p>
                         <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
+                        <Select v-model="list.entity.maintenanceUserId" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
+                          <Option v-for="item in userlist.maintenanceUser" :value="item.value" :key="item.value">{{item.label}}</Option>
+                        </Select>
                       </div>
                       <div style="min-width:30%">
                         <p>责任人联系方式：</p>
@@ -286,7 +298,9 @@
                       <div style="min-width:30%">
                         <p>行政区域：</p>
                         <span v-if="editorshow">{{list.entity.areaCode}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.areaCode" :placeholder="list.entity.areaCode" style="width: 160px;margin-top: 0" />
+                        <Select v-model="list.entity.areaCode" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
+                          <Option v-for="item in arealist.areaCode" :value="item.value" :key="item.value">{{item.label}}</Option>
+                        </Select>
                       </div>
                       <div style="min-width:30%">
                         <p>国标编码：</p>
@@ -375,7 +389,9 @@
                       <div style="min-width:30%">
                         <p>维护人员：</p>
                         <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.maintenanceUser" :placeholder="list.entity.maintenanceUser" style="width: 160px;margin-top: 0" />
+                       <Select v-model="list.entity.maintenanceUserId" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
+                          <Option v-for="item in userlist.maintenanceUser" :value="item.value" :key="item.value">{{item.label}}</Option>
+                        </Select>
                       </div>
                   </div>
 
@@ -387,12 +403,12 @@
                       <div style="min-width:30%">
                         <p>经度：</p>
                         <span v-if="editorshow">{{list.entity.longitude}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" />
+                        <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" @on-focus="jwmap(index)"/>
                       </div>
                       <div style="min-width:30%">
                         <p>纬度：</p>
                         <span v-if="editorshow">{{list.entity.latitude}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" />
+                        <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" @on-focus="jwmap(index)"/>
                       </div>
                       <div style="min-width:30%">
                         <p>管理单位：</p>
@@ -451,20 +467,29 @@
             <!-- <button   class="zhuanyixukes closebtn" @click="closecard">关闭</button> -->
             </div>
 
-  
+        
 </template>
 
 <script>
-
+import ArcgisMapsaddresjw from "@/components/ArcgisMapsaddresjw";
 export default {
   name: 'ipDevice',
+  components: {
+        ArcgisMapsaddresjw
+    },
   props: {
     workdetailshow:{type:Boolean,},
     workdetaillist:{type:Array,}
   },
   data () {
     return {
+      jwindex:0,
+      latnum:'',
+      lonnum:'',
+      jwshow:false,
+      arealist:[],
       meun:[],
+      userlist:[],
       newdata:[],
       editorshow:true,
       olddata:[],
@@ -511,11 +536,12 @@ export default {
     },
   methods:{
     closecard(){
+        this.jwshow = false
         this.editorshow = true
         this.$emit('closeworkdetailshow','false');
     },
     saveeditor(list,index){
-      console.log(list)
+      this.jwshow = false
       if(list.deviceType == '安全网关'){
         this.$http.post("res/socGateway/update",list.entity,res=>{
           this.$Message.info(res.message);
@@ -569,11 +595,18 @@ export default {
     backeditor(index){
       this.$emit('oldworkdata',this.olddata);
       this.editorshow = true
+      this.jwshow = false
     },
     edit(){
       this.olddata = this.workdetaillist
       this.$http.get("res/socGateway/getDeviceDic?pageKey=resources",{},res=>{
            this.meun = res.data
+          },err=>{});
+      this.$http.get("oauth/userMaintain/selectUser",{},res=>{
+           this.userlist = res.data
+          },err=>{});
+      this.$http.get("oauth/baseArea/selectAreaByParentCodeEdit",{parentCode:420100},res=>{
+           this.arealist = res.data
           },err=>{});
           this.editorshow = false
     },
@@ -587,7 +620,20 @@ export default {
       if(this.workdetaillist[0].deviceType == '安全网关'){
        this.workdetaillist[0].entity.systemTime = val
       }
-    }
+    },
+    jwmap(index){
+        this.jwindex = index
+        this.jwshow = true
+      },
+      lats(data){
+        this.workdetaillist[this.jwindex].entity.latitude = data.toString()
+        this.latnum = data
+      },
+      lons(data){
+        console.log(data)
+        this.workdetaillist[this.jwindex].entity.longitude = data.toString()
+        this.lonnum = data
+      }
   },
 }
 </script>

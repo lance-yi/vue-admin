@@ -168,8 +168,8 @@ export default {
             map.addLayer(img); // 将图层添加到map对象
             map.addLayer(cia);
             this.mapObj.map = map;
-            
-            this.$http.get("gis/gis/getLalontude",{requestModular:1},res=>{
+           
+            this.$http.get("res/gis/getLalontude",{requestModular:1},res=>{
                 // console.log(res.data)
                 this.point = res.data
                 var that = this

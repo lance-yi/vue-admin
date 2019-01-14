@@ -164,10 +164,10 @@ export default {
             };
         },
         initMap(obj) {
-            // obj.basemaps.delorme = {baseMapLayers: [{url: "http://100.16.3.40:6080/arcgis/rest/services/wuhann/MapServer"}]}
+            obj.basemaps.delorme = {baseMapLayers: [{url: "https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer"}]}
             this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
-            let map = new obj.Map('map', {logo: false,basemap: "dark-gray-vector",},);// 创建地图实例
-            // let map = new obj.Map('map', {logo: false,basemap: "delorme",},);
+            // let map = new obj.Map('map', {logo: false,basemap: "dark-gray-vector",},);// 创建地图实例
+            let map = new obj.Map('map', {logo: false,basemap: "delorme",},);
             let pt = new obj.Point(114.420148, 30.474698); // 设置中心点
             map.centerAndZoom(pt,13); // 设置中心点和缩放级别;
             let img = new TDT('img'); // 影像

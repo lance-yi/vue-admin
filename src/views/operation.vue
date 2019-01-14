@@ -1997,11 +1997,11 @@ export default {
       this.lanfour = false
       this.getwayip = data
       this.typeone = true
-       this.$http.get("gis/gis/getGatewayById?",{gatewayId:data},res=>{
+       this.$http.get("res/gis/getGatewayById?",{gatewayId:data},res=>{
           this.rightlist = res.data
 
           //右侧状态数据
-           this.$http.get("gis/gis/getGatewayIndexAlert?",{gatewayIp:this.rightlist.gatewayIp},res=>{
+           this.$http.get("res/gis/getGatewayIndexAlert?",{gatewayIp:this.rightlist.gatewayIp},res=>{
             this.rightlist2 = res.data
     
           },err=>{});
@@ -2058,19 +2058,19 @@ export default {
           },err=>{});
 
           //通讯状况表
-          this.$http.get("gis/gis/getGatewayState?",{gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getGatewayState?",{gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
 
 
           //表格1
-          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.rightlist.gatewayIp},res=>{
+          this.$http.get("res/gis/getDevicePing?",{ipAddress:this.rightlist.gatewayIp},res=>{
               this.dataone = res.data
               this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
 
           //表格2
-          this.$http.get("gis/gis/getCrossGatewayByIp?",{gatewayIp:this.rightlist.gatewayIp},res=>{
+          this.$http.get("res/gis/getCrossGatewayByIp?",{gatewayIp:this.rightlist.gatewayIp},res=>{
               this.data2 = res.data.gateMapList
               this.datades = res.data
               this.data2.forEach (el=>{ if(el.isOnline == 1) { el.isOnline = '在线' }else{el.isOnline = '离线'}})
@@ -2105,10 +2105,10 @@ export default {
       this.typeone = true
       var cc=document.getElementsByClassName("bigright")[0];
       cc.style.cssText="z-index:100";
-       this.$http.get("gis/gis/getGatewayById?",{gatewayId:data},res=>{
+       this.$http.get("res/gis/getGatewayById?",{gatewayId:data},res=>{
           this.rightlist = res.data
           //右侧状态数据
-           this.$http.get("gis/gis/getGatewayIndexAlert?",{gatewayIp:this.rightlist.gatewayIp},res=>{
+           this.$http.get("res/gis/getGatewayIndexAlert?",{gatewayIp:this.rightlist.gatewayIp},res=>{
             this.rightlist2 = res.data
  
           },err=>{});
@@ -2144,13 +2144,13 @@ export default {
           },err=>{});
 
           //表格1
-          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.rightlist.gatewayIp},res=>{
+          this.$http.get("res/gis/getDevicePing?",{ipAddress:this.rightlist.gatewayIp},res=>{
               this.dataone = res.data
               this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
 
           //表格2
-          this.$http.get("gis/gis/getCrossGatewayByIp?",{gatewayIp:this.rightlist.gatewayIp},res=>{
+          this.$http.get("res/gis/getCrossGatewayByIp?",{gatewayIp:this.rightlist.gatewayIp},res=>{
               this.data2 = res.data.gateMapList
               this.datades = res.data
               this.data2.forEach (el=>{ if(el.isOnline == 1) { el.isOnline = '在线' }else{el.isOnline = '离线'}})
@@ -2176,7 +2176,7 @@ export default {
           },err=>{});
 
           //通讯状况表
-          this.$http.get("gis/gis/getGatewayState?",{gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getGatewayState?",{gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
 
@@ -2236,14 +2236,14 @@ export default {
         }
     },
     allowchangetype(){
-      this.$http.put("gis/gis/changePortStatus",{gatewayId:this.rightlist.id,portMap:this.changeobj},res=>{
+      this.$http.put("res/gis/changePortStatus",{gatewayId:this.rightlist.id,portMap:this.changeobj},res=>{
         
       },err=>{});
     },
     boolping(){
       this.$Message.info('正在ping,请稍等');
       //表格1
-          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.rightlist.gatewayIp},res=>{
+          this.$http.get("res/gis/getDevicePing?",{ipAddress:this.rightlist.gatewayIp},res=>{
               this.dataone = res.data
               this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
@@ -2282,7 +2282,7 @@ export default {
           },err=>{});
 
           //表格1
-          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN6.deviceIp},res=>{
+          this.$http.get("res/gis/getDevicePing?",{ipAddress:this.devicetype.LAN6.deviceIp},res=>{
               this.dataone = res.data
               this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
@@ -2306,12 +2306,12 @@ export default {
           },err=>{});
 
           //通讯流图表
-          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN6',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN6',gatewayId:this.olddata},res=>{
               this.drawLine(res.data.lanFlow)
           },err=>{});
 
           //通讯状况表
-          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN6',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getGatewayState?",{lan:'LAN6',gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
     },
@@ -2350,7 +2350,7 @@ export default {
               }
           },err=>{});
           //表格1
-          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN5.deviceIp},res=>{
+          this.$http.get("res/gis/getDevicePing?",{ipAddress:this.devicetype.LAN5.deviceIp},res=>{
               this.dataone = res.data
               this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
@@ -2373,12 +2373,12 @@ export default {
           },err=>{});
 
           //通讯流图表
-          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN5',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN5',gatewayId:this.olddata},res=>{
               this.drawLine(res.data.lanFlow)
           },err=>{});
 
           //通讯状况表
-          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN5',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getGatewayState?",{lan:'LAN5',gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
     },
@@ -2416,7 +2416,7 @@ export default {
           },err=>{});
           
           //表格1
-          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN4.deviceIp},res=>{
+          this.$http.get("res/gis/getDevicePing?",{ipAddress:this.devicetype.LAN4.deviceIp},res=>{
               this.dataone = res.data
               this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
@@ -2439,12 +2439,12 @@ export default {
           },err=>{});
 
           //通讯流图表
-          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN4',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN4',gatewayId:this.olddata},res=>{
               this.drawLine(res.data.lanFlow)
           },err=>{});
 
           //通讯状况表
-          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN4',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getGatewayState?",{lan:'LAN4',gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
     },
@@ -2482,7 +2482,7 @@ export default {
               }
           },err=>{});
           //表格1
-          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN3.deviceIp},res=>{
+          this.$http.get("res/gis/getDevicePing?",{ipAddress:this.devicetype.LAN3.deviceIp},res=>{
               this.dataone = res.data
               this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
@@ -2505,12 +2505,12 @@ export default {
           },err=>{});
 
           //通讯流图表
-          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN3',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN3',gatewayId:this.olddata},res=>{
               this.drawLine(res.data.lanFlow)
           },err=>{});
 
           //通讯状况表
-          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN3',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getGatewayState?",{lan:'LAN3',gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
 
@@ -2550,7 +2550,7 @@ export default {
               }
           },err=>{});
           //表格1
-          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN2.deviceIp},res=>{
+          this.$http.get("res/gis/getDevicePing?",{ipAddress:this.devicetype.LAN2.deviceIp},res=>{
               this.dataone = res.data
               this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
@@ -2573,12 +2573,12 @@ export default {
           },err=>{});
 
           //通讯流图表
-          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN2',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN2',gatewayId:this.olddata},res=>{
               this.drawLine(res.data.lanFlow)
           },err=>{});
 
           //通讯状况表
-          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN2',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getGatewayState?",{lan:'LAN2',gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
     },
@@ -2616,7 +2616,7 @@ export default {
               }
           },err=>{});
           //表格1
-          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN1.deviceIp},res=>{
+          this.$http.get("res/gis/getDevicePing?",{ipAddress:this.devicetype.LAN1.deviceIp},res=>{
               this.dataone = res.data
               this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
@@ -2639,12 +2639,12 @@ export default {
           },err=>{});
 
           //通讯流图表
-          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN1',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN1',gatewayId:this.olddata},res=>{
               this.drawLine(res.data.lanFlow)
           },err=>{});
 
           //通讯状况表
-          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN1',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getGatewayState?",{lan:'LAN1',gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
     },
@@ -2682,7 +2682,7 @@ export default {
               }
           },err=>{}); 
           //表格1
-          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN7.deviceIp},res=>{
+          this.$http.get("res/gis/getDevicePing?",{ipAddress:this.devicetype.LAN7.deviceIp},res=>{
               this.dataone = res.data
               this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
@@ -2705,12 +2705,12 @@ export default {
           },err=>{});
 
           //通讯流图表
-          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN7',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN7',gatewayId:this.olddata},res=>{
               this.drawLine(res.data.lanFlow)
           },err=>{});
 
           //通讯状况表
-          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN7',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getGatewayState?",{lan:'LAN7',gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
     },
@@ -2747,7 +2747,7 @@ export default {
               }
           },err=>{});
           //表格1
-          this.$http.get("gis/gis/getDevicePing?",{ipAddress:this.devicetype.LAN8.deviceIp},res=>{
+          this.$http.get("res/gis/getDevicePing?",{ipAddress:this.devicetype.LAN8.deviceIp},res=>{
               this.dataone = res.data
               this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
@@ -2770,12 +2770,12 @@ export default {
           },err=>{});
 
           //通讯流图表
-          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN8',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getOnlineLanFlow?",{gatewayIp:this.rightlist.gatewayIp,lan:'LAN8',gatewayId:this.olddata},res=>{
               this.drawLine(res.data.lanFlow)
           },err=>{});
 
           //通讯状况表
-          this.$http.get("gis/gis/getGatewayState?",{lan:'LAN8',gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getGatewayState?",{lan:'LAN8',gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
           
@@ -3267,17 +3267,17 @@ export default {
         this.repoetmapshow = false
         this.timeOffsetAlertshow = false
         this.repoetshow = true
-          this.$http.get("gis/gis/getOnlineLanFlow?",{gatewayIp:list.ipAddr,lan:list.lan,gatewayId:list.gatewayId},res=>{
+          this.$http.get("res/gis/getOnlineLanFlow?",{gatewayIp:list.ipAddr,lan:list.lan,gatewayId:list.gatewayId},res=>{
               this.drawLine(res.data.lanFlow)
           },err=>{});
 
           //通讯状况表
-          this.$http.get("gis/gis/getGatewayState?",{lan:list.lan,gatewayId:list.gatewayId},res=>{
+          this.$http.get("res/gis/getGatewayState?",{lan:list.lan,gatewayId:list.gatewayId},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
 
           //表格1
-          this.$http.get("gis/gis/getDevicePing?",{ipAddress:list.ipAddr},res=>{
+          this.$http.get("res/gis/getDevicePing?",{ipAddress:list.ipAddr},res=>{
               this.dataone = res.data
               this.dataone.forEach (el=>{ if(el.status == 1) { el.status = '通' }else{el.status = '不通'}})
           },err=>{});
@@ -3998,7 +3998,7 @@ export default {
     see(){
       this.wgeachrtsshow = true
       //通讯状况表
-          this.$http.get("gis/gis/getGatewayState?",{gatewayId:this.olddata},res=>{
+          this.$http.get("res/gis/getGatewayState?",{gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
     },

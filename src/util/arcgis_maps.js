@@ -168,7 +168,7 @@ export default {
             map.addLayer(cia);
             this.mapObj.map = map;
             
-            this.$http.get("gis/gis/getLalontude",{requestModular:2},res=>{
+            this.$http.get("res/gis/getLalontude",{requestModular:2},res=>{
                 // console.log(res.data)
                 this.point = res.data
                 var that = this
