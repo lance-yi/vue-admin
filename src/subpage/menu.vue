@@ -21,9 +21,10 @@
             <FormItem label="标题" prop="title" >
                 <Input v-model="formValidate.title" />
             </FormItem>
-             <FormItem label="父节点" prop="parentId" >
+             <!-- <FormItem label="父节点" prop="parentId" >
                 <Input v-model="formValidate.parentId" />
-            </FormItem>
+            </FormItem> -->
+            <p style="margin-left: 39px;margin-bottom: 10px;" v-if="parentdata != ''">父节点<span style="margin-left:10px">{{parentdata}}</span></p>
             <FormItem label="图标" prop="icon" >
                 <Input v-model="formValidate.icon" />
             </FormItem>
@@ -60,6 +61,7 @@ import TreeGrid from '@/components/treeGrid2.0'
     },
     data () {
       return {
+          parentdata:'',
           formValidate: {
                     title: '',
                     parentId:'',
@@ -92,19 +94,23 @@ import TreeGrid from '@/components/treeGrid2.0'
                     { required: true, message: '地址不能为空', trigger: 'blur' }
                 ],
             },
-           columns: [{
+           columns: [
+               {
                     type: 'selection',
                     width: '50',
-                }, {
+                }, 
+                {
                     title: '标题',
                     key: 'text',
                     sortable: true,
                     width: '100',
-                }, {
-                    title: '父节点',
-                    key: 'parentId',
-                    width: '100',
-                }, {
+                }, 
+                // {
+                //     title: '父节点',
+                //     key: 'parentId',
+                //     width: '10',
+                // }, 
+                {
                     title: '图标名称',
                     key: 'icon',
                     width: '80',
@@ -225,6 +231,7 @@ import TreeGrid from '@/components/treeGrid2.0'
                 // console.log('点击事件:' + event)
                 this.selectnum = 2
                 this.formValidate.title = data.text
+                this.parentdata=''
                 this.formValidate.description = data.description
                 this.formValidate.parentId= data.parentId
                 this.formValidate.icon = data.icon
@@ -235,6 +242,7 @@ import TreeGrid from '@/components/treeGrid2.0'
                 this.modal1 = true
             },
         selectionClick(arr) {
+            console.log(arr)
             this.selectlist = arr
         },
         sortClick(key, type) {
@@ -242,16 +250,34 @@ import TreeGrid from '@/components/treeGrid2.0'
             console.log('排序规则:' + type)
         },
         addmenu(){
-            this.selectnum = 1
-            this.formValidate.title = ''
-            this.formValidate.parentId= ''
-            this.formValidate.icon= ''
-            this.formValidate.sort= ''
-            this.formValidate.description= ''
-            this.formValidate.code= ''
-            this.formValidate.href= ''
-            this.formValidate.id= ''
-            this.modal1 = true
+            if(this.selectlist.length == 0){
+                this.selectnum = 1
+                this.parentdata = '-1'
+                this.formValidate.title = ''
+                this.formValidate.parentId= '-1'
+                this.formValidate.icon= ''
+                this.formValidate.sort= ''
+                this.formValidate.description= ''
+                this.formValidate.code= ''
+                this.formValidate.href= ''
+                this.formValidate.id= ''
+                this.modal1 = true
+            }else if(this.selectlist.length == 1){
+                this.selectnum = 1
+                this.formValidate.title = ''
+                this.parentdata =this.selectlist[0].text
+                this.formValidate.parentId= this.selectlist[0].id
+                this.formValidate.icon= ''
+                this.formValidate.sort= ''
+                this.formValidate.description= ''
+                this.formValidate.code= ''
+                this.formValidate.href= ''
+                this.formValidate.id= ''
+                this.modal1 = true
+            }else if(this.selectlist.length > 1){
+                this.$Message.error('只能选择一个节点新增');
+            }
+            
         },
         ok(name){
              this.$refs[name].validate((valid) => {
@@ -280,14 +306,25 @@ import TreeGrid from '@/components/treeGrid2.0'
         deletemenu(){
              if(this.selectlist.length == 0){
                  this.$Message.error('请选择需要删除的条目！');
-             }else{
-                 this.$http.delete("oauth/menu/deleteByIds",this.selectlist,res=>{
+             }else if(this.selectlist.length > 0){
+                 var aa = 1
+                 this.selectlist.forEach(data => { if(data.children.length >0){
+                    aa = 2
+                 }})
+                 if(aa == 1){
+                     var list = []
+                     this.selectlist.forEach(data => {list.push(data.id) })
+                     this.$http.delete("oauth/menu/deleteByIds",list,res=>{
 
                         this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
                                 this.data = res.data      
                             },err=>{});
                         },err=>{});
+                 }else{
+                     this.$Message.error('请先删除子节点菜单');
+                 }
              }
+             
         }
     }
   }

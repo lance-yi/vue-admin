@@ -34,7 +34,7 @@
                 <tr v-for="(item,index) in initItems" :key="item.id" v-show="show(item)" :class="{'child-tr':item.parent}">
                     <td v-for="(column,snum) in columns" :key="column.key" :style=tdStyle(column)>
                         <label v-if="column.type === 'selection'">
-                            <input type="checkbox" :value="item.id" v-model="checkGroup" @click="handleCheckClick(item,$event,index)">
+                            <input type="checkbox" :value="item" v-model="checkGroup" @click="handleCheckClick(item,$event,index)">
                         </label>
                         <div v-if="column.type === 'action'">
                             <i-button :type="action.type" size="small" @click="RowClick(item,$event,index,action.text)" v-for='action in (column.actions)' :key="action.text">{{action.text}}</i-button>
@@ -305,36 +305,36 @@ export default {
         },
         //点击check勾选框,判断是否有children节点 如果有就一并勾选
         handleCheckClick(data, event, index){
-            data.isChecked = !data.isChecked;
+            // data.isChecked = !data.isChecked;
             var arr = data.children;
             if(arr){
                 if(data.isChecked){
-                    this.checkGroup.push(data.id);
-                    for (let i=0; i<arr.length; i++){
-                        this.checkGroup.push(arr[i].id)
-                    }
+                    // this.checkGroup.push(data);
+                    // for (let i=0; i<arr.length; i++){
+                    //     this.checkGroup.push(arr[i].id)
+                    // }
                 }else {
-                    for (var i=0; i<this.checkGroup.length; i++){
-                        if(this.checkGroup[i] == data.id){
-                            this.checkGroup.splice(i,1)
-                        }
-                        for (var j=0; j<arr.length; j++){
-                            if(this.checkGroup[i] == arr[j].id){
-                                this.checkGroup.splice(i,1);
-                            }
-                        }
-                    }
+                    // for (var i=0; i<this.checkGroup.length; i++){
+                    //     if(this.checkGroup[i] == data.id){
+                    //         this.checkGroup.splice(i,1)
+                    //     }
+                    //     for (var j=0; j<arr.length; j++){
+                    //         if(this.checkGroup[i] == arr[j].id){
+                    //             this.checkGroup.splice(i,1);
+                    //         }
+                    //     }
+                    // }
                 }
             }
         },
         //checkbox 全选 选择事件
         handleCheckAll() {
-            this.checks = !this.checks;
-            if (this.checks) {
-                this.checkGroup = this.getArray(this.checkGroup.concat(this.All(this.items)))
-            } else {
-                this.checkGroup = []
-            }
+            // this.checks = !this.checks;
+            // if (this.checks) {
+            //     this.checkGroup = this.getArray(this.checkGroup.concat(this.All(this.items)))
+            // } else {
+            //     this.checkGroup = []
+            // }
             // this.$emit('on-selection-change', this.checkGroup)
         },
         // 数组去重

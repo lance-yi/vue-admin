@@ -74,8 +74,8 @@
                <Page :total='totals' show-total class="fullpage" @on-change="changeliebiaopage"></Page>
           </div>
           <div :class="righttmainshow?'righttmain':'righttmains'">
-               <img src="../../public/img/r1.png" style="position:absolute;left:0;top:30%;cursor:pointer" @click="righttmainshow = !righttmainshow" v-if="!righttmainshow"/>
-               <img src="../../public/img/r2.png" style="position:absolute;left:0;top:30%;cursor:pointer" @click="righttmainshow = !righttmainshow" v-if="righttmainshow"/>
+               <img src="../../public/img/r1.png" style="position:absolute;left:0px;top:30%;cursor:pointer" @click="righttmainshow = !righttmainshow" v-if="!righttmainshow"/>
+               <img src="../../public/img/r2.png" style="position:absolute;left:0px;top:30%;cursor:pointer" @click="righttmainshow = !righttmainshow" v-if="righttmainshow"/>
                <div class="control-top" @click="righttmainshow = !righttmainshow" style="cursor:pointer">
                  <p >升级包列表</p>
                  

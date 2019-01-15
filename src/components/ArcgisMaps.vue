@@ -12,7 +12,7 @@ export default initArcgis;
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang = "less">
     .map {
-        padding-top: 60px;
+        padding-top: 120px;
          /* width: 100vw; */
         height:100vh; 
         /* background: url("../assets/start.gif") no-repeat center; */

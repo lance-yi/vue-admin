@@ -60,10 +60,10 @@
           </div>
           
           <div class="exjlist" v-if="aplotshow">
-              <div class="exj2" @click="educetable">
+              <!-- <div class="exj2" @click="educetable">
                     <img src="../../public/img/1242.png"/>
                     导出
-                </div>
+                </div> -->
               <div class="exj1" v-if="hadcol == 2" @click="tasknum">
                     <img src="../../public/img/124.png"/>
                     各区域任务数分配
@@ -1543,6 +1543,7 @@
           "yAxis": [
             {
               "type": "value",
+              "name": "数量",
               "nameTextStyle": {
                 "color": "#7d838b"
               },

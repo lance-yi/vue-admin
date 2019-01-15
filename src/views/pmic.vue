@@ -299,12 +299,12 @@
             </div>
 
          <!-- 点击ip弹窗 -->
-             <ipDevice :workdetailshow="workdetailshow" :workdetaillist="workdetaillist" @closeworkdetailshow="closeworkdetailshow" @oldworkdata="oldworkdata"/>
+             <ipDevice :workdetailshow="workdetailshow" :workdetaillist="workdetaillist" @closeworkdetailshow="closeworkdetailshow" @oldworkdata="oldworkdata" @changedata="changedata"/>
 
 
        
        
-      <div class="statusbox" style="width:60%;top:20px;z-index:1000;margin:0 auto;min-width:950px;padding-bottom:20px;min-height:95%" v-if="countshow">
+      <div class="statusbox" style="width:60%;top:60px;z-index:1000;margin:0 auto;min-width:950px;padding-bottom:20px;" v-if="countshow">
         <p class="detailpage" style="text-align:center">用电统计<img src="../../public/img/xxx.png"  style="float:right;margin-top: 5px" @click="countshow = false"/></p>
         <div style="padding:0 20px">
           <div  class="msgtitle"><img src="../../public/img/137.png"/>条件栏</div>
@@ -947,6 +947,10 @@ import ipDevice from "@/components/ipDevice";
           },err=>{});
      }
 
+    },
+    changedata(data,index){
+      this.workdetaillist[index].entity=data
+      // console.log(data,index)
     },
     lastelect(){
      this.chekcimg = 2

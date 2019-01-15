@@ -16,8 +16,47 @@
                            </div>
                        </Col>
                         <Col span="16">
-                           <!-- <i-table border  :columns="roletablehead" :data="roletabledata" id="wordbook" @on-selection-change="checkbookchange" ></i-table>
-                           <Page :total="totals" show-total @on-change="changemodal6page" :current.sync="pages"/> -->
+                         <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:-55px;right:0%"  @click="edit" v-if="editorshow">编辑</button>
+                      <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;top:-55px;right:105px"   v-if="!editorshow" @click="backeditor">返回</button>
+                       <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:-55px;right:0%"   v-if="!editorshow" @click="saveeditor">保存</button>
+                           <div style="display:flex;">
+                              <div style="display:flex;min-width:50%">
+                                  <p>编码：</p>
+                                  <span v-if="editorshow">123</span>
+                                  <Input v-if="!editorshow"  placeholder="111" style="width: 160px;margin-top: 0" />
+                              </div>
+                              <div style="display:flex">
+                                  <p>编码：</p>
+                                  <span v-if="editorshow">123</span>
+                                  <Input  v-if="!editorshow" placeholder="111" style="width: 160px;margin-top: 0" />
+                              </div>
+                           </div>
+                           <div style="display:flex;margin-top:30px">
+                              <div style="display:flex;min-width:50%">
+                                  <p>编码：</p>
+                                  <span v-if="editorshow">123</span>
+                                  <Input v-if="!editorshow"  placeholder="111" style="width: 160px;margin-top: 0" />
+                              </div>
+                              <div style="display:flex">
+                                  <p>编码：</p>
+                                  <span v-if="editorshow">123</span>
+                                  <Input  v-if="!editorshow" placeholder="111" style="width: 160px;margin-top: 0" />
+                              </div>
+                           </div>
+                           <div style="display:flex;;margin-top:30px">
+                              <div style="display:flex;min-width:50%">
+                                  <p>编码：</p>
+                                  <span v-if="editorshow">123</span>
+                                  <Input  v-if="!editorshow" placeholder="111" style="width: 160px;margin-top: 0" />
+                              </div>
+                              <div style="display:flex">
+                                  <p>编码：</p>
+                                  <span v-if="editorshow">123</span>
+                                  <Select v-model="model12" filterable  v-if="!editorshow">
+                                    <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                                </Select>
+                              </div>
+                           </div>
                        </Col>
                       </Row>
                  </div>
@@ -30,10 +69,10 @@
             >
              <Form ref="formrole" :model="formrole" :rules="rulerole" :label-width="100" >
                 <p style="padding-left: 16px;font-size: 13px;margin-bottom: 10px;" v-if="this.clickarea.length>0&&this.addrolenum == 0">父节点 ：<span style="margin-left: 29px;" v-if="modal4 == true">{{clickarea[0].areaName}}</span></p>
-                <FormItem label="行政区划名称" prop="name" >
+                <FormItem label="告警分组名称" prop="name" >
                     <Input v-model="formrole.name" />
                 </FormItem>
-                <FormItem label="行政区划编码" prop="num" >
+                <FormItem label="告警分组编码" prop="num" >
                     <Input v-model="formrole.num" />
                 </FormItem>
              </Form>
@@ -83,6 +122,34 @@ import axios from 'axios'
     },
     data () {
       return {
+          cityList: [
+                    {
+                        value: 'New York',
+                        label: 'New York'
+                    },
+                    {
+                        value: 'London',
+                        label: 'London'
+                    },
+                    {
+                        value: 'Sydney',
+                        label: 'Sydney'
+                    },
+                    {
+                        value: 'Ottawa',
+                        label: 'Ottawa'
+                    },
+                    {
+                        value: 'Paris',
+                        label: 'Paris'
+                    },
+                    {
+                        value: 'Canberra',
+                        label: '123'
+                    }
+                ],
+          model12: 'Canberra',
+          editorshow:true,
           titledata:"新增告警类型分组",
           totals:0,
           data1:[],
@@ -407,6 +474,15 @@ import axios from 'axios'
       },
       getCheckedNodes(val){
         this.detelearealist = val
+      },
+      edit(){
+          this.editorshow = false
+      },
+      backeditor(){
+          this.editorshow = true
+      },
+      saveeditor(){
+
       }
     }
   }

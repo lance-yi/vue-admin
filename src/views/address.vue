@@ -176,7 +176,10 @@
           <div class="content" >
             <div>
               <span>施工单位</span>&nbsp;&nbsp;&nbsp;
-              <i-input  v-model="company" placeholder="" style="width: 300px;margin-left: 10px;margin-bottom: 10px;" ></i-input>
+              <!-- <i-input  v-model="company" placeholder="" style="width: 300px;margin-left: 10px;margin-bottom: 10px;" ></i-input> -->
+              <Select v-model="constructionUnit" style="width:200px">
+                <Option v-for="item in constructionUnitlist" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
             </div>
           </div>
           <div class="content" v-if="rebuildType">
@@ -216,7 +219,10 @@
               </div>
               <div style="margin-top:20px">
                 <span>施工单位</span>&nbsp;&nbsp;&nbsp;
-                <i-input  v-model="constructionUnit" placeholder="" style="width: 200px" ></i-input>
+                <Select v-model="constructionUnit" style="width:200px">
+                <Option v-for="item in constructionUnitlist" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
+                <!-- <i-input  v-model="constructionUnit" placeholder="" style="width: 200px" ></i-input> -->
               </div>
             </div>
           </div>
@@ -311,6 +317,7 @@ import city from "../../src/util/city.js";
     },
     data () {
       return {
+        constructionUnitlist:[],
         placementposition:[],
         installaddress:'',
         cityList:city,
@@ -644,6 +651,9 @@ import city from "../../src/util/city.js";
           this.$http.get("res/ponitMove/selectByDictCode",{dictCodes:'placementPosition'},res=>{
               this.placementposition = res.data
             },err=>{});
+            this.$http.get("res/ponitMove/selectByDictCode",{dictCodes:'constructionUnit'},res=>{
+              this.constructionUnitlist = res.data
+            },err=>{});
       },
       //查看轨迹
       lookcontrail(id){
@@ -683,6 +693,9 @@ import city from "../../src/util/city.js";
             this.$http.get('res/ponitMove/selectPonitInfo?id='+id,{},res=>{
               this.movedata = res.data
               this.detecheck = true
+            },err=>{});
+            this.$http.get("res/ponitMove/selectByDictCode",{dictCodes:'constructionUnit'},res=>{
+              this.constructionUnitlist = res.data
             },err=>{});
       },
       changelabel(name){

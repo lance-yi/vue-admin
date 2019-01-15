@@ -884,7 +884,7 @@
      </div>
        
       <!-- 点击ip弹窗 -->
-             <ipDevice :workdetailshow="workdetailshow" :workdetaillist="workdetaillist" @closeworkdetailshow="closeworkdetailshow" @oldworkdata="oldworkdata"/>
+             <ipDevice :workdetailshow="workdetailshow" :workdetaillist="workdetaillist" @closeworkdetailshow="closeworkdetailshow" @oldworkdata="oldworkdata" @changedata="changedata"/>
       <!-- 点击工单详情弹窗 -->
             <div class="workdetail" v-if="workdetail">
                 <div class="detail-title" style="position: fixed;width: calc(70% - 50px);background: #fff;height:50px;margin-top:0">
@@ -3706,6 +3706,10 @@ export default {
                this.workdetaillist = res.data
           },err=>{});
       }
+    },
+    changedata(data,index){
+      this.workdetaillist[index].entity=data
+      // console.log(data,index)
     }
   }
 };

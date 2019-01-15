@@ -37,7 +37,7 @@
                       </div>
                       <div style="min-width:30%">
                         <p>维护人员：</p>
-                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
+                        <span v-if="editorshow">{{list.entity.maintenanceUserId}}</span>
                         <Select v-model="list.entity.maintenanceUserId" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
                           <Option v-for="item in userlist.maintenanceUser" :value="item.value" :key="item.value">{{item.label}}</Option>
                         </Select>
@@ -45,7 +45,9 @@
                       <div style="min-width:30%">
                         <p>管理单位：</p>
                         <span v-if="editorshow">{{list.entity.managementUnit}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.managementUnit" :placeholder="list.entity.managementUnit" style="width: 160px;margin-top: 0" />
+                        <Select v-model="list.entity.managementUnit" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
+                          <Option v-for="item in meun.managementUnit" :value="item.value" :key="item.value">{{item.label}}</Option>
+                        </Select>
                       </div>
                       <div style="min-width:30%">
                         <p>IP地址：</p>
@@ -61,7 +63,7 @@
                         <p>附件：</p>
                         <span style="border-bottom:1px solid #1D60FE;cursor:pointer;margin-right:20px" @click="download(down)" v-for="(down,index) in list.entity.enclosureUrl" :key="index">{{down}}</span>
                       </div>
-                      <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"  @click="edit" v-if="editorshow">编辑</button>
+                      <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"  @click="edit(list,index)" v-if="editorshow">编辑</button>
                       <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;top:10px;right:105px"   v-if="!editorshow" @click="backeditor(index)">返回</button>
                        <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"   v-if="!editorshow" @click="saveeditor(list,index)">保存</button>
                   </div>
@@ -93,6 +95,11 @@
                         <Input v-if="!editorshow" v-model="list.entity.mac" :placeholder="list.entity.mac" style="width: 160px;margin-top: 0" />
                       </div>
                       <div style="min-width:30%">
+                        <p>地址掩码：</p>
+                        <span v-if="editorshow">{{list.entity.addressMask}}</span>
+                        <Input v-if="!editorshow" v-model="list.entity.addressMask" :placeholder="list.entity.addressMask" style="width: 160px;margin-top: 0" />
+                      </div>
+                      <div style="min-width:30%">
                         <p>经度：</p>
                         <span v-if="editorshow">{{list.entity.longitude}}</span>
                         <Input v-if="!editorshow" v-model="list.entity.longitude" :placeholder="list.entity.longitude" style="width: 160px;margin-top: 0" @on-focus="jwmap(index)"/>
@@ -103,11 +110,6 @@
                         <Input v-if="!editorshow" v-model="list.entity.latitude" :placeholder="list.entity.latitude" style="width: 160px;margin-top: 0" @on-focus="jwmap(index)"/>
                       </div>
                       <div style="min-width:30%">
-                        <p>地址掩码：</p>
-                        <span v-if="editorshow">{{list.entity.addressMask}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.addressMask" :placeholder="list.entity.addressMask" style="width: 160px;margin-top: 0" />
-                      </div>
-                      <div style="min-width:30%">
                         <p>安装地址：</p>
                         <span v-if="editorshow">{{list.entity.installAddress}}</span>
                         <Input v-if="!editorshow" v-model="list.entity.installAddress" :placeholder="list.entity.installAddress" style="width: 160px;margin-top: 0" />
@@ -115,11 +117,13 @@
                       <div style="min-width:30%">
                         <p>管理单位：</p>
                         <span v-if="editorshow">{{list.entity.managementUnit}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.managementUnit" :placeholder="list.entity.managementUnit" style="width: 160px;margin-top: 0" />
+                        <Select v-model="list.entity.managementUnit" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
+                          <Option v-for="item in meun.managementUnit" :value="item.value" :key="item.value">{{item.label}}</Option>
+                        </Select>
                       </div>
                       <div style="min-width:30%">
                         <p>维护人员：</p>
-                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
+                        <span v-if="editorshow">{{list.entity.maintenanceUserId}}</span>
                         <Select v-model="list.entity.maintenanceUserId" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
                           <Option v-for="item in userlist.maintenanceUser" :value="item.value" :key="item.value">{{item.label}}</Option>
                         </Select>
@@ -158,7 +162,7 @@
                         <span v-if="list.entity.gatewayStatus  == 0">异常</span>
                         <span v-if="list.entity.gatewayStatus  == 1">正常</span>
                       </div> -->
-                      <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"  @click="edit" v-if="editorshow">编辑</button>
+                      <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"  @click="edit(list,index)" v-if="editorshow">编辑</button>
                       <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;top:10px;right:105px"   v-if="!editorshow" @click="backeditor(index)">返回</button>
                        <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"   v-if="!editorshow" @click="saveeditor(list,index)">保存</button>
                   </div>
@@ -267,7 +271,7 @@
                         <span v-if="editorshow">{{list.entity.teminalType}}</span>
                         <Input v-if="!editorshow" v-model="list.entity.teminalType" :placeholder="list.entity.teminalType" style="width: 160px;margin-top: 0" />
                       </div>
-                     <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"  @click="edit" v-if="editorshow">编辑</button>
+                     <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"   @click="edit(list,index)" v-if="editorshow">编辑</button>
                       <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;top:10px;right:105px"   v-if="!editorshow" @click="backeditor(index)">返回</button>
                        <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"   v-if="!editorshow" @click="saveeditor(list,index)">保存</button>
                   </div>
@@ -298,7 +302,7 @@
                       <div style="min-width:30%">
                         <p>行政区域：</p>
                         <span v-if="editorshow">{{list.entity.areaCode}}</span>
-                        <Select v-model="list.entity.areaCode" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
+                        <Select v-model="list.entity.areaCode" style="width:160px;margin-top:0" v-if="!editorshow" placement="bottom">
                           <Option v-for="item in arealist.areaCode" :value="item.value" :key="item.value">{{item.label}}</Option>
                         </Select>
                       </div>
@@ -388,7 +392,7 @@
                       </div>
                       <div style="min-width:30%">
                         <p>维护人员：</p>
-                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
+                        <span v-if="editorshow">{{list.entity.maintenanceUserId}}</span>
                        <Select v-model="list.entity.maintenanceUserId" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
                           <Option v-for="item in userlist.maintenanceUser" :value="item.value" :key="item.value">{{item.label}}</Option>
                         </Select>
@@ -430,7 +434,9 @@
                       <div style="min-width:30%">
                         <p>管理单位联系方式：</p>
                         <span v-if="editorshow">{{list.entity.managementPhone}}</span>
-                        <Input v-if="!editorshow" v-model="list.entity.managementPhone" :placeholder="list.entity.managementPhone" style="width: 160px;margin-top: 0" />
+                        <Select v-model="list.entity.managementUnit" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
+                          <Option v-for="item in meun.managementUnit" :value="item.value" :key="item.value">{{item.label}}</Option>
+                        </Select>
                       </div>
                       <div style="min-width:100%">
                         <p>摄像机功能类型：</p>
@@ -453,7 +459,7 @@
                           <Option v-for="item in meun.industry" :value="item.value" :key="item.value">{{item.label}}</Option>
                         </Select>
                       </div>
-                      <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"  @click="edit" v-if="editorshow">编辑</button>
+                      <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"   @click="edit(list,index)" v-if="editorshow">编辑</button>
                       <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;top:10px;right:105px"   v-if="!editorshow" @click="backeditor(index)">返回</button>
                        <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"   v-if="!editorshow" @click="saveeditor(list,index)">保存</button>
                   </div>
@@ -597,7 +603,29 @@ export default {
       this.editorshow = true
       this.jwshow = false
     },
-    edit(){
+    edit(list,index){
+      console.log(list)
+      if(list.deviceType == '安全网关'){
+        this.$http.get("res/socGateway/"+list.entity.id,{},res=>{
+          this.$emit('changedata',res.data,index);
+          },err=>{});
+      }else if(list.deviceType == '摄像机'){
+         this.$http.get("res/camera/"+list.entity.id,{},res=>{
+          this.$emit('changedata',res.data,index);
+          },err=>{});
+      }else if(list.deviceType == 'wifi嗅探'){
+         this.$http.get("res/WifiSniffing/"+list.entity.id,{},res=>{
+          this.$emit('changedata',res.data,index);
+          },err=>{});
+      }else if(list.deviceType == '电子围栏'){
+         this.$http.get("res/ElectronicFence/"+list.entity.id,{},res=>{
+          this.$emit('changedata',res.data,index);
+          },err=>{});
+      }else if(list.deviceType == '智能电源'){
+         this.$http.get("res/socElectrical/"+list.entity.id,{},res=>{
+          this.$emit('changedata',res.data,index);
+          },err=>{});
+      }
       this.olddata = this.workdetaillist
       this.$http.get("res/socGateway/getDeviceDic?pageKey=resources",{},res=>{
            this.meun = res.data

@@ -1,7 +1,31 @@
 <template>
 <div>
-  <div @click="showno">
-    <div style="position:absolute;top:90px;left:30%;z-index:99">
+  <div  style="position:absolute;top:74px;">
+  <button   class="zhuanyixukes"  v-if="!service">运维管理</button>
+  <button   class="zhuanyixuke"  @click="service = false" v-if="service">运维管理</button>
+  <button   class="zhuanyixuke"  @click="service = true" v-if="!service">维修轨迹</button>
+  <button   class="zhuanyixukes"  v-if="service">维修轨迹</button>
+  </div>
+  
+  <div :class="noSide?'serveceboxs':'servecebox'" v-if="service">
+    <div style="padding:20px 10px;width:360px;height:100%;margin-top:10px;text-align:left;position:relative;box-shadow: 0px -1px 10px rgba(0,0,0,0.2);" v-if="serviceleft">
+       <div class="control-top" style="align-items:center">
+          <p style="margin-left:48px;">请选择时间：</p>
+          <DatePicker type="date" placeholder="请选择具体时间" style="width: 200px"></DatePicker>
+        </div>
+        <div class="control-top" style="align-items:center;margin:20px 0">
+          <p >请选择外场维修人员：</p>
+          <i-input v-model="valuetable" placeholder="请直接输入人员名称" style="width: 200px" ></i-input>
+        </div>
+       <img src="../../public/img/159.png" style="position:absolute;right:-19px;top:40%;cursor:pointer" @click="serviceleft = false"/>
+    </div>
+    <img src="../../public/img/160.png" style="position:absolute;left:0px;top:40%;cursor:pointer" @click="serviceleft = true" v-if="!serviceleft"/>
+    <div :class="serviceleft?'serviceright':'servicerights'">
+         222
+    </div>
+  </div>
+  <div @click="showno" v-if="!service">
+    <div style="position:absolute;top:140px;left:30%;z-index:19">
         <i-button type="primary" class="sure" @click.stop="breaktime" style="border-radius:4px" v-if="hadtime">刷新</i-button>
         <div @click.stop="breaktime">
         <Select v-model="model1" style="width:100px" v-if="!hadtime">
@@ -9,7 +33,7 @@
         </Select>
         </div>
     </div>
-    <div style="position:absolute;top:90px;left:50%;z-index:99">
+    <div style="position:absolute;top:140px;left:50%;z-index:19">
                 <i-input  v-model="serachvalue" placeholder="安装地址、路口名称" style="width: 200px" class="sousuo"></i-input>
                 <i-button type="primary" class="sure" @click="serachroad">搜索</i-button>
             </div>
@@ -1010,7 +1034,7 @@
 
       
             <!-- 点击ip弹窗 -->
-             <ipDevice :workdetailshow="workdetailshow" :workdetaillist="workdetaillist" @closeworkdetailshow="closeworkdetailshow" @oldworkdata="oldworkdata"/>
+             <ipDevice :workdetailshow="workdetailshow" :workdetaillist="workdetaillist" @closeworkdetailshow="closeworkdetailshow" @oldworkdata="oldworkdata" @changedata="changedata"/>
            <!-- 点击责任人弹窗 -->
             <div v-if="personshow" class="workdetail">
               <div class="detail-title" style="margin-top:10px;">
@@ -1282,6 +1306,7 @@
 </div>
 </template>
 <script>
+import {mapState} from 'vuex'
 import ArcgisMaps from "@/components/ArcgisMaps";
 import ArcgisMapsmall from "@/components/ArcgisMapsmall";
 import ipDevice from "@/components/ipDevice";
@@ -1292,10 +1317,18 @@ export default {
   components: {
     ArcgisMaps,
     ArcgisMapsmall,
-    ipDevice
+    ipDevice,
+    mapState
+  },
+  computed:{
+    ...mapState({
+      noSide: "noSide"
+    })
   },
   data() {
     return {
+      serviceleft:true,
+      service:false,
       processlist:[],
       datades:{},
       wgeachrtsshow:false,
@@ -4006,6 +4039,10 @@ export default {
       this.$http.get("res/pole/getPoleDeviceByNo?",{poleNo:this.polenum,portName:this.onetypelistlan},res=>{
                this.workdetaillist = res.data
           },err=>{});
+    },
+    changedata(data,index){
+      this.workdetaillist[index].entity=data
+      // console.log(data,index)
     }
   }
 };
@@ -4017,7 +4054,7 @@ export default {
   background: url(../../public/img/zzz.png) no-repeat center center/100% 100%;
   position: fixed;
   right: 0;
-  top: 60px;
+  top: 120px;
   z-index: 18;
   padding: 30px;
   border: 2px solid #13C7D9;
@@ -4504,14 +4541,14 @@ export default {
 }
 .iconobj{
   position: absolute;
-  top: 55px;
+  top: 120px;
   right: 260px;
   z-index: 20;
   cursor: pointer;
 }
 .iconobjs{
   position: absolute;
-  top: 55px;
+  top: 120px;
   right: 0px;
   z-index: 20;
   cursor: pointer;
@@ -4546,5 +4583,36 @@ export default {
     position: absolute;
     top: 188px;
     left: 420px;
+  }
+  /* 维修轨迹 */
+  .servecebox{
+    position:absolute;
+    top:120px;
+    border-top:1px solid #C7C7C7;
+    display:flex;
+    height: calc(100% - 130px);
+    width: calc(100% - 270px);
+    color: #696C6F
+  }
+  .serveceboxs{
+    position:absolute;
+    top:120px;
+    border-top:1px solid #C7C7C7;
+    display:flex;
+    height: calc(100% - 130px);
+    width: calc(100% - 95px);
+    color: #696C6F
+  }
+  .serviceright{
+    width:calc(100% - 390px);
+    margin-left:30px;
+    background:green;
+    margin-top:10px;
+  }
+  .servicerights{
+    width:calc(100% - 20px);
+    margin-left:30px;
+    background:green;
+    margin-top:10px;
   }
 </style>

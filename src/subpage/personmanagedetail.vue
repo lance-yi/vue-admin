@@ -166,7 +166,7 @@
                 <p >项目名称：</p>
                 <span style="text-align:left;flex: 1">{{list.projectName}}</span>
                  </div>
-                <p style="min-width:120px;margin-left: 5px">授权端口：{{list.ifPort}}</p>
+                <p style="min-width:120px;margin-left: 5px;white-space: nowrap;">授权端口：{{list.ifPort}}</p>
               </div>
             </div>
           </div>
@@ -206,21 +206,36 @@
         <div class="rightbox-remove" v-if="moveallowshow">
           <div  class="msgtitle" style="margin-top: 10px;width:100%;min-width:600px" v-if="moveallowshow"><img src="../../public/img/yyy.png"/>当前责任人管理设备</div>
             <div  class="forbox" v-for="(list,index) in devicelist" :key="index" v-if="moveallowshow" style="min-width:700px;width:100%;text-align:left;">
-                <div class="morecontent">
-                   <div style="display: flex">
+                <div class="morecontent" style="justify-content:flex-start">
+                   <!-- <div style="display: flex">
                        <Checkbox v-model="list.isCheck" v-if="!removeallowshow"  @on-change="checkAllGroupChange()"></Checkbox>
-                       <p style="min-width:140px">设备IP：<span>{{list.gatewayIp}}</span></p>
-                   </div>
-                  <div style="display: flex;min-width:200px;margin-left: 10px">
+                       <p style="min-width:150px">设备IP：<span>{{list.gatewayIp}}</span></p>
+                   </div> -->
+                  <div style="display: flex;min-width:200px">
                   <p>安装地址：</p>
-                  <!-- <span style="text-align:left;flex: 1">按时间大数据看多了就暗水电费健康了时代峰峻示阿斯加</span> -->
+                  <!-- <span style="text-align:left;flex: 1">按时间大数据看多了是考虑到附近可是龙卷风流口水的减肥了就暗水电费健康了时代峰峻示阿斯加</span> -->
                   <span style="text-align:left;flex: 1">{{list.installAddress}}</span>
                 </div>
-                 <div style="display: flex;min-width:200px;margin-left: 10px">
+                 <div style="display: flex;min-width:200px;margin-left: 20px">
                     <p>项目名称：</p>
                     <span style="text-align:left;flex: 1">{{list.projectName}}</span>
                  </div>
-                    <p style="min-width:120px;margin-left: 5px">授权端口：{{list.ifPort}}</p>
+                    <!-- <p style="min-width:120px;margin-left: 5px">授权端口：{{list.ifPort}}</p> -->
+                </div>
+                <div class="morecontent" style="justify-content:flex-start;margin-top:0">
+                   <div style="display: flex">
+                       <Checkbox v-model="list.isCheck" v-if="!removeallowshow"  @on-change="checkAllGroupChange()"></Checkbox>
+                       <p style="min-width:180px">设备IP：<span>{{list.gatewayIp}}</span></p>
+                   </div>
+                  <!-- <div style="display: flex;min-width:200px;margin-left: 10px">
+                  <p>安装地址：</p>
+                  <span style="text-align:left;flex: 1">{{list.installAddress}}</span>
+                </div> -->
+                 <!-- <div style="display: flex;min-width:200px;margin-left: 10px">
+                    <p>项目名称：</p>
+                    <span style="text-align:left;flex: 1">{{list.projectName}}</span>
+                 </div> -->
+                    <p style="min-width:120px;margin-left: 20px">授权端口：{{list.ifPort}}</p>
                 </div>
             </div>
         </div>
@@ -329,7 +344,7 @@
       moveallow(){
         this.checklist = []
         this.devicelist.forEach (el=>{ if(el.isCheck == true){this.checklist.push(el.id)}})
-        this.$http.delete("oauth/certificate/unboundCert",{userId:this.$route.query.uesrid,gatewayIds:JSON.stringify(this.checklist)},res=>{
+        this.$http.delete("oauth/certificate/unboundCert?gatewayIds="+this.checklist+'&userId='+this.$route.query.uesrid,{},res=>{
           this.$Message.info(res.message);
           this.moves = false
           this.shebei()
