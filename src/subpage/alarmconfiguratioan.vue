@@ -259,6 +259,17 @@ import axios from 'axios'
             data:{}
           }).then(res=>{
              this.data3 = res.data
+             if(this.data3[0].type == 'group'){
+                this.$http.get("alert/baseAlert/selectAlertGroupMsg",{id:this.data3[0].id},res=>{
+                   this.gruopdata = res.data
+                   this.alertdata = []
+                },err=>{});
+            }else if(this.data3[0].type == ''){
+                this.$http.get("alert/baseAlert/selectAllAlertMsg",{id:this.data3[0].id},res=>{
+                   this.gruopdata = []
+                   this.alertdata = res.data
+                },err=>{});
+            }
           })
        this.$http.get("/oauth/dict/selectDictCommon?",{dictCodes:'alertTypeLevel'},res=>{
               this.levellist = res.data

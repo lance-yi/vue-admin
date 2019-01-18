@@ -41,11 +41,12 @@
         <div class="zhuanyixukes" style="width: 90px;margin: 0 auto;margin-top: 30px;" @click="serach">搜索</div>
         <div style="margin-right:20px;margin-top: 30px;">
         <i-table highlight-row stripe border :columns="columns1" :data="data1" ></i-table>
+        <Page :total="totals" show-total @on-change="changeliebiaopage" style="margin-top:20px" :current.sync="pages"/>
         </div>
 
 
         <div class="statusbox" v-if="echartsshow">
-            <p class="detailpage"  style="text-align:center">摄像机视频状况<span style="color:#5386FE">（2018/11/12）</span><img src="../../public/img/xxx.png" @click.stop="echartsshow = false" style="position:absolute;right:20px;z-index: 2;top:20px"/></p>
+            <p class="detailpage"  style="text-align:center">摄像机视频状况<span style="color:#5386FE">（{{daydata}}）</span><img src="../../public/img/xxx.png" @click.stop="echartsshow = false" style="position:absolute;right:20px;z-index: 2;top:20px"/></p>
             <div class="detail-title">
                   <img src="../../public/img/152.png"/>
                   <p>摄像机缺失统计</p>
@@ -53,14 +54,14 @@
             <div style="height:300px;display:flex">
                 <div id="echartsone" ></div>
                 <div class="rightmain">
-                    <img src="../../public/img/153.png" class="topimg"/>
-                    <img src="../../public/img/154.png" class="bottomimg"/>
+                    <img src="../../public/img/153.png" class="topimg" @click="bottomts"/>
+                    <img src="../../public/img/154.png" class="bottomimg" @click="bottombs"/>
                     <p style="margin-bottom:15px">缺失统计</p>
-                    <div class="maintext" v-for="(aa,index) in 8" :key="index">
-                        <p>2018/11/12 06:00:00-09:00:00</p>
-                        <p style="color:#999" v-if="index != 7">|</p>
+                    <div class="maintext" v-for="(aa,index) in bottommainlists" :key="index" v-if="index >= (currentnews - 1) * 8 && index+1 <= (currentnews) * 8">
+                        <span style="color:#999" v-if="!(index == 0 || index == (currentnews - 1)*8)">|</span>
+                        <p >{{aa.finalTime}}</p>
                     </div>
-                    <p style="margin-top:15px">总计缺失时长：<span style="color:#5386FE">20小时10分30秒</span></p>
+                    <p style="position:absolute;bottom:-27px;left:80px">总计缺失时长：<span style="color:#5386FE">{{bottomlists.hour}}小时{{bottomlists.min}}分{{bottomlists.second}}秒</span></p>
                 </div>
             </div>
             <div class="detail-title">
@@ -92,10 +93,13 @@
     },
     data () {
       return {
+          pages:1,
           totalPages:0,
+          totalPages2:0,
           currentnew:1,
+          currentnews:1,
           data2:[1,2,3,4],
-          data1:[{userName:'大范甘迪发',name1:'0',name2:'0',name3:'0'},{userName:'但是',name1:'0',name2:'1',name3:'0'}],
+          data1:[],
           columns1:[],
           persontime:'',
           startTimeOptions: {
@@ -111,7 +115,7 @@
           starttime: '', //开始日期model
           endtime: '',//结束日期model
           times:'1',
-          projectnamelist:[{value:'sss',label:'sss'},{value:'szzzss',label:'szzzss'}],
+          projectnamelist:[],
           projectname:[],
           companylist:[],
           cityList: [],
@@ -122,37 +126,47 @@
           checkAll: false,
           echartsshow:false,
           bottomlist:[],
+          bottomlists:[],
           bottommainlist:[],
+          bottommainlists:[],
           list:[],
+          totals:0,
+          daydata:'',
       }
     },
     created(){
     },
     mounted(){
-        this.$http.get("/oauth/dict/selectDictCommon?",{dictCodes:'projectName'},res=>{
-              
+        this.$http.get("oauth/certificate/selectProjectName",{},res=>{
+              this.projectnamelist = res.data
             },err=>{});
-       this.columns1 = [ {title: '安装地址',key: 'userName'},
-          {title: 'IP地址',key: 'userName',width:110,},
-          {title: '项目名称',key: 'userName',width:100},
-          {title: '行政区域',key: 'userName',width:80,},
+       this.columns1 = [ {title: '安装地址',key: 'installAddress',minWidth:180,},
+          {title: 'IP地址',key: 'ipAddress',width:110,},
+          {title: '项目名称',key: 'projectName',width:120},
+          {title: '行政区域',key: 'areaName',width:80,},
           ],
-          this.list = [{title: '1',key: 'name1',width:30},{title: '2',key: 'name2',width:30}]
-           this.list.forEach(data => { this.$set(data,'render',
+        this.$http.get("res/videoMissing/getVideoMissingStatistics",{},res=>{
+            this.list = res.data.timeList
+            this.data1 = res.data.stateList.list
+            this.totals = res.data.stateList.total
+            this.list.forEach(data => { this.$set(data,'render',
                     (h,params)=>{
                     return h('img',{
                         attrs: 
                         {src: (params.row[params.column.key]  == 1)?require('../../public/img/149.png'):require('../../public/img/150.png')},style:{'vertical-align':'middle',cursor:'pointer'},
                         on: (params.row[params.column.key]  == 0)?{
-                        click: () => {this.gotodetal(params)}}:''
+                        click: () => {this.gotodetal(params.row.ipAddress,params.column.key)}}:''
                         },'img')})})
-                 this.list.forEach(data => {this.columns1.push(data) })  
+                 this.list.forEach(data => {this.columns1.push(data) }) 
+            },err=>{});
+        
        this.$http.get("oauth/baseArea/selectAreaByParentCode?parentCode=420100",{},res=>{
               this.addcodelist = res.data
             },err=>{});
         this.$http.get("/oauth/dict/selectDictCommon?",{dictCodes:'managementUnit'},res=>{
               this.cityList = res.data
             },err=>{});
+        
     },
     methods: {
         handleCheckAll () {
@@ -169,7 +183,7 @@
                     this.addresscode = [];
                 }
             },
-       checkAllGroupChange (data) {
+        checkAllGroupChange (data) {
                 if (data.length === 14) {
                     this.indeterminate = false;
                     this.checkAll = true;
@@ -181,7 +195,7 @@
                     this.checkAll = false;
                 }
             },
-       changetime(val){
+        changetime(val){
            if(val == '自定义'){
                
            }else{
@@ -189,8 +203,14 @@
               this.starttime = ''
               this.endtime = ''
            }
-       },
-       startTimeChange: function(e) { //设置开始时间
+        },
+        //表格分页
+        changeliebiaopage(i){
+            this.$http.get("res/videoMissing/getVideoMissingStatistics",{current:i},res=>{
+            this.data1 = res.data.stateList.list
+            },err=>{});
+        },
+        startTimeChange: function(e) { //设置开始时间
           console.log(e)
           this.starttime = e;
           this.endTimeOptions = {
@@ -201,7 +221,7 @@
             }
           }
         },
-          endTimeChange: function(e) { //设置结束时间
+        endTimeChange: function(e) { //设置结束时间
           this.endtime = e;
           let bb = new Date(this.endtime).valueOf() - 30 * 24 * 60 * 60 * 1000;
           let endTime = this.endtime ? new Date(this.endtime).valueOf() : '';
@@ -213,46 +233,75 @@
         },
         serach(){
             if(this.times == 1){
-
-            }else{
-                if(this.starttime == '' || this.endtime == ''){
-                    this.$Message.error('请选择时间');
-                }else{
-                  console.log(this.starttime)
-                }
-                
-            }
-            this.columns1 = [ {title: '安装地址',key: 'userName'},
-          {title: 'IP地址',key: 'userName',width:110,},
-          {title: '项目名称',key: 'userName',width:100},
-          {title: '行政区域',key: 'userName',width:80,},
-          ],
-           this.list = [{title: '1',key: 'name1',width:30},{title: '2',key: 'name2',width:30},{title: '3',key: 'name3',width:30}]
-           this.list.forEach(data => { this.$set(data,'render',
+              this.pages = 1
+              this.columns1 = [ {title: '安装地址',key: 'installAddress',width:180},
+                                {title: 'IP地址',key: 'ipAddress',width:110,},
+                                {title: '项目名称',key: 'projectName',width:120},
+                                {title: '行政区域',key: 'areaName',width:80,},
+                                ]
+              this.$http.get("res/videoMissing/getVideoMissingStatistics",{areaCodes:this.addresscode,managementUnit:this.companylist,nearlyWeek:0,installAddress:this.valueadd},res=>{
+            this.list = res.data.timeList
+            this.data1 = res.data.stateList.list
+            this.totals = res.data.stateList.total
+            this.list.forEach(data => { this.$set(data,'render',
                     (h,params)=>{
                     return h('img',{
                         attrs: 
                         {src: (params.row[params.column.key]  == 1)?require('../../public/img/149.png'):require('../../public/img/150.png')},style:{'vertical-align':'middle',cursor:'pointer'},
                         on: (params.row[params.column.key]  == 0)?{
-                        click: () => {this.gotodetal(params)}}:''
+                        click: () => {this.gotodetal(params.row.ipAddress,params.column.key)}}:''
                         },'img')})})
-                 this.list.forEach(data => {this.columns1.push(data) })   
+                 this.list.forEach(data => {this.columns1.push(data) }) 
+            },err=>{});
+
+
+            }else{
+                if(this.starttime == '' || this.endtime == ''){
+                    this.$Message.error('请选择时间');
+                }else{
+                   this.pages = 1
+                   this.columns1 = [ {title: '安装地址',key: 'installAddress',width:180},
+                                    {title: 'IP地址',key: 'ipAddress',width:110,},
+                                    {title: '项目名称',key: 'projectName',width:120},
+                                    {title: '行政区域',key: 'areaName',width:80,},
+                                    ]
+
+
+                }  
+            }
+         
+          
            
             
         },
-        gotodetal(name){
+        gotodetal(ip,time){
+          this.daydata = time
           this.currentnew=1
+          this.currentnews=1
           this.echartsshow = true
-          this.$http.get("res/ftpVideo/cameraVideoCoordinate?",{day:'2019-01-09',ipAddress:'192.168.8.63'},res=>{
+          this.$http.get("res/ftpVideo/cameraVideoCoordinate?",{day:time,ipAddress:ip},res=>{
               this.bottomlist = res.data
               this.bottommainlist = res.data.time.content
               this.totalPages = res.data.time.totalPages
             },err=>{});
-        this.$http.get("res/ftpVideo/backupCameraVideo?",{day:'2019-01-09',ipAddress:'192.168.8.63'},res=>{
+         this.$http.get("res/ftpVideo/backupCameraVideo?",{day:time,ipAddress:ip},res=>{
               setTimeout(() => {
             //   this.echartscamera()
               this.echartscamera2(res.data)
            }, 200);
+            },err=>{});
+
+        this.$http.get("res/videoMissing/lostAndRecord",{time:time,ipAddress:ip},res=>{
+              setTimeout(() => {
+            //   this.echartscamera()
+              this.echartscamera(res.data)
+           }, 200);
+            },err=>{});
+
+            this.$http.get("res/videoMissing/videoLost",{time:time,ipAddress:ip},res=>{
+              this.bottomlists = res.data
+              this.bottommainlists = res.data.time.content
+              this.totalPages2 = res.data.time.totalPages
             },err=>{});
           
         },
@@ -272,38 +321,54 @@
               this.currentnew++
           }
         },
-        echartscamera(){
+        //缺失上一页
+        bottomts(){
+          if(this.currentnews == 1){
+              this.$Message.info('已经是第一页了');
+          }else{
+             this.currentnews-- 
+          }
+        },
+        //缺失下一页
+        bottombs(){
+          if(this.currentnews == this.totalPages2){
+              this.$Message.info('已经是最后一页了');
+          }else{
+              this.currentnews++
+          }
+        },
+        echartscamera(data){
             let myChart = this.$echarts.init(document.getElementById('echartsone'))
             window.addEventListener("resize", function () {
             myChart.resize();
             });
-            var date = '2016-08-09';
-            var aa =  [{type: 'line',
-                        lineStyle:{color:'#C1C1C1',type:'dashed'},
-                        itemStyle:{opacity:'0'},
-                        data: [{name: '均值1',value: ["2016-08-09 00:00:00", '缺失']}, 
-                        { name: '均值2',value: ["2016-08-09 23:59:59", '缺失']}],
-                    },
-                    {
-                        type: 'line',lineStyle:{color:'#C1C1C1',type:'dashed'},
-                        itemStyle:{opacity:'0'},
-                        data: [{name: '均值1',value: ["2016-08-09 00:00:00", '正常']}, 
-                        {name: '均值2',value: ["2016-08-09 23:59:59", '正常']}],
-                    },
-                    {
-                        type: 'line',
-                        lineStyle:{color:'#00E115'},
-                        data: [{ name: '均值1',value: ["2016-08-09 10:05:22", '正常']}, 
-                        {name: '均值2',value: ["2016-08-09 15:05:22", '正常'] }],
-                    },
-                    {
-                        type: 'line',
-                        lineStyle:{color:'#E10000'},
-                        data: [{name: '均值1',value: ["2016-08-09 02:05:22", '缺失']}, 
-                        {name: '均值2',value: ["2016-08-09 04:05:22", '缺失']}],
-                    },
+            var date = this.daydata
+            // var aa =  [{type: 'line',
+            //             lineStyle:{color:'#C1C1C1',type:'dashed'},
+            //             itemStyle:{opacity:'0'},
+            //             data: [{name: '均值1',value: ["2016-08-09 00:00:00", '缺失']}, 
+            //             { name: '均值2',value: ["2016-08-09 23:59:59", '缺失']}],
+            //         },
+            //         {
+            //             type: 'line',lineStyle:{color:'#C1C1C1',type:'dashed'},
+            //             itemStyle:{opacity:'0'},
+            //             data: [{name: '均值1',value: ["2016-08-09 00:00:00", '正常']}, 
+            //             {name: '均值2',value: ["2016-08-09 23:59:59", '正常']}],
+            //         },
+            //         {
+            //             type: 'line',
+            //             lineStyle:{color:'#00E115'},
+            //             data: [{ name: '均值1',value: ["2016-08-09 10:05:22", '正常']}, 
+            //             {name: '均值2',value: ["2016-08-09 15:05:22", '正常'] }],
+            //         },
+            //         {
+            //             type: 'line',
+            //             lineStyle:{color:'#E10000'},
+            //             data: [{name: '均值1',value: ["2016-08-09 02:05:22", '缺失']}, 
+            //             {name: '均值2',value: ["2016-08-09 04:05:22", '缺失']}],
+            //         },
                     
-                ]
+            //     ]
             myChart.setOption({
                 tooltip: {
                     trigger: 'item',
@@ -362,7 +427,7 @@
                         data:['', '缺失','正常','']
                     }
                 ],
-                series:aa
+                series:data
                         })
         },
         echartscamera2(data){
@@ -370,38 +435,7 @@
             window.addEventListener("resize", function () {
             myChart.resize();
             });
-            var date = '2019-01-09'
-            // var date = '2016-08-09';
-            var aa =  [
-                {
-                        type: 'line',
-                        // symbol: "roundRect",
-                        lineStyle:{color: "#C1C1C1", type: "dashed"},
-                        itemStyle:{opacity:"0"},
-                        data: [{
-                            name: '均值1',
-                            value: ["2016-08-09 00:00:00", '备录']
-                        }, {
-                            name: '均值2',
-                            value: ["2016-08-09 23:59:59", '备录']
-                        }],
-
-                    },
-                    {
-                        type: 'line',
-                        // symbol: "roundRect",
-                        lineStyle:{color:'#00E115'},
-                        data: [{
-                            name: '均值1',
-                            value: ["2016-08-09 6:05:22", '备录']
-                        }, {
-                            name: '均值2',
-                            value: ["2016-08-09 15:05:22", '备录']
-                        }],
-
-                    },
-                    
-                ]
+           var date = this.daydata
             myChart.setOption({
                 tooltip: {
                     trigger: 'item',
@@ -542,10 +576,12 @@
         position: absolute;
         right: 45px;
         top: 45px;
+        cursor: pointer;
     }
     .bottomimg{
        position: absolute;
         right: 45px;
         bottom: 32px;
+        cursor: pointer;
     }
 </style>

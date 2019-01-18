@@ -651,7 +651,7 @@ import city from "../../src/util/city.js";
           this.$http.get("res/ponitMove/selectByDictCode",{dictCodes:'placementPosition'},res=>{
               this.placementposition = res.data
             },err=>{});
-            this.$http.get("res/ponitMove/selectByDictCode",{dictCodes:'constructionUnit'},res=>{
+            this.$http.get("oauth/dict/selectDictCommon",{dictCodes:'constructionUnit'},res=>{
               this.constructionUnitlist = res.data
             },err=>{});
       },
@@ -694,7 +694,7 @@ import city from "../../src/util/city.js";
               this.movedata = res.data
               this.detecheck = true
             },err=>{});
-            this.$http.get("res/ponitMove/selectByDictCode",{dictCodes:'constructionUnit'},res=>{
+            this.$http.get("oauth/dict/selectDictCommon",{dictCodes:'constructionUnit'},res=>{
               this.constructionUnitlist = res.data
             },err=>{});
       },
@@ -743,7 +743,7 @@ import city from "../../src/util/city.js";
             this.$http.post('res/ponitMove/ponintMove',{
             "rebuildType":nn,
             areaName:this.installadd,
-            "constructionUnit":this.company,
+            "constructionUnit":this.constructionUnit,
             "installAddress":this.installaddress,
             "resId":this.movedata[0].placePosition.resId,
             "id":this.movedata[0].placePosition.id,
