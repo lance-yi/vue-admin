@@ -984,7 +984,7 @@
       this.hxnum = (h-250)
       document.getElementsByClassName("divbox")[0].style.height = (h-20)+'px'
       this.online()
-      this.$http.get("/oauth/dict/selectManagementUnit?",{dictCodes:'managementUnit'},res=>{
+      this.$http.get("/oauth/dict/selectDictCommon?",{dictCodes:'managementUnit'},res=>{
               this.cityList = res.data
             },err=>{});
       this.$http.get("/report/report/find3Rate?managementUnit="+this.comlistdata,{},res=>{

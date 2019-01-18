@@ -912,15 +912,15 @@
                     <span>{{processlist.processStatus}}</span>
                   </div>
                   <div style="min-width:30%">
-                    <p>反馈人：</p>
+                    <p>当前处理人：</p>
                     <span>{{processlist.auditer}}</span>
                   </div>
                   <div style="min-width:40%">
-                    <p>反馈时间：</p>
+                    <p>处理时间：</p>
                     <span>{{processlist.startTime}}</span>
                   </div>
                   <div style="min-width:100%">
-                    <p>反馈具体内容：</p>
+                    <p>备注：</p>
                     <span>{{processlist.content}}</span>
                   </div>
                  </div>
@@ -2040,7 +2040,7 @@ export default {
         this.lanfive = false
         this.lanthree = false
         this.lanfour = false
-        this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN6.deviceType,ipAddress:this.devicetype.LAN6.deviceIp},res=>{
+        this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN6.deviceTypeCode,ipAddress:this.devicetype.LAN6.deviceIp},res=>{
               this.msgtypelist = res.data
           },err=>{});
           //发送工单按钮显示隐藏
@@ -2106,7 +2106,7 @@ export default {
         this.lanseven = false
         this.laneig = false
         this.wangguanshow = false
-         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN5.deviceType,ipAddress:this.devicetype.LAN5.deviceIp},res=>{
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN5.deviceTypeCode,ipAddress:this.devicetype.LAN5.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -2172,7 +2172,7 @@ export default {
         this.laneig = false
         this.lanthree = false
         this.wangguanshow = false
-         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN4.deviceType,ipAddress:this.devicetype.LAN4.deviceIp},res=>{
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN4.deviceTypeCode,ipAddress:this.devicetype.LAN4.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -2238,7 +2238,7 @@ export default {
         this.lanseven = false
         this.laneig = false
         this.wangguanshow = false
-         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN3.deviceType,ipAddress:this.devicetype.LAN3.deviceIp},res=>{
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN3.deviceTypeCode,ipAddress:this.devicetype.LAN3.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -2305,7 +2305,7 @@ export default {
         this.lanseven = false
         this.laneig = false
         this.wangguanshow = false
-         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN2.deviceType,ipAddress:this.devicetype.LAN2.deviceIp},res=>{
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN2.deviceTypeCode,ipAddress:this.devicetype.LAN2.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -2371,7 +2371,7 @@ export default {
         this.lanseven = false
         this.laneig = false
         this.wangguanshow = false
-        this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN1.deviceType,ipAddress:this.devicetype.LAN1.deviceIp},res=>{
+        this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN1.deviceTypeCode,ipAddress:this.devicetype.LAN1.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -2437,7 +2437,7 @@ export default {
         this.lanfive = false
         this.laneig = false
         this.wangguanshow = false
-         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN7.deviceType,ipAddress:this.devicetype.LAN7.deviceIp},res=>{
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN7.deviceTypeCode,ipAddress:this.devicetype.LAN7.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -2503,7 +2503,7 @@ export default {
         this.lansix = false
         this.lanfive = false
         this.wangguanshow = false
-         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN8.deviceType,ipAddress:this.devicetype.LAN8.deviceIp},res=>{
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN8.deviceTypeCode,ipAddress:this.devicetype.LAN8.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});

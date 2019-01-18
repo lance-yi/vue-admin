@@ -11,17 +11,37 @@
     <div style="padding:20px 10px;width:360px;height:100%;margin-top:10px;text-align:left;position:relative;box-shadow: 0px -1px 10px rgba(0,0,0,0.2);" v-if="serviceleft">
        <div class="control-top" style="align-items:center">
           <p style="margin-left:48px;">请选择时间：</p>
-          <DatePicker type="date" placeholder="请选择具体时间" style="width: 200px"></DatePicker>
+          <DatePicker type="date" placeholder="请选择具体时间" style="width: 200px"  v-model="starttime" @on-change="startTimeChange" format="yyyy-MM-dd"></DatePicker>
         </div>
         <div class="control-top" style="align-items:center;margin:20px 0">
           <p >请选择外场维修人员：</p>
-          <i-input v-model="valuetable" placeholder="请直接输入人员名称" style="width: 200px" ></i-input>
+          <i-input v-model="username" placeholder="请直接输入人员名称" style="width: 200px" @on-keydown="keydown" @on-change="usernamechange"></i-input>
         </div>
+        <div class="control-top" style="padding:20px 0;border-top:1px solid #C1C1C1">
+          <p style="width:60px">字母检索：</p>
+          <div style="width:270px;word-wrap: break-word;word-break: break-all; white-space: pre-wrap !important;">
+            <span style="margin:0px 10px 20px 10px;display: inline-block;cursor:pointer" class="nocheck" v-for="(code,index) in codelist" :key="index" @click="checkcode(code)">{{code}}</span>
+          </div>
+        </div>
+        <div class="control-top" style="padding:20px 0;border-top:1px solid #C1C1C1">
+          <p style="width:60px">人员列表：</p>
+          <div style="height:200px;overflow-y:auto">
+            <RadioGroup v-model="vertical" vertical>
+              <Radio :label="list.id" v-for="(list,index) in userlist" :key="index">
+                  <span>{{list.userName}}({{list.company}})</span>
+              </Radio>
+            </RadioGroup>
+        </div>
+        </div>
+        <div style="text-align:center" v-if="userlist.length>0">
+           <button   class="zhuanyixukes"  @click="allowservice">确定</button>
+        </div>
+        
        <img src="../../public/img/159.png" style="position:absolute;right:-19px;top:40%;cursor:pointer" @click="serviceleft = false"/>
     </div>
     <img src="../../public/img/160.png" style="position:absolute;left:0px;top:40%;cursor:pointer" @click="serviceleft = true" v-if="!serviceleft"/>
     <div :class="serviceleft?'serviceright':'servicerights'">
-         222
+         <ArcgisMapsservice :propstimes="propsdata" @formids="formids"/>
     </div>
   </div>
   <div @click="showno" v-if="!service">
@@ -1152,7 +1172,7 @@
                     <span>{{processlist.processStatus}}</span>
                   </div>
                   <div style="min-width:30%">
-                    <p>处理人：</p>
+                    <p>当前处理人：</p>
                     <span>{{processlist.auditer}}</span>
                   </div>
                   <div style="min-width:40%">
@@ -1160,7 +1180,7 @@
                     <span>{{processlist.startTime}}</span>
                   </div>
                   <div style="min-width:100%">
-                    <p>处理具体内容：</p>
+                    <p>备注：</p>
                     <span>{{processlist.content}}</span>
                   </div>
                  </div>
@@ -1309,6 +1329,7 @@
 import {mapState} from 'vuex'
 import ArcgisMaps from "@/components/ArcgisMaps";
 import ArcgisMapsmall from "@/components/ArcgisMapsmall";
+import ArcgisMapsservice from "@/components/ArcgisMapsservice";
 import ipDevice from "@/components/ipDevice";
 import Vue from "vue";
 // let echarts = require('echarts/lib/echarts');
@@ -1317,6 +1338,7 @@ export default {
   components: {
     ArcgisMaps,
     ArcgisMapsmall,
+    ArcgisMapsservice,
     ipDevice,
     mapState
   },
@@ -1327,6 +1349,13 @@ export default {
   },
   data() {
     return {
+      propsdata:[],
+      userlist:[],
+      vertical: '',
+      usernames:0,
+      username:'',
+      codelist:['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
+      starttime: '', //开始日期model
       serviceleft:true,
       service:false,
       processlist:[],
@@ -2294,7 +2323,7 @@ export default {
         this.lanfive = false
         this.lanthree = false
         this.lanfour = false
-        this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN6.deviceType,ipAddress:this.devicetype.LAN6.deviceIp},res=>{
+        this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN6.deviceTypeCode,ipAddress:this.devicetype.LAN6.deviceIp},res=>{
               this.msgtypelist = res.data
           },err=>{});
           //发送工单按钮显示隐藏
@@ -2361,7 +2390,7 @@ export default {
         this.lanseven = false
         this.laneig = false
         this.wangguanshow = false
-         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN5.deviceType,ipAddress:this.devicetype.LAN5.deviceIp},res=>{
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN5.deviceTypeCode,ipAddress:this.devicetype.LAN5.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -2428,7 +2457,7 @@ export default {
         this.laneig = false
         this.lanthree = false
         this.wangguanshow = false
-         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN4.deviceType,ipAddress:this.devicetype.LAN4.deviceIp},res=>{
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN4.deviceTypeCode,ipAddress:this.devicetype.LAN4.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -2494,7 +2523,7 @@ export default {
         this.lanseven = false
         this.laneig = false
         this.wangguanshow = false
-         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN3.deviceType,ipAddress:this.devicetype.LAN3.deviceIp},res=>{
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN3.deviceTypeCode,ipAddress:this.devicetype.LAN3.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -2561,7 +2590,7 @@ export default {
         this.lanseven = false
         this.laneig = false
         this.wangguanshow = false
-         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN2.deviceType,ipAddress:this.devicetype.LAN2.deviceIp},res=>{
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN2.deviceTypeCode,ipAddress:this.devicetype.LAN2.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -2628,7 +2657,7 @@ export default {
         this.lanseven = false
         this.laneig = false
         this.wangguanshow = false
-        this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN1.deviceType,ipAddress:this.devicetype.LAN1.deviceIp},res=>{
+        this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN1.deviceTypeCode,ipAddress:this.devicetype.LAN1.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -2694,7 +2723,7 @@ export default {
         this.lanfive = false
         this.laneig = false
         this.wangguanshow = false
-         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN7.deviceType,ipAddress:this.devicetype.LAN7.deviceIp},res=>{
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN7.deviceTypeCode,ipAddress:this.devicetype.LAN7.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -2760,7 +2789,7 @@ export default {
         this.lansix = false
         this.lanfive = false
         this.wangguanshow = false
-         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN8.deviceType,ipAddress:this.devicetype.LAN8.deviceIp},res=>{
+         this.$http.get("alert/warning/selectByDeviceTypeAndIp?",{deviceType:this.devicetype.LAN8.deviceTypeCode,ipAddress:this.devicetype.LAN8.deviceIp},res=>{
               // console.log(res)
               this.msgtypelist = res.data
           },err=>{});
@@ -4043,7 +4072,66 @@ export default {
     changedata(data,index){
       this.workdetaillist[index].entity=data
       // console.log(data,index)
-    }
+    },
+    startTimeChange: function(e) { //设置开始时间
+          this.starttime = e;
+    },
+    checkcode(code){
+      if(this.usernames == 1){
+        this.username = ''
+        this.usernames = 0
+      }
+      this.username += code
+      if(this.username != ''){
+      this.$http.get("oauth/userMaintain/selectUserByParam",{userName:this.username},res=>{
+            this.userlist = res.data
+          },err=>{});
+      }
+    },
+    keydown(event){
+      if(event.key != 'Backspace'){
+        this.usernames = 1
+      }else{
+        this.usernames = 0
+      }
+    },
+    usernamechange(val){
+      if(this.username != ''){
+         this.$http.get("oauth/userMaintain/selectUserByParam",{userName:this.username},res=>{
+            this.userlist = res.data
+          },err=>{});
+      }else{
+        this.userlist = []
+      }
+    },
+    allowservice(){
+      if(this.vertical == ''){
+        this.$Message.error('请选择人员');
+      }else if(this.starttime == ''){
+        this.$Message.error('请选择时间');
+      }else{
+        this.propsdata = []
+        this.propsdata.push(this.starttime)
+        this.propsdata.push(this.vertical)
+      }
+    },
+    formids(data){
+
+          this.workdetail = true
+          //工单详情
+          this.$http.get("workflow/workflow/findFormDetail?",{formId:data},res=>{
+            //反馈信息
+              this.feebacklist = res.data[0].feedback
+            //催单信息
+              this.remindlist = res.data[0].remind
+            //派单信息故障
+              this.devicelist = res.data[0].device
+            //派单信息公有
+              this.formlists = res.data[0].form
+            //流程信息
+            this.processlist = res.data[0].process
+          },err=>{});
+    },
   }
 };
 </script>
@@ -4606,13 +4694,22 @@ export default {
   .serviceright{
     width:calc(100% - 390px);
     margin-left:30px;
-    background:green;
+    /* background:green; */
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.2);
     margin-top:10px;
   }
   .servicerights{
     width:calc(100% - 20px);
     margin-left:30px;
-    background:green;
+    /* background:green; */
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.2);
     margin-top:10px;
+  }
+  .nocheck{
+    color:#D3D3D3
+  }
+  .nochecks{
+    color:#1D60FE;
+    border-bottom: 1px solid #1D60FE;
   }
 </style>

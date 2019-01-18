@@ -3,6 +3,7 @@
                  <div style="padding:0 20px;text-align:left" >
                       <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" @click="addbook">新增</button>
                       <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" @click="detele">删除</button>
+                      <button   class="zhuanyixuke" style="border:1px solid #1D60FE;color:#1D60FE;margin-bottom:20px" @click="grouping">新增组</button>
                  <i-table border stripe :columns="wordbookhead" :data="wordbookdata" id="wordbook" @on-selection-change="checkbookchange" class="bigtable"></i-table>
                  </div>
                  
@@ -11,6 +12,7 @@
         :title="edittile"
         @on-ok="ok('formValidate')">
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" >
+            <p v-if="modal4" style="margin-left:40px;margin-bottom:20px">字典组：{{detelebook[0].classifyName}}</p>
             <FormItem label="编码" prop="num" v-if="addbookshow">
                 <Input v-model="formValidate.num" />
             </FormItem>
@@ -41,6 +43,22 @@
                 </Col>
             </Row>
         </FormItem>
+        </Form>
+    </Modal>
+
+
+    <Modal
+        v-model="modal2"
+        title="新增组"
+        @on-ok="oks('formValidates')">
+        <Form ref="formValidates" :model="formValidates" :rules="ruleValidates" :label-width="80" >
+            <p v-if="modal3" style="margin-left:40px;margin-bottom:20px">字典组：{{detelebook[0].classifyName}}</p>
+            <FormItem label="编码" prop="num" >
+                <Input v-model="formValidates.num" />
+            </FormItem>
+             <FormItem label="名称" prop="name" >
+                <Input v-model="formValidates.name" />
+            </FormItem>
         </Form>
     </Modal>
        
@@ -93,6 +111,18 @@
               name: '',
               num:'',
           },
+          formValidates:{
+              name: '',
+              num:'',
+          },
+          ruleValidates: {
+                name: [
+                    { required: true, message: '名称不能为空', trigger: 'blur' }
+                ],
+                num: [
+                    { required: true, message: '编码不能为空', trigger: 'blur' }
+                ],
+            },
           ruleValidate: {
                 name: [
                     { required: true, message: '名称不能为空', trigger: 'blur' }
@@ -102,6 +132,7 @@
                 ],
             },
           wordbookhead:[{type: 'selection',width: 60,align: 'center'},
+                  {title: '字典分配',key: 'classifyName',width:150,align: 'center',},
                   {title: '编码',key: 'dictCode',width:150,align: 'center',},
                   {title: '字典项',key: 'dictName',width:150,align: 'center'},
                   {title: '字典属性',key: 'attrName',align: 'center'},
@@ -192,16 +223,32 @@
          if(this.addbookshow == true){
              this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.$http.post("oauth/dict/add",{
+                        if(this.modal4 == false){
+                            this.$http.post("oauth/dict/add",{
                         dictCode:this.formValidate.num,
                         dictName:this.formValidate.name,
                         dictAttrs:this.formValidate.attrlist,
+                        classifyId:-1
                         },res=>{
                             this.$Message.info(res.message);
                             this.$http.get("oauth/dict/select",{},res=>{
                             this.wordbookdata = res.data
                             },err=>{});
-            },err=>{});
+                         },err=>{});
+                        }else{
+                            this.$http.post("oauth/dict/add",{
+                        dictCode:this.formValidate.num,
+                        dictName:this.formValidate.name,
+                        dictAttrs:this.formValidate.attrlist,
+                        classifyId:this.detelebook[0].classifyId
+                        },res=>{
+                            this.$Message.info(res.message);
+                            this.$http.get("oauth/dict/select",{},res=>{
+                            this.wordbookdata = res.data
+                            },err=>{});
+                         },err=>{}); 
+                        }
+                        
                     } else {
                         this.$Message.error('请填写完整');
                     }
@@ -238,6 +285,10 @@
         },
         checkbookchange(val){
            this.detelebook = val
+           if(this.detelebook.length == 0){
+               this.modal4 = false
+               this.modal3 = false
+           }
         },
         detele(){
           var deletedata = []
@@ -256,16 +307,86 @@
           
         },
         addbook(){
-             this.edittile = '新增字典'
-             this.modal1 = true
-             this.addbookshow = true
-             this.formValidate.name = ''
-             this.formValidate.attrlist = []
-             this.formValidate.attrlist.push({
-                    name:''
+             if(this.detelebook.length == 0){
+                this.edittile = '新增字典'
+                this.modal1 = true
+                this.modal4 = false
+                this.addbookshow = true
+                this.formValidate.name = ''
+                this.formValidate.num = ''
+                this.formValidate.attrlist = []
+                this.formValidate.attrlist.push({
+                        name:''
              });
+                }else if(this.detelebook.length == 1){
+                this.edittile = '新增字典'
+                this.modal1 = true
+                this.modal4 = true
+                this.addbookshow = true
+                this.formValidate.num = ''
+                this.formValidate.name = ''
+                this.formValidate.attrlist = []
+                this.formValidate.attrlist.push({
+                        name:''
+             });
+                }else{
+                    this.$Message.error('只能选择一个分组进行新增');
+                }
         },
-       
+       grouping(){
+        if(this.detelebook.length == 0){
+            this.formValidates.name=''
+            this.formValidates.num=''
+           this.modal3 = false
+           this.modal2 = true
+        }else if(this.detelebook.length == 1){
+            this.formValidates.name=''
+            this.formValidates.num=''
+          this.modal3 = true
+          this.modal2 = true
+        }else{
+            this.$Message.error('只能选择一个分组进行新增');
+        }
+       },
+       oks(name){
+         if(this.modal3 == false){
+           this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        this.$http.post("oauth/dictClassifiy/add",{
+                        name:this.formValidates.name,
+                        code:this.formValidates.num,
+                        parentId:-1
+                        },res=>{
+                            this.$Message.info(res.message);
+                            this.$http.get("oauth/dict/select",{},res=>{
+                            this.wordbookdata = res.data
+                            },err=>{});
+            },err=>{});
+                    } else {
+                        this.$Message.error('请输入名称');
+                    }
+                }) 
+         }else{
+            this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        this.$http.post("oauth/dictClassifiy/add",{
+                        name:this.formValidates.name,
+                        code:this.formValidates.num,
+                        parentId:this.detelebook[0].classifyId
+                        },res=>{
+                            this.$Message.info(res.message);
+                            this.$http.get("oauth/dict/select",{},res=>{
+                            this.wordbookdata = res.data
+                            },err=>{});
+            },err=>{});
+                    } else {
+                        this.$Message.error('请输入名称');
+                    }
+                })  
+         }
+              
+          
+      },
     
       
 

@@ -3,7 +3,8 @@
         
         <div style="padding:0 20px;text-align:left" >
                   
-                  <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" @click="addrole">新增</button>
+                  <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" @click="addrole">新增组</button>
+                  <button   class="zhuanyixuke" style="border:1px solid #1D60FE;color:#1D60FE" @click="addalert">新增告警类型</button>
                   <!-- <button   class="zhuanyixuke" @click="changerole">修改</button> -->
                   <button   class="zhuanyixuke" style="border:1px solid #E15C5C;color:#E15C5C;margin-bottom:20px" @click="detelerole">删除</button>
                    <!-- <button   class="zhuanyixukes" @click="power">分配权限</button>
@@ -12,49 +13,56 @@
                        <Col span="7" style="margin-right: 20px;">
                            <div class="head-left">告警类型管理</div>
                            <div style="border:1px solid  #e8eaec;padding-left:20px">
-                              <Tree :data="data3"  show-checkbox @on-select-change="checkrole" :scheck-strictly="true" @on-check-change="getCheckedNodes"></Tree>
+                              <Tree :data="data3"  show-checkbox @on-select-change="checkrole" :scheck-strictly="true" @on-check-change="getCheckedNodes" ></Tree>
                            </div>
                        </Col>
                         <Col span="16">
-                         <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:-55px;right:0%"  @click="edit" v-if="editorshow">编辑</button>
+                         <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:-55px;right:0%"  @click="edit" v-if="gruopdata.length>0||alertdata.length > 0">编辑</button>
                       <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;top:-55px;right:105px"   v-if="!editorshow" @click="backeditor">返回</button>
                        <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:-55px;right:0%"   v-if="!editorshow" @click="saveeditor">保存</button>
-                           <div style="display:flex;">
-                              <div style="display:flex;min-width:50%">
-                                  <p>编码：</p>
-                                  <span v-if="editorshow">123</span>
-                                  <Input v-if="!editorshow"  placeholder="111" style="width: 160px;margin-top: 0" />
+                           <div style="display:flex;" v-if="gruopdata.length>0">
+                               <div style="display:flex;min-width:50%">
+                                  <p>告警分组编码：</p>
+                                  <span >{{gruopdata[0].code}}</span>
                               </div>
                               <div style="display:flex">
-                                  <p>编码：</p>
-                                  <span v-if="editorshow">123</span>
-                                  <Input  v-if="!editorshow" placeholder="111" style="width: 160px;margin-top: 0" />
+                                  <p>告警分组名称：</p>
+                                  <span v-if="editorshow">{{gruopdata[0].name}}</span>
+                                  <Input v-if="!editorshow"  v-model="gruopdata[0].name" style="width: 160px;margin-top: 0" />
                               </div>
                            </div>
-                           <div style="display:flex;margin-top:30px">
-                              <div style="display:flex;min-width:50%">
-                                  <p>编码：</p>
-                                  <span v-if="editorshow">123</span>
-                                  <Input v-if="!editorshow"  placeholder="111" style="width: 160px;margin-top: 0" />
+                           <div style="display:flex;margin-top:30px" v-if="alertdata.length > 0">
+                               <div style="display:flex;min-width:50%">
+                                  <p>告警类型编码：</p>
+                                  <span >{{alertdata[0].code}}</span>
                               </div>
                               <div style="display:flex">
-                                  <p>编码：</p>
-                                  <span v-if="editorshow">123</span>
-                                  <Input  v-if="!editorshow" placeholder="111" style="width: 160px;margin-top: 0" />
+                                  <p>告警类型名称：</p>
+                                  <span v-if="editorshow">{{alertdata[0].name}}</span>
+                                  <Input v-if="!editorshow"  v-model="alertdata[0].name" style="width: 160px;margin-top: 0" />
                               </div>
                            </div>
-                           <div style="display:flex;;margin-top:30px">
+                           <div style="display:flex;;margin-top:30px" v-if="alertdata.length > 0">
                               <div style="display:flex;min-width:50%">
-                                  <p>编码：</p>
-                                  <span v-if="editorshow">123</span>
-                                  <Input  v-if="!editorshow" placeholder="111" style="width: 160px;margin-top: 0" />
-                              </div>
-                              <div style="display:flex">
-                                  <p>编码：</p>
-                                  <span v-if="editorshow">123</span>
-                                  <Select v-model="model12" filterable  v-if="!editorshow">
-                                    <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                                  <p>告警类型等级：</p>
+                                  <span v-if="editorshow">{{alertdata[0].levelName}}</span>
+                                  <Select v-model="alertdata[0].level" filterable  v-if="!editorshow" style="width:170px">
+                                    <Option v-for="item in levellist" :value="item.value" :key="item.value">{{ item.label }}</Option>
                                 </Select>
+                              </div>
+                              <div style="display:flex">
+                                  <p>告警所属资源：</p>
+                                  <span v-if="editorshow">{{alertdata[0].diviceName}}</span>
+                                  <Select v-model="alertdata[0].resType" filterable  v-if="!editorshow" style="width:170px">
+                                    <Option v-for="item in citylist" :value="item.label" :key="item.value">{{ item.value }}</Option>
+                                </Select>
+                              </div>
+                           </div>
+                           <div style="display:flex;margin-top:30px" v-if="alertdata.length > 0">
+                               <div style="display:flex;min-width:50%">
+                                  <p>告警分组：</p>
+                                  <span v-if="editorshow">{{alertdata[0].groupName}}</span>
+                                  <Input v-if="!editorshow"  v-model="alertdata[0].groupName" style="width: 160px;margin-top: 0"  @on-focus="jwmap"/>
                               </div>
                            </div>
                        </Col>
@@ -68,12 +76,12 @@
             @on-ok="okrole('formrole')"
             >
              <Form ref="formrole" :model="formrole" :rules="rulerole" :label-width="100" >
-                <p style="padding-left: 16px;font-size: 13px;margin-bottom: 10px;" v-if="this.clickarea.length>0&&this.addrolenum == 0">父节点 ：<span style="margin-left: 29px;" v-if="modal4 == true">{{clickarea[0].areaName}}</span></p>
-                <FormItem label="告警分组名称" prop="name" >
-                    <Input v-model="formrole.name" />
-                </FormItem>
+                <p style="padding-left: 16px;font-size: 13px;margin-bottom: 10px;" v-if="this.clickarea.length>0">父组 ：<span style="margin-left: 29px;" >{{clickarea[0].name}}</span></p>
                 <FormItem label="告警分组编码" prop="num" >
                     <Input v-model="formrole.num" />
+                </FormItem>
+                <FormItem label="告警分组名称" prop="name" >
+                    <Input v-model="formrole.name" />
                 </FormItem>
              </Form>
         </Modal>       
@@ -81,30 +89,39 @@
 
         <Modal
             v-model="modal5"
-            :title="formrole.name"
-            @on-ok="okuser()"
+            title="新增告警类型"
+            @on-ok="okuser('formroles')"
             >
-            <Tree :data="data2" show-checkbox @on-check-change="treechange"></Tree>
+            <Form ref="formroles" :model="formroles" :rules="ruleroles" :label-width="100" >
+                <p style="padding-left: 16px;font-size: 13px;margin-bottom: 10px;" v-if="this.clickarea.length>0">告警分组名称 ：<span style="margin-left: 29px;" >{{clickarea[0].name}}</span></p>
+                <FormItem label="告警类型编码" prop="num" >
+                    <Input v-model="formroles.num" />
+                </FormItem>
+                <FormItem label="告警类型名称" prop="names" >
+                    <Input v-model="formroles.names" />
+                </FormItem>
+                <FormItem label="告警类型等级" prop="lever" >
+                    <Select v-model="formroles.lever" placeholder="请选择">
+                    <Option :value="list.value" v-for="(list,index) in levellist" :key="index">{{list.label}}</Option>
+                </Select>
+                </FormItem>
+                <FormItem label="告警所属资源" prop="city">
+                <Select v-model="formroles.city" placeholder="请选择">
+                    <Option :value="list.label" v-for="(list,index) in citylist" :key="index">{{list.value}}</Option>
+                </Select>
+            </FormItem>
+             </Form>
         </Modal>
 
 
-        <Modal
-            v-model="modal6"
-            :title="formrole.name"
-            width='800'
-            @on-ok="okallotuser()"
-            >
-            <div style="text-align:center;margin-bottom:20px">
-                <i-input v-model="value" placeholder="请输入" style="width: 200px" class="sousuo"></i-input>
-                <i-button type="primary" class="sure" @click="serachuser">搜索</i-button>
-            </div>
-            <i-table highlight-row stripe border :columns="columns1" :data="data1" @on-selection-change="checkuserchange"></i-table>
-              <Page :total='searchUsertotla' show-total  ></Page>
-        </Modal>
+        
 
 
        
-
+        <div v-if="modal6" style="min-height: 100px;background: #fff;position:absolute; right: 33%;top: 24%;min-width: 300px;border: 1px solid #999;z-index: 555;text-align: left;padding: 10px;" >
+         <img src="../../public/img/xxx.png" @click.stop="modal6 = false" style="position:absolute;top:8%;left: 90%;z-index: 555;"/>
+          <Tree :data="data1" @on-select-change="checkdata"></Tree>
+       </div>
 
 
 
@@ -122,32 +139,7 @@ import axios from 'axios'
     },
     data () {
       return {
-          cityList: [
-                    {
-                        value: 'New York',
-                        label: 'New York'
-                    },
-                    {
-                        value: 'London',
-                        label: 'London'
-                    },
-                    {
-                        value: 'Sydney',
-                        label: 'Sydney'
-                    },
-                    {
-                        value: 'Ottawa',
-                        label: 'Ottawa'
-                    },
-                    {
-                        value: 'Paris',
-                        label: 'Paris'
-                    },
-                    {
-                        value: 'Canberra',
-                        label: '123'
-                    }
-                ],
+          citylist:[],
           model12: 'Canberra',
           editorshow:true,
           titledata:"新增告警类型分组",
@@ -199,13 +191,33 @@ import axios from 'axios'
               name: '',
               num:'',
           },
+          formroles:{
+              names: '',
+              num:'',
+              lever:'',
+
+          },
             rulerole:{
               name: [
-                    { required: true, message: '行政区划名称不能为空', trigger: 'blur' }
+                    { required: true, message: '告警分组名称不能为空', trigger: 'blur' }
                 ],
                 num: [
-                    { required: true, message: '行政区划编码不能为空', trigger: 'blur' }
+                    { required: true, message: '告警分组编码不能为空', trigger: 'blur' }
                 ],
+          },
+          ruleroles:{
+               names: [
+                    { required: true, message: '告警分组名称不能为空', trigger: 'blur' }
+                ],
+                num: [
+                    { required: true, message: '告警分组编码不能为空', trigger: 'blur' }
+                ],
+                lever: [
+                    { required: true, message: '告警分组编码不能为空', trigger: 'blur' }
+                ],
+                city: [
+                        { required: true, message: '请选择', trigger: 'change' }
+                    ],
           },
           columns1:[
               {type: 'selection',width: 60,align: 'center',},
@@ -225,17 +237,20 @@ import axios from 'axios'
           clickarea:[],
           detelearealist:[],
           data3:[],
+          gruopdata:[],
+          alertdata:[],
+          levellist:[],
       }
     },
     created(){
     },
     mounted(){
-        // this.$http.get("oauth/baseArea/getAllArea",{},res=>{
-        //     console.log(res)
-        //     },err=>{});
+        this.$http.get("alert/baseAlert/getResDevice",{},res=>{
+            this.citylist = res.data
+            },err=>{});
         axios({
             method: 'get',
-            url: 'oauth/baseArea/getAllArea',
+            url: 'alert/baseAlert/getAllAlertGroup',
             baseURL: window.g.ApiUrl,
             dataType: 'json',
             headers:{
@@ -245,6 +260,22 @@ import axios from 'axios'
           }).then(res=>{
              this.data3 = res.data
           })
+       this.$http.get("/oauth/dict/selectDictCommon?",{dictCodes:'alertTypeLevel'},res=>{
+              this.levellist = res.data
+            },err=>{});
+       axios({
+            method: 'get',
+            url: 'alert/baseAlert/getGroup',
+            baseURL: window.g.ApiUrl,
+            dataType: 'json',
+            headers:{
+             Authorization:localStorage.getItem('token'),
+            },
+            data:{}
+          }).then(res=>{
+             this.data1 = res.data
+          })
+     
     },
     methods: {
        changerole(){
@@ -260,20 +291,16 @@ import axios from 'axios'
       okrole(name){
         this.$refs[name].validate((valid) => {
             if (valid) {
-                if(this.addrolenum == 0){
-                    var aa = 0
-                    if(this.clickarea.length == 1){
-                        var aa = this.clickarea[0].areaCode
-                    }
-                    this.$http.post("oauth/baseArea/addArea",{
-                    areaCode:this.formrole.num,
-                    areaName:this.formrole.name,
-                    parentCode:aa,
+                if(this.clickarea.length == 1){
+                  this.$http.post("alert/baseAlert/addAlertGroup",{
+                    code:this.formrole.num,
+                    name:this.formrole.name,
+                    parentId:this.clickarea[0].id,
                     },res=>{
                         this.$Message.info(res.message);
                         axios({
                             method: 'get',
-                            url: 'oauth/baseArea/getAllArea',
+                            url: 'alert/baseAlert/getAllAlertGroup',
                             baseURL: window.g.ApiUrl,
                             dataType: 'json',
                             headers:{
@@ -286,12 +313,16 @@ import axios from 'axios'
                         })
                     },err=>{
                     })
-                }else if(this.addrolenum == 1){
-                      this.$http.put("oauth/baseArea/editArea",{areaCode:this.formrole.num,areaName:this.formrole.name,id:this.clickarea[0].id},res=>{
+                }else{
+                    this.$http.post("alert/baseAlert/addAlertGroup",{
+                    code:this.formrole.num,
+                    name:this.formrole.name,
+                    parentId:'',
+                    },res=>{
                         this.$Message.info(res.message);
                         axios({
                             method: 'get',
-                            url: 'oauth/baseArea/getAllArea',
+                            url: 'alert/baseAlert/getAllAlertGroup',
                             baseURL: window.g.ApiUrl,
                             dataType: 'json',
                             headers:{
@@ -305,6 +336,7 @@ import axios from 'axios'
                     },err=>{
                     })
                 }
+                    
                
             } else {
                 this.$Message.error('请填写完整');
@@ -313,27 +345,34 @@ import axios from 'axios'
       },
       addrole(){
           if(this.clickarea.length == 0){
-              this.titledata="新增告警类型分组"
+            this.titledata="新增告警类型分组"
+            this.modal4 = true
+            this.formrole.name = ''
+            this.formrole.num = ''
+            this.roledata = []
+          }else if(this.clickarea.length == 1&&this.clickarea[0].type == 'group'){
+            this.titledata="新增告警类型分组"
+            this.modal4 = true
+            this.formrole.name = ''
+            this.formrole.num = ''
+            this.roledata = []
           }else{
-              this.titledata="新增告警类型"
+             this.$Message.error('不能在告警类型下面新增组');
           }
-          this.formrole.name = ''
-          this.formrole.num = ''
-          this.roledata = []
-          this.modal4 = true
-          this.addrolenum = 0
+          
       },
       detelerole(){
           if(this.detelearealist.length == 0){
-             this.$Message.error('请选择想要删除的行政区划！');
+             this.$Message.error('请选择想要删除的条项！');
           }else{
-              var datalist = []
-              this.detelearealist.forEach(data => { datalist = datalist.concat(data.id);})
-              this.$http.delete("oauth/baseArea/deleteArea",datalist,res => {
+              var list = []
+             this.detelearealist.forEach (el=>{list.push({id:el.id,type:el.type,code:el.code})})
+
+              this.$http.delete("alert/baseAlert/deleteAlertType",list,res => {
                       this.$Message.info(res.message);
                         axios({
                             method: 'get',
-                            url: 'oauth/baseArea/getAllArea',
+                            url: 'alert/baseAlert/getAllAlertGroup',
                             baseURL: window.g.ApiUrl,
                             dataType: 'json',
                             headers:{
@@ -352,125 +391,56 @@ import axios from 'axios'
           this.pages = 1
           this.clickarea = val
           if(val.length != 0){
-           this.$http.get("oauth/baseArea/selectrMaintainUserByCodes",{areaCodes:this.clickarea[0].areaCode},res=>{
-                        this.roletabledata = res.data.list
-                        this.totals = res.data.total
-                        },err=>{});
+            if(val[0].type == 'group'){
+                this.$http.get("alert/baseAlert/selectAlertGroupMsg",{id:val[0].id},res=>{
+                   this.gruopdata = res.data
+                   this.alertdata = []
+                },err=>{});
+            }else if(val[0].type == ''){
+                this.$http.get("alert/baseAlert/selectAllAlertMsg",{id:val[0].id},res=>{
+                   this.gruopdata = []
+                   this.alertdata = res.data
+                },err=>{});
+            }
+          }else{
+            this.alertdata = []
+            this.gruopdata = [] 
           }
         
       },
-      power(){
-          this.treevalue = 0
-          this.treelist = []
-          if(this.roledata.length == 0){
-              this.$Message.error('请选择条目！');
-          }else if(this.roledata.length > 1){
-              this.$Message.error('请勿选择多条数据！');
-          }else{
-             this.$http.get("oauth/group/"+this.roledata,{},res=>{
-                  this.modal5 = true
-                  this.formrole.name = res.data.name
-                  this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
-                      this.data2 = res.data
-                      this.$http.get("oauth/group/"+this.roledata+"/authority/menu?",{},res=>{
-                          var list = res.data
-                       for(var i=0;i<this.data2.length;i++){
-                           if(this.data2[i].children.length == 0){
-                               list.forEach(el=>{if(this.data2[i].id==el.id&&el.parentId == -1){this.$set(this.data2[i],'checked',true)}})
-                           }else{
-                               list.forEach(el=>{if(this.data2[i].id==el.id&&el.parentId == -1){this.$set(this.data2[i],'expand',true)}})
-                                for(var j=0;j<this.data2[i].children.length;j++){
-                                        list.forEach(el=>{if(this.data2[i].children[j].id==el.id&&el.parentId != -1){this.$set(this.data2[i].children[j],'checked',true)}})
-                                }
-                           }
-                           
-                       }
-                        },err=>{});
-                        
-                        },err=>{});
-                  
-                },err=>{
-                })
-          }
-      },
-      allotuser(){
-          this.data1=[]
-          this.value = ''
-          this.bb = 0
-           if(this.roledata.length == 0){
-              this.$Message.error('请选择条目！');
-          }else if(this.roledata.length > 1){
-              this.$Message.error('请勿选择多条数据！');
-          }else{
-             this.$http.get("oauth/group/"+this.roledata,{},res=>{
-                  this.modal6 = true
-                  this.formrole.name = res.data.name
-                   this.$http.get("oauth/user/searchUser?",{param:'',current:1},res=>{
-                          this.searchUsertotla = res[0].total
-                          this.data1 = res[0].user
-                           this.$http.get("oauth/group/"+this.roledata+"/user",{},res=>{
-                               for(var i=0;i<res.data.length;i++){    
-                                     this.data1.forEach (el=>{if(res.data[i].id==el.id){this.$set(el,'_checked',true)}})
-                                } 
-                            },err=>{});
-                        },err=>{});
-                  
-                },err=>{
-                })
-          }
-      },
-      checkbookchange(val){
-           this.detelebook = val
-        },
-       okallotuser(){
-          var userlistid = []
-          if(this.bb = 2&&this.userlist.length != 0){
-              this.userlist.forEach (el=>{userlistid.push(el.id)})
-          }
-           this.$http.put("oauth/group/"+this.roledata+"/user",userlistid,res=>{
-                if(res.rel == true){
-                    this.$Message.info('分配用户成功！');
-                }
-            },err=>{});
-      },
-      okuser(){
-          if(this.treevalue == 1){
-              this.$http.put("oauth/group/"+this.roledata+"/authority/menu",this.treelist,res=>{
-                 if(res.rel == true){
-                        this.$Message.info('分配权限成功！');
-                        this.$http.get("oauth/group/all",{},res=>{
-                        this.rolelist = res.data
-                        this.roledata = []
-                        },err=>{});
-                 }
-            },err=>{});
-          }
-      },
-     checkuserchange(val){
-            this.userlist = val
-            this.bb = 2
-        },
-       treechange(val){
-          this.treevalue = 1
-          var list = val
-          list.forEach (el=>{this.treelist.push(el.id)})
-      },
-      changemodal6page(i){
-          this.$http.get("oauth/baseArea/selectrMaintainUserByCodes",{areaCodes:this.clickarea[0].areaCode,current:i},res=>{
-                        this.roletabledata = res.data.list
-             
-                        },err=>{});
-      },
-      serachuser(){
-          this.$http.get("oauth/user/searchUser?",{param:this.value,current:1},res=>{
-              this.searchUsertotla = res[0].total
-                this.data1 = res[0].user
-                this.$http.get("oauth/group/"+this.roledata+"/user",{},res=>{
-                    for(var i=0;i<res.data.length;i++){    
-                            this.data1.forEach (el=>{if(res.data[i].id==el.id){this.$set(el,'_checked',true)}})
-                    } 
-                },err=>{});
-          },err=>{});
+      okuser(name){
+        this.$refs[name].validate((valid) => {
+            if (valid) {
+                  this.$http.post("alert/baseAlert/addAlertType",{
+                    code:this.formroles.num,
+                    name:this.formroles.names,
+                    groupCode:this.clickarea[0].code,
+                    level:this.formroles.lever,
+                    resType:this.formroles.city
+                    },res=>{
+                        this.$Message.info(res.message);
+                        axios({
+                            method: 'get',
+                            url: 'alert/baseAlert/getAllAlertGroup',
+                            baseURL: window.g.ApiUrl,
+                            dataType: 'json',
+                            headers:{
+                            Authorization:localStorage.getItem('token'),
+                            },
+                            data:{}
+                        }).then(res=>{
+                            this.data3 = res.data
+                            this.clickarea = []
+                        })
+                    },err=>{
+                    })
+                
+                    
+               
+            } else {
+                this.$Message.error('请填写完整');
+            }
+        })  
       },
       getCheckedNodes(val){
         this.detelearealist = val
@@ -480,10 +450,89 @@ import axios from 'axios'
       },
       backeditor(){
           this.editorshow = true
+          if(this.clickarea.length != 0){
+            if(this.clickarea[0].type == 'group'){
+                this.$http.get("alert/baseAlert/selectAlertGroupMsg",{id:this.clickarea[0].id},res=>{
+                   this.gruopdata = res.data
+                   this.alertdata = []
+                },err=>{});
+            }else if(this.clickarea[0].type == ''){
+                this.$http.get("alert/baseAlert/selectAllAlertMsg",{id:this.clickarea[0].id},res=>{
+                   this.gruopdata = []
+                   this.alertdata = res.data
+                },err=>{});
+            }
+          }
       },
       saveeditor(){
+         if(this.gruopdata.length >0){
+            this.$http.put("alert/baseAlert/editAlert",{id:this.gruopdata[0].id,name:this.gruopdata[0].name,code:this.gruopdata[0].code,type:'group'},res=>{
+                  this.$Message.info(res.message);
+                  this.editorshow = true
+                  this.$http.get("alert/baseAlert/selectAlertGroupMsg",{id:this.clickarea[0].id},res=>{
+                   this.gruopdata = res.data
+                   this.alertdata = []
+                },err=>{});
+                axios({
+            method: 'get',
+            url: 'alert/baseAlert/getAllAlertGroup',
+            baseURL: window.g.ApiUrl,
+            dataType: 'json',
+            headers:{
+             Authorization:localStorage.getItem('token'),
+            },
+            data:{}
+          }).then(res=>{
+             this.data3 = res.data
+          })
+                },err=>{});
+         }else if(this.alertdata.length >0){
+            this.$http.put("alert/baseAlert/editAlert",this.alertdata[0],res=>{
+                  this.$Message.info(res.message);
+                  this.editorshow = true
+                  this.$http.get("alert/baseAlert/selectAllAlertMsg",{id:this.clickarea[0].id},res=>{
+                   this.alertdata = res.data
+                   this.gruopdata = []
+                },err=>{});
+                axios({
+            method: 'get',
+            url: 'alert/baseAlert/getAllAlertGroup',
+            baseURL: window.g.ApiUrl,
+            dataType: 'json',
+            headers:{
+             Authorization:localStorage.getItem('token'),
+            },
+            data:{}
+          }).then(res=>{
+             this.data3 = res.data
+          })
+                },err=>{});
+         }
+      },
+      addalert(){
+          if(this.clickarea.length == 1&&this.clickarea[0].type == ''){
+              this.$Message.error('不能在告警类型下面新增告警类型！');
+          }else{
+              this.modal5 = true
+              this.formroles.names = ''
+              this.formroles.num = ''
+              this.formroles.lever = ''
+              this.formroles.city = ''
+          }
+      },
+      jwmap(){
+          this.modal6 = true
+      },
+      checkdata(data){
+        if(data.length >0){
+            this.alertdata[0].groupName = data[0].title
+            this.alertdata[0].groupCode = data[0].code
+            this.modal6 = false
+        }
+      },
+      
 
-      }
+
     }
   }
 </script>

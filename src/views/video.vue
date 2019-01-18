@@ -129,6 +129,9 @@
     created(){
     },
     mounted(){
+        this.$http.get("/oauth/dict/selectDictCommon?",{dictCodes:'projectName'},res=>{
+              
+            },err=>{});
        this.columns1 = [ {title: '安装地址',key: 'userName'},
           {title: 'IP地址',key: 'userName',width:110,},
           {title: '项目名称',key: 'userName',width:100},
@@ -147,7 +150,7 @@
        this.$http.get("oauth/baseArea/selectAreaByParentCode?parentCode=420100",{},res=>{
               this.addcodelist = res.data
             },err=>{});
-        this.$http.get("/oauth/dict/selectManagementUnit?",{dictCodes:'managementUnit'},res=>{
+        this.$http.get("/oauth/dict/selectDictCommon?",{dictCodes:'managementUnit'},res=>{
               this.cityList = res.data
             },err=>{});
     },

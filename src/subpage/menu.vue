@@ -18,13 +18,13 @@
         title="新增菜单"
         @on-ok="ok('formValidate')">
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" >
+            <p style="margin-left: 39px;margin-bottom: 10px;" v-if="parentdata != ''">父节点<span style="margin-left:10px">{{parentdata}}</span></p>
             <FormItem label="标题" prop="title" >
                 <Input v-model="formValidate.title" />
             </FormItem>
              <!-- <FormItem label="父节点" prop="parentId" >
                 <Input v-model="formValidate.parentId" />
             </FormItem> -->
-            <p style="margin-left: 39px;margin-bottom: 10px;" v-if="parentdata != ''">父节点<span style="margin-left:10px">{{parentdata}}</span></p>
             <FormItem label="图标" prop="icon" >
                 <Input v-model="formValidate.icon" />
             </FormItem>
@@ -307,7 +307,10 @@ import TreeGrid from '@/components/treeGrid2.0'
              if(this.selectlist.length == 0){
                  this.$Message.error('请选择需要删除的条目！');
              }else if(this.selectlist.length > 0){
-                 var aa = 1
+                 this.$Modal.confirm({
+                  title: '您确定要删除吗',
+                  onOk: () => {
+                  var aa = 1
                  this.selectlist.forEach(data => { if(data.children.length >0){
                     aa = 2
                  }})
@@ -315,7 +318,6 @@ import TreeGrid from '@/components/treeGrid2.0'
                      var list = []
                      this.selectlist.forEach(data => {list.push(data.id) })
                      this.$http.delete("oauth/menu/deleteByIds",list,res=>{
-
                         this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
                                 this.data = res.data      
                             },err=>{});
@@ -323,6 +325,10 @@ import TreeGrid from '@/components/treeGrid2.0'
                  }else{
                      this.$Message.error('请先删除子节点菜单');
                  }
+              },
+          });
+                
+                 
              }
              
         }

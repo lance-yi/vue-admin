@@ -886,7 +886,7 @@ import ipDevice from "@/components/ipDevice";
          this.$http.get("res/socElectrical/selectElectricStatisticsByCondition?",{},res=>{
                   this.countmaindata = res.data
                     },err=>{});
-          this.$http.get("/oauth/dict/selectManagementUnit?",{dictCodes:'managementUnit'},res=>{
+          this.$http.get("/oauth/dict/selectDictCommon?",{dictCodes:'managementUnit'},res=>{
               this.cityList = res.data
             },err=>{});
             this.$http.get("oauth/baseArea/selectAreaByParentCode?parentCode=420100",{},res=>{

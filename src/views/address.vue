@@ -710,6 +710,7 @@ import city from "../../src/util/city.js";
       },
       // 确认迁移
       allowmove(){
+        console.log()
         var aa = false
           if(this.animal == '原地迁改'){
             var nn = 0
@@ -717,7 +718,7 @@ import city from "../../src/util/city.js";
             this.installaddress = ''
             this.latnum = ''
             this.lonnum = ''
-            if(this.company == ''){
+            if(this.constructionUnit == ''){
               var aa = false
               this.$Message.error('请填写施工单位');
             }else{
@@ -731,7 +732,7 @@ import city from "../../src/util/city.js";
             }else if(this.latnum == ''){
               var aa = false
               this.$Message.error('请选择经纬度');
-            }else if(this.company == ''){
+            }else if(this.constructionUnit == ''){
               var aa = false
               this.$Message.error('请填写施工单位');
             }else{
