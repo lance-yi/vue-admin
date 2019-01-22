@@ -37,7 +37,7 @@
                       </div>
                       <div style="min-width:30%">
                         <p>维护人员：</p>
-                        <span v-if="editorshow">{{list.entity.maintenanceUserId}}</span>
+                        <span v-if="editorshow">{{list.entity.maintenanceUserName}}</span>
                         <Select v-model="list.entity.maintenanceUserId" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
                           <Option v-for="item in userlist.maintenanceUser" :value="item.value" :key="item.value">{{item.label}}</Option>
                         </Select>
@@ -123,7 +123,7 @@
                       </div>
                       <div style="min-width:30%">
                         <p>维护人员：</p>
-                        <span v-if="editorshow">{{list.entity.maintenanceUserId}}</span>
+                        <span v-if="editorshow">{{list.entity.maintenanceUserName}}</span>
                         <Select v-model="list.entity.maintenanceUserId" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
                           <Option v-for="item in userlist.maintenanceUser" :value="item.value" :key="item.value">{{item.label}}</Option>
                         </Select>
@@ -239,7 +239,7 @@
                       </div>
                       <div style="min-width:30%">
                         <p>责任人：</p>
-                        <span v-if="editorshow">{{list.entity.maintenanceUser}}</span>
+                        <span v-if="editorshow">{{list.entity.maintenanceUserName}}</span>
                         <Select v-model="list.entity.maintenanceUserId" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
                           <Option v-for="item in userlist.maintenanceUser" :value="item.value" :key="item.value">{{item.label}}</Option>
                         </Select>
@@ -392,7 +392,7 @@
                       </div>
                       <div style="min-width:30%">
                         <p>维护人员：</p>
-                        <span v-if="editorshow">{{list.entity.maintenanceUserId}}</span>
+                        <span v-if="editorshow">{{list.entity.maintenanceUserName}}</span>
                        <Select v-model="list.entity.maintenanceUserId" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
                           <Option v-for="item in userlist.maintenanceUser" :value="item.value" :key="item.value">{{item.label}}</Option>
                         </Select>

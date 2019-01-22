@@ -239,20 +239,20 @@
                                 {title: '项目名称',key: 'projectName',width:120},
                                 {title: '行政区域',key: 'areaName',width:80,},
                                 ]
-              this.$http.get("res/videoMissing/getVideoMissingStatistics",{areaCodes:this.addresscode,managementUnit:this.companylist,nearlyWeek:0,installAddress:this.valueadd},res=>{
-            this.list = res.data.timeList
-            this.data1 = res.data.stateList.list
-            this.totals = res.data.stateList.total
-            this.list.forEach(data => { this.$set(data,'render',
-                    (h,params)=>{
-                    return h('img',{
-                        attrs: 
-                        {src: (params.row[params.column.key]  == 1)?require('../../public/img/149.png'):require('../../public/img/150.png')},style:{'vertical-align':'middle',cursor:'pointer'},
-                        on: (params.row[params.column.key]  == 0)?{
-                        click: () => {this.gotodetal(params.row.ipAddress,params.column.key)}}:''
-                        },'img')})})
-                 this.list.forEach(data => {this.columns1.push(data) }) 
-            },err=>{});
+              this.$http.get("res/videoMissing/getVideoMissingStatistics",{areaCodes:JSON.stringify(this.addresscode),managementUnit:JSON.stringify(this.companylist),nearlyWeek:0,installAddress:this.valueadd},res=>{
+                        this.list = res.data.timeList
+                        this.data1 = res.data.stateList.list
+                        this.totals = res.data.stateList.total
+                        this.list.forEach(data => { this.$set(data,'render',
+                        (h,params)=>{
+                        return h('img',{
+                            attrs: 
+                            {src: (params.row[params.column.key]  == 1)?require('../../public/img/149.png'):require('../../public/img/150.png')},style:{'vertical-align':'middle',cursor:'pointer'},
+                            on: (params.row[params.column.key]  == 0)?{
+                            click: () => {this.gotodetal(params.row.ipAddress,params.column.key)}}:''
+                            },'img')})})
+                    this.list.forEach(data => {this.columns1.push(data) }) 
+                },err=>{});
 
 
             }else{
@@ -265,6 +265,20 @@
                                     {title: '项目名称',key: 'projectName',width:120},
                                     {title: '行政区域',key: 'areaName',width:80,},
                                     ]
+                    this.$http.get("res/videoMissing/getVideoMissingStatistics",{areaCodes:JSON.stringify(this.addresscode),managementUnit:JSON.stringify(this.companylist),nearlyWeek:1,installAddress:this.valueadd,startStr:this.starttime,endStr:this.endtime},res=>{
+                        this.list = res.data.timeList
+                        this.data1 = res.data.stateList.list
+                        this.totals = res.data.stateList.total
+                        this.list.forEach(data => { this.$set(data,'render',
+                            (h,params)=>{
+                            return h('img',{
+                                attrs: 
+                                {src: (params.row[params.column.key]  == 1)?require('../../public/img/149.png'):require('../../public/img/150.png')},style:{'vertical-align':'middle',cursor:'pointer'},
+                                on: (params.row[params.column.key]  == 0)?{
+                                click: () => {this.gotodetal(params.row.ipAddress,params.column.key)}}:''
+                                },'img')})})
+                        this.list.forEach(data => {this.columns1.push(data) }) 
+                    },err=>{});
 
 
                 }  

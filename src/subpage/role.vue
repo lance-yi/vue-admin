@@ -162,6 +162,12 @@
     mounted(){
         this.$http.get("oauth/group/all",{},res=>{
               this.rolelist = res.data
+              this.$http.get("oauth/group/"+this.rolelist[0].id+'/UserAndAuthorityByGroupId',{},res=>{
+                        this.roletabledata = res.data
+                        if(this.roletabledata.length == 0){
+                            this.$Message.info('该角色下没有用户！');
+                        }
+                        },err=>{});
             },err=>{});
     },
     methods: {

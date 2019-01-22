@@ -31,6 +31,7 @@
         v-model="modal2"
         :title="persontitle"
         width='800'
+        :mask-closable="false"
         @on-ok="personok('formpersondate')"
         >
        <Form ref="formpersondate" :model="formpersondate" :rules="rulepersondate" :label-width="100">
@@ -67,7 +68,10 @@
                 </Col>
                  <Col span="7">
                     <FormItem label="公司名称" >
-                        <Input v-model="formpersondate.company" />
+                        <!-- <Input v-model="formpersondate.company" /> -->
+                        <Select v-model="formpersondate.company" filterable >
+                                <Option v-for="item in selectlist[0].dictAttrs" :value="item.id" :key="item.id">{{item.name}}</Option>
+                        </Select>
                     </FormItem>
                 </Col>
                 <Col span="7">
@@ -82,7 +86,10 @@
                 </Col>
                 <Col span="7">
                     <FormItem label="类别" >
-                        <Input v-model="formpersondate.persType" />
+                        <!-- <Input v-model="formpersondate.persType" /> -->
+                        <Select v-model="formpersondate.persType" filterable >
+                                <Option v-for="item in selectlist[1].dictAttrs" :value="item.id" :key="item.id">{{item.name}}</Option>
+                        </Select>
                     </FormItem>
                 </Col>
                 <Col span="7">
@@ -90,6 +97,19 @@
                         <Input v-model="formpersondate.persJob" />
                     </FormItem>
                  </Col>
+                 <Col span="7">
+                    <FormItem label="角色管理" >
+                        <!-- <Input v-model="formpersondate.company" /> -->
+                        <Select v-model="formpersondate.role" multiple >
+                                <Option v-for="item in selectlist2" :value="item.id" :key="item.id">{{item.name}}</Option>
+                        </Select>
+                    </FormItem>
+                </Col>
+                <Col span="7">
+                    <FormItem label="行政区划" >
+                        <Input v-model="formpersondate.areaName"  @on-focus="areashow = true"/>
+                    </FormItem>
+                </Col>
                 <Col span="7">
                     <FormItem label="备注" >
                         <Input v-model="formpersondate.remark" type="textarea"/>
@@ -133,13 +153,13 @@
              </Form>
         </Modal>
 
-        <Modal
+        <!-- <Modal
             v-model="modal5"
             :title="formrole.name"
             @on-ok="okuser()"
             >
             <Tree :data="data2" show-checkbox @on-check-change="treechange"></Tree>
-        </Modal>
+        </Modal> -->
 
 
         <Modal
@@ -197,9 +217,15 @@
         </Form>
     </Modal>
        
+
+        <div v-if="areashow" class="areabox" >
+         <img src="../../public/img/xxx.png" @click.stop="areashow = false" style="position:absolute;top:5%;left: 95%;z-index: 555;"/>
+         <Tree :data="data3" @on-select-change="treechange"></Tree>
+       </div>
     </div>
 </template>
 <script>
+import axios from 'axios'
 import TreeGrid from '@/components/treeGrid2.0'
   export default {
     name: 'system',
@@ -217,6 +243,7 @@ import TreeGrid from '@/components/treeGrid2.0'
             }
         };
       return {
+          areashow:false,
           columns: [{
                     type: 'selection',
                     width: '50',
@@ -383,7 +410,10 @@ import TreeGrid from '@/components/treeGrid2.0'
                     persType:'',
                     deptId:'',
                     cardId:'',
-                    deptName:''
+                    deptName:'',
+                    areaCode:'',
+                    areaName:'',
+                    role:[],
           },
           rulepersondate: {
                 personName: [
@@ -448,10 +478,10 @@ import TreeGrid from '@/components/treeGrid2.0'
                                 return h('span',params.row.department?params.row.department.deptName:''); 
                             }  
                      },
-                     {title: '公司名称',key: 'company',align: 'center',},
+                     {title: '公司名称',key: 'companyName',align: 'center',},
                      {title: '邮箱',key: 'email',width:150,align: 'center',},
                      {title: '联系电话',key: 'phone',width:120,align: 'center',},
-                     {title: '类别',key: 'persType',width:90,align: 'center',},
+                     {title: '类别',key: 'persTypeName',width:90,align: 'center',},
                      {title: '职务',key: 'persJob',width:80,align: 'center',},
                      {title: '备注',key: 'remark',width:100,align: 'center',},
                      {title: '编辑',key: 'dictCode',width:80,align: 'center',
@@ -531,6 +561,9 @@ import TreeGrid from '@/components/treeGrid2.0'
           passid:'',
           bookname:'',
           navlist:[],
+          selectlist:[],
+          selectlist2:[],
+          data3:[],
       }
     },
     created(){
@@ -547,6 +580,25 @@ import TreeGrid from '@/components/treeGrid2.0'
                 this.$router.push({path:res.data[0].path})
                 this.bookname = res.data[0].title
             },err=>{});
+     this.$http.get("oauth/user/dic",{},res=>{
+                this.selectlist = res.data
+            },err=>{});
+     this.$http.get("oauth/group/all",{},res=>{
+                this.selectlist2 = res.data
+            },err=>{});
+     axios({
+            method: 'get',
+            url: 'oauth/baseArea/getAllArea',
+            baseURL: window.g.ApiUrl,
+            dataType: 'json',
+            headers:{
+             Authorization:localStorage.getItem('token'),
+            },
+            data:{}
+          }).then(res=>{
+             this.data3 = res.data
+             
+          })
     },
     methods: {
       wordbook(name){
@@ -561,6 +613,7 @@ import TreeGrid from '@/components/treeGrid2.0'
                  this.showpage = true
             //  console.log(res[0].user)
             },err=>{});
+            
          }else if(name == '角色管理'){
              this.$router.push({path:'/system/role'})
             //  this.$http.get("oauth/group/all",{},res=>{
@@ -585,7 +638,7 @@ import TreeGrid from '@/components/treeGrid2.0'
         this.addbookshow = false
         this.$http.get("oauth/dict/selectByDictId?",{dictId:list.dictId},res=>{
              this.formValidate.name = res.data.dictName
-             this.formValidate.attrlist = res.data.dictAttrs
+            //  this.formValidate.attrlist = res.data.dictAttrs
              this.bookonedata = res.data
             },err=>{});
         
@@ -682,7 +735,10 @@ import TreeGrid from '@/components/treeGrid2.0'
              this.deteleperson.forEach (el=>{if(el.account == 'admin'||  el.account == 'sys'){
                  this.aa++
              }})
-             if(this.deteleperson.length == 0){
+             this.$Modal.confirm({
+                  title: '您确定要删除吗',
+                  onOk: () => {
+                     if(this.deteleperson.length == 0){
                  this.$Message.error('请先选择需要删除的人员');
              }else{
                  if(this.aa == 0){
@@ -699,18 +755,33 @@ import TreeGrid from '@/components/treeGrid2.0'
                     this.$Message.error('系统管理员不允许删除');
                 }
              }
-             
-
-        
+                  }})
         },
         addperson(){
             this.persontitle = '新增人员'
-            this.formpersondate = this.personolddata
             this.modal2= true
             this.nopersonadd = 0
             this.passworkshow = true
+            this.formpersondate.personName = ''
+            this.formpersondate.account=''
+            this.formpersondate.password=''
+            this.formpersondate.email=''
+            this.formpersondate.phone=''
+            this.formpersondate.remark=''
+            this.formpersondate.company=''
+            this.formpersondate.persJob=''
+            this.formpersondate.persType=''
+            this.formpersondate.deptId=''
+            this.formpersondate.cardId=''
+            this.formpersondate.deptName=''
+            this.formpersondate.areaCode=''
+            this.formpersondate.areaName=''
+            this.formpersondate.role=[]
         },
         checkperson(list){
+            this.$http.get("oauth/user/dic",{},res=>{
+                this.selectlist = res.data
+            },err=>{});
             this.persontitle = '编辑人员'
             this.passworkshow = false
             this.modal2= true
@@ -874,6 +945,12 @@ import TreeGrid from '@/components/treeGrid2.0'
             },err=>{});
           }
       },
+      treechange(val){
+        //   console.log(val)
+          this.formpersondate.areaName = val[0].areaName
+          this.formpersondate.areaCode = val[0].areaCode
+          this.areashow = false
+      },
       checkrole(list,index){
         this.colornum = index
         this.$http.get("oauth/group/"+list.id+'/UserAndAuthorityByGroupId',{},res=>{
@@ -982,11 +1059,6 @@ import TreeGrid from '@/components/treeGrid2.0'
             },err=>{});
           }
       },
-      treechange(val){
-          this.treevalue = 1
-          var list = val
-          list.forEach (el=>{this.treelist.push(el.id)})
-      },
       rowClick(data, index, event) {
                 console.log('当前行数据:' + data)
                 console.log('点击行号:' + index)
@@ -999,7 +1071,8 @@ import TreeGrid from '@/components/treeGrid2.0'
                 console.log('排序字段:' + key)
                 console.log('排序规则:' + type)
             }
-    }
+    },
+    
   }
 </script>
 <style scoped>
@@ -1052,5 +1125,17 @@ import TreeGrid from '@/components/treeGrid2.0'
 ivu-icon ivu-icon-plus-circled{
     width: 12px;
     height: 12px;
+}
+.areabox{
+    position:absolute;
+    top:25%;
+    right: 23%;
+    z-index: 2000;
+    width: 500px;
+    background: #fff;
+    min-height: 150px;
+    border: 1px solid #999;
+    text-align:left;
+    padding-left: 20px;
 }
 </style>

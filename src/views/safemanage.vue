@@ -328,51 +328,87 @@
                 <div class="detail-text" v-if="LANshow">
                   <div style="left:50px;" class="fixedborder" v-if="wangguanshow"></div>
                   <div style="left:22px;width:60px" class="fixedimg" @click="backwgs"></div>
-                  <div style="left:110px;" class="fixedborder" v-if="laneig"></div>
-                    <p class="fixedtext" style="left:85px;" v-if="laneig">{{devicetype.LAN8.deviceType}}</p>
-                    <img src="../../public/img/1.gif" style="left:88px;" class="fixedimg" v-if="devicetype.LAN8 != '' && devicetype.LAN8.alert == 2" @click="checklaneig"/>
-                    <img src="../../public/img/2.gif" style="left:88px;" class="fixedimg" v-if="devicetype.LAN8 != '' && devicetype.LAN8.alert == 1" @click="checklaneig"/>
-                    <img src="../../public/img/gg2.png" style="left:88px;" class="fixedimg" v-if="devicetype.LAN8 != '' && devicetype.LAN8.alert == 0" @click="checklaneig"/>
-                   <div style="left:160px;" class="fixedborder" v-if="lanseven"></div>
-                    <p class="fixedtext" style="left:135px;" v-if="lanseven">{{devicetype.LAN7.deviceType}}</p>
-                    <img src="../../public/img/1.gif" style="left:138px;" class="fixedimg" v-if="devicetype.LAN7 != '' && devicetype.LAN7.alert == 2" @click="checklansrven"/>
-                    <img src="../../public/img/2.gif" style="left:138px;" class="fixedimg" v-if="devicetype.LAN7 != '' && devicetype.LAN7.alert == 1" @click="checklansrven"/>
-                    <img src="../../public/img/gg2.png" style="left:138px;" class="fixedimg" v-if="devicetype.LAN7 != '' && devicetype.LAN7.alert == 0" @click="checklansrven"/>
-                   <div style="left:210px;" class="fixedborder" v-if="lansix"></div>
-                    <p class="fixedtext" style="left:185px;" v-if="lansix">{{devicetype.LAN6.deviceType}}</p>
-                    <img src="../../public/img/1.gif" style="left:188px;" class="fixedimg" v-if="devicetype.LAN6 != '' && devicetype.LAN6.alert == 2" @click="checklansix"/>
-                    <img src="../../public/img/2.gif" style="left:188px;" class="fixedimg" v-if="devicetype.LAN6 != '' && devicetype.LAN6.alert == 1" @click="checklansix"/>
-                    <img src="../../public/img/gg2.png" style="left:188px;" class="fixedimg" v-if="devicetype.LAN6 != '' && devicetype.LAN6.alert == 0" @click="checklansix"/>
-                   <div style="left:260px;" class="fixedborder" v-if="lanfive"></div>
-                    <p class="fixedtext" style="left:235px;" v-if="lanfive">{{devicetype.LAN5.deviceType}}</p>
-                    <img src="../../public/img/1.gif" style="left:237px;" class="fixedimg" v-if="devicetype.LAN5 != '' && devicetype.LAN5.alert == 2" @click="checklanfive"/>
-                    <img src="../../public/img/2.gif" style="left:237px;" class="fixedimg" v-if="devicetype.LAN5 != '' && devicetype.LAN5.alert == 1" @click="checklanfive"/>
-                    <img src="../../public/img/gg2.png" style="left:237px;" class="fixedimg" v-if="devicetype.LAN5 != '' && devicetype.LAN5.alert == 0" @click="checklanfive"/>
-                   <div style="left:320px;" class="fixedborder" v-if="lanfour"></div>
-                    <p class="fixedtext" style="left:295px;" v-if="lanfour">{{devicetype.LAN4.deviceType}}</p>
-                    <img src="../../public/img/1.gif" style="left:298px;" class="fixedimg" v-if="devicetype.LAN4 != '' && devicetype.LAN4.alert == 2" @click="checklanfour"/>
-                    <img src="../../public/img/2.gif" style="left:298px;" class="fixedimg" v-if="devicetype.LAN4 != '' && devicetype.LAN4.alert == 1" @click="checklanfour"/>
-                    <img src="../../public/img/gg2.png" style="left:298px;" class="fixedimg" v-if="devicetype.LAN4 != '' && devicetype.LAN4.alert == 0" @click="checklanfour"/>
-                   <div style="left:370px;" class="fixedborder" v-if="lanthree"></div>
-                   <p class="fixedtext" style="left:345px;" v-if="lanthree">{{devicetype.LAN3.deviceType}}</p>
-                    <img src="../../public/img/1.gif" style="left:348px;" class="fixedimg" v-if="devicetype.LAN3 != '' && devicetype.LAN3.alert == 2" @click="checklanthree"/>
-                    <img src="../../public/img/2.gif" style="left:348px;" class="fixedimg" v-if="devicetype.LAN3 != '' && devicetype.LAN3.alert == 1" @click="checklanthree"/>
-                    <img src="../../public/img/gg2.png" style="left:348px;" class="fixedimg" v-if="devicetype.LAN3 != '' && devicetype.LAN3.alert == 0" @click="checklanthree"/>
-                   <div style="left:420px;" class="fixedborder" v-if="lantwo"></div>
-                   <p class="fixedtext" style="left:395px;" v-if="lantwo">{{devicetype.LAN2.deviceType}}</p>
-                    <img src="../../public/img/1.gif" style="left:398px;" class="fixedimg" v-if="devicetype.LAN2 != '' && devicetype.LAN2.alert == 2" @click="checklantwo"/>
-                    <img src="../../public/img/2.gif" style="left:398px;" class="fixedimg" v-if="devicetype.LAN2 != '' && devicetype.LAN2.alert == 1" @click="checklantwo"/>
-                    <img src="../../public/img/gg2.png" style="left:398px;" class="fixedimg" v-if="devicetype.LAN2 != '' && devicetype.LAN2.alert == 0" @click="checklantwo"/>
-                   <div style="left:470px;" class="fixedborder" v-if="lanone"></div>
-                    <p class="fixedtext" style="left:445px;" v-if="lanone">{{devicetype.LAN1.deviceType}}</p>
-                    <img src="../../public/img/1.gif" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 2" @click="checklanone"/>
-                    <img src="../../public/img/2.gif" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 1" @click="checklanone"/>
-                    <img src="../../public/img/gg2.png" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 0" @click="checklanone"/>
-                    <img src="../../public/img/gg2.png" style="left:515px;" class="fixedimg"  v-if="devicetype.Wan == 1"/>
-                    <img src="../../public/img/1.gif" style="left:515px;" class="fixedimg"  v-if="devicetype.Wan == 0"/>
+                  <div style="left:110px;" class="fixedborder" v-if="laneig&&rightlist.lanNum == 8"></div>
+                    <p class="fixedtext" style="left:85px;" v-if="laneig&&rightlist.lanNum == 8">{{devicetype.LAN8.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:88px;" class="fixedimg" v-if="devicetype.LAN8&& devicetype.LAN8.alert == 2&&rightlist.lanNum == 8" @click="checklaneig"/>
+                    <img src="../../public/img/2.gif" style="left:88px;" class="fixedimg" v-if="devicetype.LAN8&& devicetype.LAN8.alert == 1&&rightlist.lanNum == 8" @click="checklaneig"/>
+                    <img src="../../public/img/gg2.png" style="left:88px;" class="fixedimg" v-if="devicetype.LAN8&& devicetype.LAN8.alert == 0&&rightlist.lanNum == 8" @click="checklaneig"/>
+                   <div style="left:160px;" class="fixedborder" v-if="lanseven&&rightlist.lanNum == 8"></div>
+                    <p class="fixedtext" style="left:135px;" v-if="lanseven&&rightlist.lanNum == 8">{{devicetype.LAN7.deviceType}}</p>
+                   <div style="left:110px;" class="fixedborder" v-if="lanseven&&rightlist.lanNum == 7"></div>
+                    <p class="fixedtext" style="left:85px;" v-if="lanseven&&rightlist.lanNum == 7">{{devicetype.LAN7.deviceType}}</p> 
+                    <img src="../../public/img/1.gif" style="left:138px;" class="fixedimg" v-if="devicetype.LAN7 != '' && devicetype.LAN7.alert == 2&&rightlist.lanNum == 8" @click="checklansrven"/>
+                    <img src="../../public/img/2.gif" style="left:138px;" class="fixedimg" v-if="devicetype.LAN7 != '' && devicetype.LAN7.alert == 1&&rightlist.lanNum == 8" @click="checklansrven"/>
+                    <img src="../../public/img/gg2.png" style="left:138px;" class="fixedimg" v-if="devicetype.LAN7 != '' && devicetype.LAN7.alert == 0&&rightlist.lanNum == 8" @click="checklansrven"/>
+                    <img src="../../public/img/1.gif" style="left:88px;" class="fixedimg" v-if="devicetype.LAN7 != '' && devicetype.LAN7.alert == 2&&rightlist.lanNum == 7" @click="checklansrven"/>
+                    <img src="../../public/img/2.gif" style="left:88px;" class="fixedimg" v-if="devicetype.LAN7 != '' && devicetype.LAN7.alert == 1&&rightlist.lanNum == 7" @click="checklansrven"/>
+                    <img src="../../public/img/gg2.png" style="left:88px;" class="fixedimg" v-if="devicetype.LAN7 != '' && devicetype.LAN7.alert == 0&&rightlist.lanNum == 7" @click="checklansrven"/>
+                   <div style="left:210px;" class="fixedborder" v-if="lansix&&rightlist.lanNum == 8"></div>
+                    <p class="fixedtext" style="left:185px;" v-if="lansix&&rightlist.lanNum == 8">{{devicetype.LAN6.deviceType}}</p>
+                    <div style="left:160px;" class="fixedborder" v-if="lansix&&rightlist.lanNum == 7"></div>
+                    <p class="fixedtext" style="left:135px;" v-if="lansix&&rightlist.lanNum == 7">{{devicetype.LAN6.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:188px;" class="fixedimg" v-if="devicetype.LAN6 != '' && devicetype.LAN6.alert == 2&&rightlist.lanNum == 8" @click="checklansix"/>
+                    <img src="../../public/img/2.gif" style="left:188px;" class="fixedimg" v-if="devicetype.LAN6 != '' && devicetype.LAN6.alert == 1&&rightlist.lanNum == 8" @click="checklansix"/>
+                    <img src="../../public/img/gg2.png" style="left:188px;" class="fixedimg" v-if="devicetype.LAN6 != '' && devicetype.LAN6.alert == 0&&rightlist.lanNum == 8" @click="checklansix"/>
+                    <img src="../../public/img/1.gif" style="left:138px;" class="fixedimg" v-if="devicetype.LAN6 != '' && devicetype.LAN6.alert == 2&&rightlist.lanNum == 7" @click="checklansix"/>
+                    <img src="../../public/img/2.gif" style="left:138px;" class="fixedimg" v-if="devicetype.LAN6 != '' && devicetype.LAN6.alert == 1&&rightlist.lanNum == 7" @click="checklansix"/>
+                    <img src="../../public/img/gg2.png" style="left:138px;" class="fixedimg" v-if="devicetype.LAN6 != '' && devicetype.LAN6.alert == 0&&rightlist.lanNum == 7" @click="checklansix"/>
+                   <div style="left:260px;" class="fixedborder" v-if="lanfive&&rightlist.lanNum == 8"></div>
+                    <p class="fixedtext" style="left:235px;" v-if="lanfive&&rightlist.lanNum == 8">{{devicetype.LAN5.deviceType}}</p>
+                  <div style="left:210px;" class="fixedborder" v-if="lanfive&&rightlist.lanNum == 7"></div>
+                    <p class="fixedtext" style="left:185px;" v-if="lanfive&&rightlist.lanNum == 7">{{devicetype.LAN5.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:237px;" class="fixedimg" v-if="devicetype.LAN5 != '' && devicetype.LAN5.alert == 2&&rightlist.lanNum == 8" @click="checklanfive"/>
+                    <img src="../../public/img/2.gif" style="left:237px;" class="fixedimg" v-if="devicetype.LAN5 != '' && devicetype.LAN5.alert == 1&&rightlist.lanNum == 8" @click="checklanfive"/>
+                    <img src="../../public/img/gg2.png" style="left:237px;" class="fixedimg" v-if="devicetype.LAN5 != '' && devicetype.LAN5.alert == 0&&rightlist.lanNum == 8" @click="checklanfive"/>
+                    <img src="../../public/img/1.gif" style="left:188px;" class="fixedimg" v-if="devicetype.LAN5 != '' && devicetype.LAN5.alert == 2&&rightlist.lanNum == 7" @click="checklanfive"/>
+                    <img src="../../public/img/2.gif" style="left:188px;" class="fixedimg" v-if="devicetype.LAN5 != '' && devicetype.LAN5.alert == 1&&rightlist.lanNum == 7" @click="checklanfive"/>
+                    <img src="../../public/img/gg2.png" style="left:188px;" class="fixedimg" v-if="devicetype.LAN5 != '' && devicetype.LAN5.alert == 0&&rightlist.lanNum == 7" @click="checklanfive"/>
+                   <div style="left:320px;" class="fixedborder" v-if="lanfour&&rightlist.lanNum == 8"></div>
+                    <p class="fixedtext" style="left:295px;" v-if="lanfour&&rightlist.lanNum == 8">{{devicetype.LAN4.deviceType}}</p>
+                    <div style="left:260px;" class="fixedborder" v-if="lanfour&&rightlist.lanNum == 7"></div>
+                    <p class="fixedtext" style="left:235px;" v-if="lanfour&&rightlist.lanNum == 7">{{devicetype.LAN4.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:298px;" class="fixedimg" v-if="devicetype.LAN4 != '' && devicetype.LAN4.alert == 2&&rightlist.lanNum == 8" @click="checklanfour"/>
+                    <img src="../../public/img/2.gif" style="left:298px;" class="fixedimg" v-if="devicetype.LAN4 != '' && devicetype.LAN4.alert == 1&&rightlist.lanNum == 8" @click="checklanfour"/>
+                    <img src="../../public/img/gg2.png" style="left:298px;" class="fixedimg" v-if="devicetype.LAN4 != '' && devicetype.LAN4.alert == 0&&rightlist.lanNum == 8" @click="checklanfour"/>
+                    <img src="../../public/img/1.gif" style="left:237px;" class="fixedimg" v-if="devicetype.LAN4 != '' && devicetype.LAN4.alert == 2&&rightlist.lanNum == 7" @click="checklanfour"/>
+                    <img src="../../public/img/2.gif" style="left:237px;" class="fixedimg" v-if="devicetype.LAN4 != '' && devicetype.LAN4.alert == 1&&rightlist.lanNum == 7" @click="checklanfour"/>
+                    <img src="../../public/img/gg2.png" style="left:237px;" class="fixedimg" v-if="devicetype.LAN4 != '' && devicetype.LAN4.alert == 0&&rightlist.lanNum == 7" @click="checklanfour"/>
+                   <div style="left:370px;" class="fixedborder" v-if="lanthree&&rightlist.lanNum == 8"></div>
+                   <p class="fixedtext" style="left:345px;" v-if="lanthree&&rightlist.lanNum == 8">{{devicetype.LAN3.deviceType}}</p>
+                    <div style="left:320px;" class="fixedborder" v-if="lanthree&&rightlist.lanNum == 7"></div>
+                    <p class="fixedtext" style="left:295px;" v-if="lanthree&&rightlist.lanNum == 7">{{devicetype.LAN3.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:348px;" class="fixedimg" v-if="devicetype.LAN3 != '' && devicetype.LAN3.alert == 2&&rightlist.lanNum == 8" @click="checklanthree"/>
+                    <img src="../../public/img/2.gif" style="left:348px;" class="fixedimg" v-if="devicetype.LAN3 != '' && devicetype.LAN3.alert == 1&&rightlist.lanNum == 8" @click="checklanthree"/>
+                    <img src="../../public/img/gg2.png" style="left:348px;" class="fixedimg" v-if="devicetype.LAN3 != '' && devicetype.LAN3.alert == 0&&rightlist.lanNum == 8" @click="checklanthree"/>
+                    <img src="../../public/img/1.gif" style="left:298px;" class="fixedimg" v-if="devicetype.LAN3 != '' && devicetype.LAN3.alert == 2&&rightlist.lanNum == 7" @click="checklanthree"/>
+                    <img src="../../public/img/2.gif" style="left:298px;" class="fixedimg" v-if="devicetype.LAN3 != '' && devicetype.LAN3.alert == 1&&rightlist.lanNum == 7" @click="checklanthree"/>
+                    <img src="../../public/img/gg2.png" style="left:298px;" class="fixedimg" v-if="devicetype.LAN3 != '' && devicetype.LAN3.alert == 0&&rightlist.lanNum == 7" @click="checklanthree"/>
+                   <div style="left:420px;" class="fixedborder" v-if="lantwo&&rightlist.lanNum == 8"></div>
+                   <p class="fixedtext" style="left:395px;" v-if="lantwo&&rightlist.lanNum == 8">{{devicetype.LAN2.deviceType}}</p>
+                   <div style="left:370px;" class="fixedborder" v-if="lantwo&&rightlist.lanNum == 7"></div>
+                   <p class="fixedtext" style="left:345px;" v-if="lantwo&&rightlist.lanNum == 7">{{devicetype.LAN2.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:398px;" class="fixedimg" v-if="devicetype.LAN2 != '' && devicetype.LAN2.alert == 2&&rightlist.lanNum == 8" @click="checklantwo"/>
+                    <img src="../../public/img/2.gif" style="left:398px;" class="fixedimg" v-if="devicetype.LAN2 != '' && devicetype.LAN2.alert == 1&&rightlist.lanNum == 8" @click="checklantwo"/>
+                    <img src="../../public/img/gg2.png" style="left:398px;" class="fixedimg" v-if="devicetype.LAN2 != '' && devicetype.LAN2.alert == 0&&rightlist.lanNum == 8" @click="checklantwo"/>
+                    <img src="../../public/img/1.gif" style="left:348px;" class="fixedimg" v-if="devicetype.LAN2 != '' && devicetype.LAN2.alert == 2&&rightlist.lanNum == 7" @click="checklantwo"/>
+                    <img src="../../public/img/2.gif" style="left:348px;" class="fixedimg" v-if="devicetype.LAN2 != '' && devicetype.LAN2.alert == 1&&rightlist.lanNum == 7" @click="checklantwo"/>
+                    <img src="../../public/img/gg2.png" style="left:348px;" class="fixedimg" v-if="devicetype.LAN2 != '' && devicetype.LAN2.alert == 0&&rightlist.lanNum == 7" @click="checklantwo"/>
+                   <div style="left:470px;" class="fixedborder" v-if="lanone&&rightlist.lanNum == 8"></div>
+                    <p class="fixedtext" style="left:445px;" v-if="lanone&&rightlist.lanNum == 8">{{devicetype.LAN1.deviceType}}</p>
+                    <div style="left:420px;" class="fixedborder" v-if="lanone&&rightlist.lanNum == 7"></div>
+                   <p class="fixedtext" style="left:395px;" v-if="lanone&&rightlist.lanNum == 7">{{devicetype.LAN1.deviceType}}</p>
+                    <img src="../../public/img/1.gif" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 2&&rightlist.lanNum == 8" @click="checklanone"/>
+                    <img src="../../public/img/2.gif" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 1&&rightlist.lanNum == 8" @click="checklanone"/>
+                    <img src="../../public/img/gg2.png" style="left:448px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 0&&rightlist.lanNum == 8" @click="checklanone"/>
+                    <img src="../../public/img/1.gif" style="left:395px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 2&&rightlist.lanNum == 7" @click="checklanone"/>
+                    <img src="../../public/img/2.gif" style="left:395px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 1&&rightlist.lanNum == 7" @click="checklanone"/>
+                    <img src="../../public/img/gg2.png" style="left:395px;" class="fixedimg" v-if="devicetype.LAN1 != '' && devicetype.LAN1.alert == 0&&rightlist.lanNum == 7" @click="checklanone"/>
+                    <img src="../../public/img/gg2.png" style="left:515px;" class="fixedimg"  v-if="devicetype.Wan == 1&&rightlist.lanNum == 8"/>
+                    <img src="../../public/img/1.gif" style="left:515px;" class="fixedimg"  v-if="devicetype.Wan == 0&&rightlist.lanNum == 8"/>
                    
                    
-                  <img src="../../public/img/wg.png"/>
+                  <img src="../../public/img/wg.png" v-if="rightlist.lanNum == 8"/>
+                  <img src="../../public/img/7+2.png" v-if="rightlist.lanNum == 7"/>
                   <div class="detail-textbox" v-if="rightlist">
                       <p>安装地址：<span style="color:#1D60FE">{{rightlist.installAddress}}</span></p>
                       <div>
@@ -385,7 +421,7 @@
                       </div>
                       <div>
                         <span style="min-width:198px;width:50%;margin-right:0">MAC地址：<span style="color:#1D60FE">{{rightlist.mac}}</span></span>
-                        <span style="margin-right:0">责任人：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkperson(rightlist.maintenanceUserId)">{{rightlist.maintenanceUser}}</span></span>
+                        <span style="margin-right:0">责任人：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkperson(rightlist.maintenanceUserId)">{{rightlist.maintenanceUserName}}</span></span>
                       </div>
                       <div>
                         <span >产权单位：<span style="color:#1D60FE">{{rightlist.ownerShipUnit}}</span></span>
@@ -531,7 +567,7 @@
                   <p style="margin-right:0">安装地址：</p>
                   <span style="text-align:left;flex: 1;color: #1D60FE;">{{msgtypelist.installAddress}}</span>
                 </div>
-                <p style="min-width:200px" >维护人员：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkperson(msgtypelist.maintenanceUserId)">{{msgtypelist.maintenanceUser}}</span></p>
+                <p style="min-width:200px" >维护人员：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkperson(msgtypelist.maintenanceUserId)">{{msgtypelist.maintenanceUserName}}</span></p>
               </div>
               <div style="margin-top:20px" v-if="msgtypelist.deviceName != '摄像机'">
                 <p style="min-width:150px" >管理单位：<span>{{msgtypelist.managementUnit}}</span></p>
@@ -543,7 +579,7 @@
                 <p style="min-width:200px" >设备名称：<span>{{msgtypelist.cameraName}}</span></p>
                 <p style="min-width:200px" >品牌：<span>{{msgtypelist.manufacturer}}</span></p>
                 <p style="min-width:200px" >国标编码：<span>{{msgtypelist.nationnalId}}</span></p>
-                <p style="min-width:200px" >维护人员：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkperson(msgtypelist.maintenanceUserId)">{{msgtypelist.maintenanceUser}}</span></p>
+                <p style="min-width:200px" >维护人员：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="checkperson(msgtypelist.maintenanceUserId)">{{msgtypelist.maintenanceUserName}}</span></p>
                 
               </div>
               <div style="margin-top:20px" v-if="msgtypelist.deviceName == '摄像机'">
@@ -591,7 +627,7 @@
                     <button   class="zhuanyixuke" v-if="movealert" @click="backs">返回</button>
                   </div>
                  </div>
-                <div  style="padding:20px 20px 0 20px" v-if="alertshow">
+                <div  style="padding:20px" v-if="alertshow">
                   <Timeline>
                   <Timeline-item v-for="(list,index) in timelinelists" :key="index">
                       <img src="../../public/img/16.png" slot="dot" v-if="list.isAlert == 2" />
@@ -627,6 +663,7 @@
                 <img slot="dot" src="../../public/img/ending.png" />
                 </TimelineItem>
                   </Timeline>
+                   <!-- <Page :total="oppagetotal" show-total :current.sync="oppages" :page-size="5" @on-change="changeoppage"/> -->
                 </div>
 
             <div class="reportbox" style="width: 1000px;padding: 0 20px;padding-bottom: 20px;right: 10px;" v-if="wgeachrtsshow">
@@ -1183,7 +1220,7 @@
                       </div>
                       <div style="min-width:160px">
                         <p>维护人员：</p>
-                        <span style="color: #696C6F;">{{rightlist.maintenanceUser}}</span>
+                        <span style="color: #696C6F;">{{rightlist.maintenanceUserName}}</span>
                       </div>
                      </div>
                    <div class="detail-text" style="margin:20px;min-height: 0px;">
@@ -1252,6 +1289,8 @@ export default {
   },
   data() {
     return {
+      oppages:1,
+      oppagetotal:0,
       processlist:[],
       alertshow:true,
       wgeachrtsshow:false,
@@ -1776,6 +1815,8 @@ export default {
           this.$http.get("alert/warning/getAlertByGatewayId",{gatewayId:data,requestModular:2},res=>{
               if(res.data.list.length>0){
                 this.timelinelists = res.data.list
+                this.oppagetotal = res.data.total
+                this.oppages = 1
                 this.alertshow = true
               }else{
                 this.alertshow = false
@@ -1875,6 +1916,8 @@ export default {
           this.$http.get("alert/warning/getAlertByGatewayId",{gatewayId:data,requestModular:2},res=>{
               if(res.data.list.length>0){
                 this.timelinelists = res.data.list
+                this.oppagetotal = res.data.total
+                this.oppages = 1
                 this.alertshow = true
               }else{
                 this.alertshow = false
@@ -2054,6 +2097,8 @@ export default {
           this.$http.get("alert/warning/getAlertByGatewayId",{gatewayId:this.olddata,port:'LAN6',requestModular:2},res=>{
               if(res.data.list.length>0){
                 this.timelinelists = res.data.list
+                this.oppagetotal = res.data.total
+                this.oppages = 1
                 this.alertshow = true
               }else{
                 this.alertshow = false
@@ -2121,6 +2166,8 @@ export default {
           this.$http.get("alert/warning/getAlertByGatewayId",{gatewayId:this.olddata,port:'LAN5',requestModular:2},res=>{
               if(res.data.list.length>0){
                 this.timelinelists = res.data.list
+                this.oppagetotal = res.data.total
+                this.oppages = 1
                 this.alertshow = true
               }else{
                 this.alertshow = false
@@ -2187,6 +2234,8 @@ export default {
           this.$http.get("alert/warning/getAlertByGatewayId",{gatewayId:this.olddata,port:'LAN4',requestModular:2},res=>{
               if(res.data.list.length>0){
                 this.timelinelists = res.data.list
+                this.oppagetotal = res.data.total
+                this.oppages = 1
                 this.alertshow = true
               }else{
                 this.alertshow = false
@@ -2253,6 +2302,8 @@ export default {
           this.$http.get("alert/warning/getAlertByGatewayId",{gatewayId:this.olddata,port:'LAN3',requestModular:2},res=>{
               if(res.data.list.length>0){
                 this.timelinelists = res.data.list
+                this.oppagetotal = res.data.total
+                this.oppages = 1
                 this.alertshow = true
               }else{
                 this.alertshow = false
@@ -2320,6 +2371,8 @@ export default {
           this.$http.get("alert/warning/getAlertByGatewayId",{gatewayId:this.olddata,port:'LAN2',requestModular:2},res=>{
               if(res.data.list.length>0){
                 this.timelinelists = res.data.list
+                this.oppagetotal = res.data.total
+                this.oppages = 1
                 this.alertshow = true
               }else{
                 this.alertshow = false
@@ -2386,6 +2439,8 @@ export default {
           this.$http.get("alert/warning/getAlertByGatewayId",{gatewayId:this.olddata,port:'LAN1',requestModular:2},res=>{
               if(res.data.list.length>0){
                 this.timelinelists = res.data.list
+                this.oppagetotal = res.data.total
+                this.oppages = 1
                 this.alertshow = true
               }else{
                 this.alertshow = false
@@ -2452,6 +2507,8 @@ export default {
           this.$http.get("alert/warning/getAlertByGatewayId",{gatewayId:this.olddata,port:'LAN7',requestModular:2},res=>{
               if(res.data.list.length>0){
                 this.timelinelists = res.data.list
+                this.oppagetotal = res.data.total
+                this.oppages = 1
                 this.alertshow = true
               }else{
                 this.alertshow = false
@@ -2518,6 +2575,8 @@ export default {
           this.$http.get("alert/warning/getAlertByGatewayId",{gatewayId:this.olddata,port:'LAN8',requestModular:2},res=>{
               if(res.data.list.length>0){
                 this.timelinelists = res.data.list
+                this.oppagetotal = res.data.total
+                this.oppages = 1
                 this.alertshow = true
               }else{
                 this.alertshow = false
@@ -3673,12 +3732,12 @@ export default {
         this.repoetmapshow = false
         this.timeOffsetAlertshow = false
         this.repoetshow = true
-          this.$http.get("res/gis/getOnlineLanFlow?",{gatewayIp:list.ipAddr,lan:list.lan,gatewayId:list.gatewayId},res=>{
+          this.$http.get("res/gis/getOnlineLanFlow?",{gatewayIp:list.ipAddr,lan:list.lan,gatewayId:this.olddata},res=>{
               this.drawLine(res.data.lanFlow)
           },err=>{});
 
           //通讯状况表
-          this.$http.get("res/gis/getGatewayState?",{lan:list.lan,gatewayId:list.gatewayId},res=>{
+          this.$http.get("res/gis/getGatewayState?",{lan:list.lan,gatewayId:this.olddata},res=>{
               this.drawLines(res.data.gatewayState)
           },err=>{});
 
@@ -3710,6 +3769,9 @@ export default {
     changedata(data,index){
       this.workdetaillist[index].entity=data
       // console.log(data,index)
+    },
+    changeoppage(i){
+
     }
   }
 };

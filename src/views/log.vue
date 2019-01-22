@@ -79,22 +79,24 @@
                     <p class="hour" v-if="list.gatewayRunning">{{list.gatewayRunning.ResPerfMongo.time}}</p>
                     <img src="../../public/img/16.png" slot="dot" v-if="list.gatewayRunning && list.gatewayRunning.state == 0" />
                     <img src="../../public/img/17.png" slot="dot" v-if="list.gatewayRunning && list.gatewayRunning.state == 1"/>
-                    <div v-if="list.gatewayRunning">
+                    <div v-if="list.gatewayRunning" style="min-height: 90px;">
                         <div class="timelinecont" >
+                            <p >IP地址：<span>{{list.gatewayRunning.ResPerfMongo.ipAddress}}</span></p>
+                            <p >端口启用数量：<span>{{list.gatewayRunning.ResPerfMongo.portNum}}</span></p>
+                            <p >WIFI状态：<span>{{list.gatewayRunning.ResPerfMongo.wifiState?'打开':'关闭'}}</span></p>
+                            
+                            <!-- <p >网关时间：<span>{{list.gatewayRunning.ResPerfMongo.gatewayTime}}</span></p> -->
+                            <p >经度：<span>{{list.gatewayRunning.ResPerfMongo.longitude}}</span></p>
+                            <p >纬度：<span>{{list.gatewayRunning.ResPerfMongo.latitude}}</span></p>
+                            <p >在线时长：<span>{{list.gatewayRunning.ResPerfMongo.runningTimes}}</span></p>
+                            <p >震动干扰：<span v-if="list.gatewayRunning.ResPerfMongo.shake <= 100">{{list.gatewayRunning.ResPerfMongo.shake}}次</span>
+                            <span v-if="list.gatewayRunning.ResPerfMongo.shake > 100" style="color:#E60012">{{list.gatewayRunning.ResPerfMongo.shake}}次</span>
+                            </p>
                             <p >温度：<span v-if="list.gatewayRunning.ResPerfMongo.temperature <= 70">{{list.gatewayRunning.ResPerfMongo.temperature}}℃</span>
                             <span v-if="list.gatewayRunning.ResPerfMongo.temperature > 70" style="color:#E60012">{{list.gatewayRunning.ResPerfMongo.temperature}}℃</span>
                             </p>
                             <p >湿度：<span v-if="list.gatewayRunning.ResPerfMongo.humidity <= 60">{{list.gatewayRunning.ResPerfMongo.humidity}}%</span>
                             <span v-if="list.gatewayRunning.ResPerfMongo.humidity >60" style="color:#E60012">{{list.gatewayRunning.ResPerfMongo.humidity}}%</span>
-                            </p>
-                            <p >WIFI状态：<span>{{list.gatewayRunning.ResPerfMongo.wifiState?'打开':'关闭'}}</span></p>
-                            <p >在线时长：<span>{{list.gatewayRunning.ResPerfMongo.runningTimes}}</span></p>
-                            <!-- <p >网关时间：<span>{{list.gatewayRunning.ResPerfMongo.gatewayTime}}</span></p> -->
-                            <p >经度：<span>{{list.gatewayRunning.ResPerfMongo.longitude}}</span></p>
-                            <p >纬度：<span>{{list.gatewayRunning.ResPerfMongo.latitude}}</span></p>
-                            <p >端口启用数量：<span>{{list.gatewayRunning.ResPerfMongo.portNum}}</span></p>
-                            <p >震动干扰：<span v-if="list.gatewayRunning.ResPerfMongo.shake <= 100">{{list.gatewayRunning.ResPerfMongo.shake}}次</span>
-                            <span v-if="list.gatewayRunning.ResPerfMongo.shake > 100" style="color:#E60012">{{list.gatewayRunning.ResPerfMongo.shake}}次</span>
                             </p>
                         </div>
                         <div class="wglogbox" v-for="(lists,index) in list.gatewayRunning.listPort" :key="index">
@@ -118,11 +120,11 @@
                      <img src="../../public/img/nono.png" slot="dot" v-if="list.platForm"/>
                      <div v-if="list.platForm">
                         <div class="timelinecont" style="margin-bottom:50px">
-                            <p >操作人：<span>{{list.platForm.user}}</span></p>
-                            <p >操作内容：<span>{{list.platForm.operateContent}}</span></p>
                             <p >操作类型：<span>{{list.platForm.operateType}}</span></p>
-                            <p >操作时间：<span>{{list.platForm.operateTime}}</span></p>
+                            <p >操作人：<span>{{list.platForm.user}}</span></p>
                             <p >证书编号：<span>{{list.platForm.certificateNo}}</span></p>
+                            <p >操作内容：<span>{{list.platForm.operateContent}}</span></p>
+                            <!-- <p >操作时间：<span>{{list.platForm.operateTime}}</span></p> -->
                         </div>
                     </div>
                     
@@ -132,12 +134,16 @@
                     <img src="../../public/img/nono.png" slot="dot" v-if="list.personOperate"/>
                     <div v-if="list.personOperate">
                         <div class="timelinecont" style="margin-bottom:50px">
-                            <p >操作人：<span>{{list.personOperate.operatUser}}</span></p>
-                            <p >操作内容：<span>{{list.personOperate.content}}</span></p>
-                            <p >设备类型：<span v-if="list.personOperate.externalDeviceType == camera">摄像机</span>
-                            <span v-if="list.personOperate.externalDeviceType == gateway">网关</span>
+                            <p >设备类型：<span v-if="list.personOperate.externalDeviceType == 'camera'">摄像机</span>
+                            <span v-if="list.personOperate.externalDeviceType == 'gateway'">网关</span>
+                            <span v-if="list.personOperate.externalDeviceType == 'electronicFence'">电子围栏</span>
+                            <span v-if="list.personOperate.externalDeviceType == 'electric'">智能电源</span>
+                            <span v-if="list.personOperate.externalDeviceType == 'wifiSniffing'">wifi嗅探</span>
+                            <span v-if="list.personOperate.externalDeviceType == 'onu'">onu</span>
                             </p>
                             <p >IP地址：<span>{{list.personOperate.externalDeviceIp}}</span></p>
+                            <p >操作人：<span>{{list.personOperate.operatUser}}</span></p>
+                            <p >操作内容：<span>{{list.personOperate.content}}</span></p>
                         </div>
                     </div>
 
@@ -148,10 +154,11 @@
                     <img src="../../public/img/17.png" slot="dot" v-if="list.portOperate && list.state == 1"/>
                     <div v-if="list.portOperate">
                         <div class="timelinecont" style="margin-bottom:50px">
+                            <p style="min-width:150px">IP地址：<span>{{list.portOperate.gatewayIp}}</span></p>
+                            <p >证书编号：<span>{{list.portOperate.certificateNo}}</span></p>
+                            <p >操作人：<span>{{list.portOperate.userName}}</span></p>
                             <p v-if="list.state == 1">安全运维网关 端口{{list.portOperate.lan}} 发生许可操作</p>
                             <p v-if="list.state == 0">安全运维网关 端口{{list.portOperate.lan}} <span style="color:#E60012">发生非许可操作</span></p>
-                            <p >操作人：<span>{{list.portOperate.userName}}</span></p>
-                            <p >证书编号：<span>{{list.portOperate.certificateNo}}</span></p>
                             <p >操作内容：
                                 <span v-if="list.state == 1">{{list.portOperate.descr}}</span>
                                 <span style="color:E60012" v-if="list.state == 0">{{list.portOperate.descr}}</span>
@@ -361,11 +368,11 @@ import ArcgisMaplog from "@/components/ArcgisMaplog";
     font-size: 14px;  
     }
     .sure {
-  height: 32px;
-  border-radius: 0;
-  background: #1d60fe;
-  width: 60px;
-  padding: 0;
-  border-radius: 0 4px 4px 0;
-}
+    height: 32px;
+    border-radius: 0;
+    background: #1d60fe;
+    width: 60px;
+    padding: 0;
+    border-radius: 0 4px 4px 0;
+    }
 </style>

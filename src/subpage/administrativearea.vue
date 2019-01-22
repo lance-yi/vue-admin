@@ -177,6 +177,10 @@ import axios from 'axios'
             data:{}
           }).then(res=>{
              this.data3 = res.data
+             this.$http.get("oauth/baseArea/selectrMaintainUserByCodes",{areaCodes:this.data3[0].areaCode},res=>{
+                        this.roletabledata = res.data.list
+                        this.totals = res.data.total
+                        },err=>{});
           })
     },
     methods: {
