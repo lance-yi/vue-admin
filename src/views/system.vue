@@ -630,6 +630,8 @@ import TreeGrid from '@/components/treeGrid2.0'
               this.$router.push({path:'/system/administrativearea'})
          }else if(name == '告警配置'){
               this.$router.push({path:'/system/alarmconfiguratioan'})
+         }else if(name == '设备配置'){
+              this.$router.push({path:'/system/configuration'})
          }
       },
       checkbook(list){

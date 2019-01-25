@@ -256,7 +256,7 @@
                             <span v-if="aa.state == 1">正在处理</span>
                             <span v-if="aa.state == 2">处理完成</span>
                             </p>
-                            <p style="min-width:230px">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
+                            <p style="min-width:230px" v-if="aa.onDeal != ''">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
                         </div>
                         <div class="timelinecont" style="justify-content:left;margin-top:5px">
                         <p >故障描述：
@@ -608,7 +608,7 @@
                         <span v-if="aa.state == 1">正在处理</span>
                         <span v-if="aa.state == 2">处理完成</span>
                         </p>
-                        <p style="min-width:230px">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
+                        <p style="min-width:230px" v-if="aa.onDeal != ''">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
                     </div>
                     <p style="margin-top: 5px;margin-bottom:30px">故障描述：
                               <span style="color:rgb(255, 94, 94)" >{{aa.description}}</span>&nbsp;&nbsp;&nbsp;
@@ -655,7 +655,7 @@
                         <!-- <div style="margin-left: 10px;min-width:400px;text-align:left">
                             <p>安装地址：<span style="color:#1D60FE;">{{list.installAddress}}</span></p>
                         </div> -->
-                        <div>
+                        <div v-if="list.alertType == 'deviationAlert'||list.alertType == 'timeOffsetAlert'||list.alertType == 'portFlowAlert'||list.alertType == 'wifiSniffingOfflineAlert'||list.alertType == 'electricOfflineAlert'||list.alertType == 'gatewayOfflineAlert'||list.alertType == 'cameraOfflineAlert'||list.alertType == 'electfenceOfflineAlert'">
                             <p>分析报告：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="report(list)">查看</span></p>
                           </div>
                         
@@ -965,7 +965,7 @@
             </div>
 
             <div class="reportbox" style="width:640px;top:20%" v-if="timeOffsetAlertshow">
-                  <p class="detailpage">事件偏移预警详情 <img src="../../public/img/xxx.png" @click.stop="timeOffsetAlertshow = false" style="float:right;margin-top: 5px"/></p>
+                  <p class="detailpage">分析报告 <img src="../../public/img/xxx.png" @click.stop="timeOffsetAlertshow = false" style="float:right;margin-top: 5px"/></p>
                   <div class="offsetbox">
                      <p>预警信息：系统在<span >{{timeOffsetdata.currentTime}}</span>检测到摄像机 <span>{{timeOffsetdata.cameraTime}}</span>,请注意时间出现偏移</p>
                      <p style="margin:40px 0 20px 0px">系统时间：</p>

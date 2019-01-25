@@ -332,7 +332,7 @@
               title: '您确定要批量升级吗',
               // content: '<p>一些对话框内容</p><p>一些对话框内容</p>',
               onOk: () => {
-                this.$http.post("res/upgrade/upgradeBatch",{param:this.checklist,upgradeType:0},res=>{
+                this.$http.post("res/upgrade/upgradeBatch",{param:this.checklist,upgradeType:'0'},res=>{
                     if(res.rel = true){
                        this.$Message.info(res.message);
                         this.$http.post("res/upgrade/selectGatewayState",{state:this.updatedetail,param:this.valuetable,current:1,gatewayState:this.wgstate},res=>{

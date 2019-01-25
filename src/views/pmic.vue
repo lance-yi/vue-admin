@@ -368,7 +368,7 @@
         <div class="detail-top">
           <p>安装地址：<span>{{toplist.installAddress}}</span></p>
           <p>IP地址：<span>{{toplist.electricalIp}}</span></p>
-          <p>责任人：<span>{{toplist.maintenanceUser}}</span></p>
+          <p>责任人：<span>{{toplist.maintenanceUserName}}</span></p>
           <p>责任单位：<span>{{toplist.managementUnit}}</span></p>
           <p>项目名称：<span>{{toplist.projectName}}</span></p>
         </div>

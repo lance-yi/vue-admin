@@ -101,7 +101,7 @@
                             <span v-if="aa.state == 1">正在处理</span>
                             <span v-if="aa.state == 2">处理完成</span>
                             </p>
-                            <p style="min-width:230px">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
+                            <p style="min-width:230px" v-if="aa.onDeal != ''">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
                         </div>
                         <p style="margin-top: 2px;">故障描述：
                                  <a style="border:none" >{{aa.description}}</a>&nbsp;&nbsp;&nbsp;
@@ -140,7 +140,7 @@
                 <span>安装地址：{{rightlist.installAddress}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <span>IP地址：{{rightlist.gatewayIp}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <span>路口/小区：{{rightlist.crossVillage}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <span>责任人：{{rightlist.maintenanceUser}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>责任人：{{rightlist2.userName}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <span>联系方式：{{rightlist2.mobile}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <span>项目名称：{{rightlist.projectName}}</span>
               </div>
@@ -604,7 +604,7 @@
                     <span v-if="aa.state == 1">正在处理</span>
                     <span v-if="aa.state == 2">处理完成</span>
                     </p>
-                    <p style="min-width:230px">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
+                    <p style="min-width:230px" v-if="aa.onDeal != ''">工单编号：<span @click="gotodetal(aa.onDeal)" style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer">{{aa.onDeal}}</span></p>
                 </div>
                 <p style="margin-top: 5px;margin-bottom:30px">故障描述：
                           <span style="color:rgb(255, 94, 94)" >{{aa.description}}</span>&nbsp;&nbsp;&nbsp;
@@ -649,7 +649,7 @@
                         <!-- <div style="margin-left: 10px;min-width:400px;text-align:left">
                             <p>安装地址：<span style="color:#1D60FE;">{{list.installAddress}}</span></p>
                         </div> -->
-                        <div>
+                        <div v-if="list.alertType == 'deviationAlert'||list.alertType == 'timeOffsetAlert'||list.alertType == 'portFlowAlert'||list.alertType == 'wifiSniffingOfflineAlert'||list.alertType == 'electricOfflineAlert'||list.alertType == 'gatewayOfflineAlert'||list.alertType == 'cameraOfflineAlert'||list.alertType == 'electfenceOfflineAlert'">
                             <p>分析报告：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="report(list)">查看</span></p>
                           </div>
                         
@@ -1168,7 +1168,7 @@
             </div>
 
             <div class="reportbox" style="width:640px;top:20%" v-if="timeOffsetAlertshow">
-                  <p class="detailpage">事件偏移预警详情 <img src="../../public/img/xxx.png" @click.stop="timeOffsetAlertshow = false" style="float:right;margin-top: 5px"/></p>
+                  <p class="detailpage">分析报告 <img src="../../public/img/xxx.png" @click.stop="timeOffsetAlertshow = false" style="float:right;margin-top: 5px"/></p>
                   <div class="offsetbox">
                      <p>预警信息：系统在<span >{{timeOffsetdata.currentTime}}</span>检测到摄像机 <span>{{timeOffsetdata.cameraTime}}</span>,请注意时间出现偏移</p>
                      <p style="margin:40px 0 20px 0px">系统时间：</p>
@@ -3468,6 +3468,10 @@ export default {
                     // data : ['刑事犯罪\n前科','刑事犯罪\n前科','LAN3\n电子围栏','LAN4\n电子围栏','LAN5\n电子围栏','LAN6\n电子围栏','LAN7\n电子围栏','LAN8\n电子围栏',],
                     axisTick: {
                         alignWithLabel: true
+                    },
+                    axisLabel: {
+                        // color: '#fff',
+                        fontSize: 12
                     }
                 }
             ],
@@ -3492,7 +3496,7 @@ export default {
                 {
                     name:'流量',
                     type:'bar',
-                    barWidth: '60%',
+                    barWidth: '20',
                     data:data.flows
                 }
             ]
@@ -3890,7 +3894,7 @@ export default {
   transition: all 300ms;
 }
 .bigright2{
-  min-width: 1200px;
+  min-width: 1250px;
   width: 90%;
   height: 100%;
   background:#fff;

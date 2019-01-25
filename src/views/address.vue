@@ -648,7 +648,7 @@ import city from "../../src/util/city.js";
         this.$http.get("res/ponitMove/selectResDetail",{resId:data},res=>{
             this.detaildata = res.data
             },err=>{});
-          this.$http.get("res/ponitMove/selectByDictCode",{dictCodes:'placementPosition'},res=>{
+          this.$http.get("oauth/dict/selectDictCommon",{dictCodes:'placementPosition'},res=>{
               this.placementposition = res.data
             },err=>{});
             this.$http.get("oauth/dict/selectDictCommon",{dictCodes:'constructionUnit'},res=>{
@@ -690,6 +690,8 @@ import city from "../../src/util/city.js";
             this.animal='异地迁改'
             this.rebuildType = true
             this.installadd = []
+            this.installaddress = ''
+            this.constructionUnit = ''
             this.$http.get('res/ponitMove/selectPonitInfo?id='+id,{},res=>{
               this.movedata = res.data
               this.detecheck = true

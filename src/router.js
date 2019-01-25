@@ -9,6 +9,7 @@ import book from '@/subpage/book.vue'
 import role from '@/subpage/role.vue'
 import administrativearea from '@/subpage/administrativearea.vue'
 import alarmconfiguratioan from '@/subpage/alarmconfiguratioan.vue'
+import configuration from '@/subpage/configuration.vue'
 import menu from '@/subpage/menu.vue'
 import echartstime from '@/subpage/echartstime.vue'
 import log from '@/views/log.vue'
@@ -119,6 +120,10 @@ const router = new Router({
           path: '/system/alarmconfiguratioan',
           name: 'system',
           component: alarmconfiguratioan
+        },{
+          path: '/system/configuration',
+          name: 'system',
+          component: configuration
         }
       ]
     }

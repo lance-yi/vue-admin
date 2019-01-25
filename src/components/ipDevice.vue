@@ -63,6 +63,13 @@
                         <p>附件：</p>
                         <span style="border-bottom:1px solid #1D60FE;cursor:pointer;margin-right:20px" @click="download(down)" v-for="(down,index) in list.entity.enclosureUrl" :key="index">{{down}}</span>
                       </div>
+                      <div style="min-width:30%">
+                        <p>行政区域：</p>
+                        <span v-if="editorshow">{{list.entity.areaCode}}</span>
+                        <Select v-model="list.entity.areaCode" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
+                          <Option v-for="item in arealist.areaCode" :value="item.value" :key="item.value">{{item.label}}</Option>
+                        </Select>
+                      </div>
                       <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"  @click="edit(list,index)" v-if="editorshow">编辑</button>
                       <button   class="zhuanyixuke"  style="padding:5px 30px;position:absolute;top:10px;right:105px"   v-if="!editorshow" @click="backeditor(index)">返回</button>
                        <button   class="zhuanyixukes"  style="padding:5px 30px;position:absolute;top:10px;right:0%"   v-if="!editorshow" @click="saveeditor(list,index)">保存</button>
@@ -156,6 +163,13 @@
                         <Select v-model="list.entity.manufacturer" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
                           <Option v-for="item in meun.manufacturer" :value="item.value" :key="item.value">{{ item.label }}</Option>
                       </Select>
+                      </div>
+                      <div style="min-width:30%">
+                        <p>行政区域：</p>
+                        <span v-if="editorshow">{{list.entity.areaCode}}</span>
+                        <Select v-model="list.entity.areaCode" style="width:160px;margin-top:0" v-if="!editorshow" placement="top">
+                          <Option v-for="item in arealist.areaCode" :value="item.value" :key="item.value">{{item.label}}</Option>
+                        </Select>
                       </div>
                       <!-- <div style="min-width:30%">
                         <p>终端状态：</p>
