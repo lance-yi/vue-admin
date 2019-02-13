@@ -51,7 +51,7 @@
                                             <p v-for="(list,index) in environmentlist" :key="index" style="padding: 10px 0 0 10px;cursor:pointer" @click="chekcdecives(list,index)" :class="deviceindexs == index?'check':''">{{list.name}}</p>
                                         </div> 
                                     </Col>
-                                    <Col span="17">
+                                    <Col span="17" v-if="environmentdatalist.groupCode">
                                        <div style="margin-top:40px;position:relative">
                                            <button   class="zhuanyixuke" style="position:absolute;right:0;top:-40px" @click="editingmode" v-if="bianji1">编辑</button>
                                            <button   class="zhuanyixukes" style="position:absolute;right:0;top:-40px"  v-if="!bianji1">编辑</button>
@@ -168,14 +168,14 @@
              <Form ref="formproperty" :model="formproperty" :rules="ruleproperty" :label-width="100" >
               <Row>
                 <Col span="7">
-                    <FormItem label="属性编码" prop="notes" >
-                        <Input v-model="formproperty.notes" v-if="this.addrolenum == 0"/>
-                        <Input v-model="formproperty.notes" v-if="this.addrolenum == 1" disabled/>
+                    <FormItem label="属性编码" prop="name" >
+                        <Input v-model="formproperty.name" v-if="this.addrolenum == 0"/>
+                        <Input v-model="formproperty.name" v-if="this.addrolenum == 1" disabled/>
                     </FormItem>
                 </Col>
                 <Col span="7" >
-                    <FormItem label="属性名称" prop="name" >
-                        <Input v-model="formproperty.name" />
+                    <FormItem label="属性名称" prop="notes" >
+                        <Input v-model="formproperty.notes" />
                     </FormItem>
                 </Col>
                 <Col span="7">
@@ -263,12 +263,20 @@
             >
              <Form ref="formthreshold" :model="formthreshold" :rules="rulethreshold" :label-width="100" >
               <Row>
-                <Col span="7">
-                    <FormItem label="编码名称" prop="indication" >
+                  <Col span="7">
+                    <FormItem label="编码指标" prop="indication" >
                        <Select v-model="formthreshold.indication" v-if="this.addrolenum == 0" >
                         <Option :value="list.label" v-for="(list,indexs) in indicationlist" :key="indexs">{{list.value}}</Option>
                         </Select>
-                        <Input v-model="formthreshold.indicationName" disabled   v-if="this.addrolenum == 1"/>
+                        <Input v-model="formthreshold.indicationName"  disabled  v-if="this.addrolenum == 1"/>
+                    </FormItem>
+                </Col>
+                <Col span="7">
+                    <FormItem label="编码名称" prop="indicationName" >
+                       <!-- <Select v-model="formthreshold.indication" v-if="this.addrolenum == 0" >
+                        <Option :value="list.label" v-for="(list,indexs) in indicationlist" :key="indexs">{{list.value}}</Option>
+                        </Select> -->
+                        <Input v-model="formthreshold.indicationName" />
                     </FormItem>
                 </Col>
                 <Col span="7">
@@ -290,14 +298,14 @@
                         </Select>
                     </FormItem>
                 </Col>
-                <Col span="7">
+                <Col span="21">
                     <FormItem label="告警描述" prop="alertDesc" >
-                        <Input v-model="formthreshold.alertDesc" />
+                        <Input v-model="formthreshold.alertDesc" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="当前流量为:${value},超过流量阈值:${threshold}"/>
                     </FormItem>
                 </Col>
-                <Col span="7">
+                <Col span="21">
                     <FormItem label="恢复告警描述" prop="recoverDesc" >
-                        <Input v-model="formthreshold.recoverDesc" />
+                        <Input v-model="formthreshold.recoverDesc" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="流量恢复正常，当前流量为:${value}"/>
                     </FormItem>
                 </Col>         
             </Row>
@@ -429,6 +437,7 @@
         },
         formthreshold:{
             indication:'',
+            indicationName:'',
             threshold:'',
             judgeSymbol:'',
             alertType:'',
@@ -437,7 +446,10 @@
         },
         rulethreshold:{
                 indication: [
-                    { required: true, message: '编码不能为空', trigger: 'blur' }
+                    { required: true, message: '编码指标不能为空', trigger: 'blur' }
+                ],
+                indicationName: [
+                    { required: true, message: '编码名称不能为空', trigger: 'blur' }
                 ],
                 threshold: [
                     { required: true, message: '阈值不能为空', trigger: 'blur', type: 'number' }
@@ -514,7 +526,7 @@
                         align: 'center'
                     },
                     {
-                        title: '编码',
+                        title: '名称',
                         key: 'indicationName',
                         width:100
                     },
@@ -675,13 +687,16 @@
             this.$http.get("res/resEvnGroup/selectEvnGroup",{deviceCode:this.chekcdecivedata.deviceCode},res=>{
                 this.environmentlist = res.data
                 this.deviceindexs = 0
+                if(this.environmentlist.length == 0){
+                    this.environmentdatalist = []
+                }
                     this.$http.get("res/resEvnGroup/selectEvnAttr",{groupCode:this.environmentlist[0].code},res=>{
                         this.environmentdatalist = res.data
                          this.checkendata = this.environmentlist[0]
                     },err=>{});
                 },err=>{});
           }else if(name == '阈值状态'){
-            this.$http.get("res/rerfThreshold/selectAttrPage",{page:1,limit:10},res=>{
+            this.$http.get("res/rerfThreshold/selectAttrPage",{page:1,limit:10,deviceCode:this.chekcdecivedata.deviceCode},res=>{
                 this.data1 = res.data.list
               this.thresholdtotal = res.data.total
                 },err=>{});
@@ -690,11 +705,11 @@
                this.judgeSymbollist = res.data
                 },err=>{});
             //告警类型下拉框
-            this.$http.get("res/rerfThreshold/getAlertType",{},res=>{
+            this.$http.get("res/rerfThreshold/getAlertType",{resType:this.chekcdecivedata.deviceCode},res=>{
                this.alertlist = res.data
                 },err=>{});
             //编码下拉框
-            this.$http.get("res/resEvnGroup/evnSelect",{},res=>{
+            this.$http.get("res/resEvnGroup/evnSelect",{deviceCode:this.chekcdecivedata.deviceCode},res=>{
                this.indicationlist = res.data
                 },err=>{});
                 
@@ -722,10 +737,26 @@
           this.$http.get("res/resEvnGroup/selectEvnGroup",{deviceCode:this.chekcdecivedata.deviceCode},res=>{
                 this.environmentlist = res.data
                 this.deviceindexs = 0
+                if(this.environmentlist.length == 0){
+                    this.environmentdatalist = []
+                }
                 this.$http.get("res/resEvnGroup/selectEvnAttr",{groupCode:this.environmentlist[0].code},res=>{
                         this.environmentdatalist = res.data
                          this.checkendata = this.environmentlist[0]
                     },err=>{});
+                },err=>{});
+         //告警类型下拉框
+            this.$http.get("res/rerfThreshold/getAlertType",{resType:this.chekcdecivedata.deviceCode},res=>{
+               this.alertlist = res.data
+                },err=>{});
+         //编码下拉框
+            this.$http.get("res/resEvnGroup/evnSelect",{deviceCode:this.chekcdecivedata.deviceCode},res=>{
+               this.indicationlist = res.data
+                },err=>{});
+
+        this.$http.get("res/rerfThreshold/selectAttrPage",{page:1,limit:10,deviceCode:this.chekcdecivedata.deviceCode},res=>{
+                this.data1 = res.data.list
+              this.thresholdtotal = res.data.total
                 },err=>{});
       },
       //属相详情分页
@@ -889,7 +920,7 @@
       },
       //阈值分页
       changethresholdlpage(i){
-        this.$http.get("res/rerfThreshold/selectAttrPage",{page:i,limit:10},res=>{
+        this.$http.get("res/rerfThreshold/selectAttrPage",{page:i,limit:10,deviceCode:this.chekcdecivedata.deviceCode},res=>{
                 this.data1 = res.data.list
                 },err=>{});
       },
@@ -910,13 +941,13 @@
       okthreshold(name){
          this.$refs[name].validate((valid) => {
             if (valid) {
-                this.indicationlist.forEach(data => { if(this.formthreshold.indication == data.label){
-                    this.formthreshold.indicationName = data.value
-                }})
+                // this.indicationlist.forEach(data => { if(this.formthreshold.indication == data.label){
+                //     this.formthreshold.indicationName = data.value
+                // }})
                 if(this.addrolenum == 0){
                     this.$http.post("res/rerfThreshold/add",this.formthreshold,res=>{
                         this.$Message.info(res.message);
-                        this.$http.get("res/rerfThreshold/selectAttrPage",{page:1,limit:10},res=>{
+                        this.$http.get("res/rerfThreshold/selectAttrPage",{page:1,limit:10,deviceCode:this.chekcdecivedata.deviceCode},res=>{
                         this.data1 = res.data.list
                         this.pagesthreshold = 1
                         this.thresholdtotal = res.data.total
@@ -926,7 +957,7 @@
                 }else if(this.addrolenum == 1){
                    this.$http.put("res/rerfThreshold/edit",this.formthreshold,res=>{
                         this.$Message.info(res.message);
-                        this.$http.get("res/rerfThreshold/selectAttrPage",{page:1,limit:10},res=>{
+                        this.$http.get("res/rerfThreshold/selectAttrPage",{page:1,limit:10,deviceCode:this.chekcdecivedata.deviceCode},res=>{
                         this.data1 = res.data.list
                         this.pagesthreshold = 1
                         this.thresholdtotal = res.data.total
@@ -967,7 +998,7 @@
                         list,res=>{
                         this.$Message.info(res.message);
                         this.checkthresholddata=[]
-                        this.$http.get("res/rerfThreshold/selectAttrPage",{page:1,limit:10},res=>{
+                        this.$http.get("res/rerfThreshold/selectAttrPage",{page:1,limit:10,deviceCode:this.chekcdecivedata.deviceCode},res=>{
                         this.data1 = res.data.list
                         this.pagesthreshold = 1
                         this.thresholdtotal = res.data.total

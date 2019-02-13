@@ -883,7 +883,7 @@ import ipDevice from "@/components/ipDevice";
       countshows(){
         this.rightdialogshow = false
         this.countshow = true
-         this.$http.get("res/socElectrical/selectElectricStatisticsByCondition?",{},res=>{
+         this.$http.post("res/socElectrical/selectElectricStatisticsByCondition?",{},res=>{
                   this.countmaindata = res.data
                     },err=>{});
           this.$http.get("/oauth/dict/selectDictCommon?",{dictCodes:'managementUnit'},res=>{
@@ -897,7 +897,7 @@ import ipDevice from "@/components/ipDevice";
         // console.log(this.addresscode)
         // console.log(this.companylist)
         // console.log(this.valueadd)
-        this.$http.get("res/socElectrical/selectElectricStatisticsByCondition?areas="+this.addresscode,{managementUnit:this.companylist,param:this.valueadd,},res=>{
+        this.$http.post("res/socElectrical/selectElectricStatisticsByCondition?",{areas:this.addresscode,managementUnit:this.companylist,param:this.valueadd,},res=>{
               // this.addcodelist = res.data
               if(res.data.length == 0){
                 this.countmaindata = []
@@ -1097,7 +1097,7 @@ import ipDevice from "@/components/ipDevice";
       right: 0;
       top: 60px;
       z-index: 18;
-      padding: 30px;
+      padding: 30px 0 30px 30px;
       border: 2px solid #13C7D9;
     }
     .rightdialog div {

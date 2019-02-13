@@ -566,22 +566,22 @@ import city from "../../src/util/city.js";
       },
       //表格分页
     changeliebiaopage(i){
-        if(this.checknum = 'name2'){
+        if(this.checknum == 'name2'){
           // this.$http.get("res/ponitMove/selectMoveRebuildList",{state:'-1',current:i,pageSize:10},res=>{
           //     this.datalist = res.data
           //   },err=>{});
          
-        }else if(this.checknum = 'name3'){
+        }else if(this.checknum == 'name3'){
             // this.$http.get("res/ponitMove/selectMoveRebuildList",{state:'1',rebuildType:'0',current:i,pageSize:10},res=>{
             //   this.datalist = res.data
             // },err=>{});
           
-        }else if(this.checknum = 'name4'){
+        }else if(this.checknum == 'name4'){
           // this.$http.get("res/ponitMove/selectMoveRebuildList",{state:'1',rebuildType:'1',current:i,pageSize:10},res=>{
           //     this.datalist = res.data
           //   },err=>{});
              
-        }else if(this.checknum = 'name1'){
+        }else if(this.checknum == 'name1'){
             this.$http.get("res/ponitMove/selectAllPoint",{current:i,pageSize:10},res=>{
                 this.data1 = res.data.list
             },err=>{});
@@ -815,7 +815,7 @@ import city from "../../src/util/city.js";
       right: 0;
       top: 60px;
       z-index: 18;
-      padding: 30px;
+      padding: 30px 0 30px 30px;
       border: 2px solid #13C7D9;
     }
     .rightdialog div {

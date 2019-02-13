@@ -3789,7 +3789,7 @@ export default {
   right: 0;
   top: 60px;
   z-index: 18;
-  padding: 30px;
+  padding: 30px 0 30px 30px;
   border: 2px solid #13C7D9;
 }
 .rightdialog div {

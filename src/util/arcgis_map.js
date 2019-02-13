@@ -168,7 +168,7 @@ export default {
             map.addLayer(img); // 将图层添加到map对象
             map.addLayer(cia);
             this.mapObj.map = map;
-            
+            // console.log(map)
             // map.on("extent-change", function(evt){
             //     console.log(evt.extent)
             // });
@@ -177,7 +177,7 @@ export default {
                 // console.log(res.data)
                 this.point = res.data
                 var that = this
-                this.point.forEach (el=>{ 
+                this.point.forEach (el=>{
                     if(el.isAlert == 1){
                         that.createCircle(el)
                     }else if(el.isAlert == 2){
