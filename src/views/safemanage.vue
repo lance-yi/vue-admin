@@ -55,12 +55,17 @@
                 <i-button type="primary" class="sure" @click="serach">搜索</i-button>
               </div>
             </div>
-            <p v-if="timelinelist.length == 0&&this.levels == 2" style="padding:10px 0px;font-size:15px;color:#FE0302">暂无运行严重故障设备</p>
-            <p v-if="timelinelist.length == 0&&this.levels == 1" style="padding:10px 0px;font-size:15px;color:#F4A750">暂无运行一般故障设备</p>
-            <p v-if="timelinelist.length == 0&&this.levels == 0" style="padding:10px 0px;font-size:15px;color:#1DE509">暂无运行状态正常设备</p>
-            <div class="timelinebox" v-if="timelinelist.length != 0">
+            <Page :total="timelinelist.total" v-if="timelinelist.list.length != 0&&this.levels == 2" :current.sync="oppages"  @on-change="changelevew2"/>
+            <Page :total="timelinelist.total" v-if="timelinelist.list.length != 0&&this.levels == 1" :current.sync="oppages"  @on-change="changelevew1"/>
+            <Page :total="timelinelist.total" v-if="timelinelist.list.length != 0&&this.levels == 0" :current.sync="oppages"  @on-change="changelevew0"/>
+            <Page :total="timelinelist.total" v-if="timelinelist.list.length != 0&&this.levels == 4" :current.sync="oppages"  @on-change="changelevew4"/>
+            <p v-if="timelinelist.list.length == 0&&this.levels == 2" style="padding:10px 0px;font-size:15px;color:#FE0302">暂无运行严重故障设备</p>
+            <p v-if="timelinelist.list.length == 0&&this.levels == 1" style="padding:10px 0px;font-size:15px;color:#F4A750">暂无运行一般故障设备</p>
+            <p v-if="timelinelist.list.length == 0&&this.levels == 0" style="padding:10px 0px;font-size:15px;color:#1DE509">暂无运行状态正常设备</p>
+            <p v-if="timelinelist.list.length == 0&&this.levels == 4" style="padding:10px 0px;font-size:15px;color:#1D60FE">暂无安全接入网关</p>
+            <div class="timelinebox" v-if="timelinelist.list.length != 0">
               <Timeline>
-              <Timeline-item v-for="(list,index) in timelinelist" :key="index">
+              <Timeline-item v-for="(list,index) in timelinelist.list" :key="index">
                 <!-- <p class="time">{{list.occurTimeHead}}</p>
                 <p class="hour">{{list.occurTimeRoot}}</p> -->
                   <img src="../../public/img/16.png" slot="dot" v-if="list.isAlert == 2" />
@@ -106,6 +111,7 @@
                         <p style="margin-top: 2px;">故障描述：
                                  <a style="border:none" >{{aa.description}}</a>&nbsp;&nbsp;&nbsp;
                                  <a  class="brspans"  style="color:#1D60FE;margin-left:0;display:inline-block" @click.stop="tracing(aa.id)">事件追溯</a>
+                                 <a  class="brspans"  style="color:#1D60FE;margin-left:10px;display:inline-block" @click.stop="fastFeedback(aa.id)" v-if="aa.isHandBack == 0">快速反馈处理</a>
                         </p>
                         
                       </div>
@@ -608,7 +614,8 @@
                 </div>
                 <p style="margin-top: 5px;margin-bottom:30px">故障描述：
                           <span style="color:rgb(255, 94, 94)" >{{aa.description}}</span>&nbsp;&nbsp;&nbsp;
-                          <a  class="brspans"  style="color:#1D60FE;margin-left:0;display:inline-block" @click.stop="tracing(aa.id)">事件追溯</a>&nbsp;&nbsp;&nbsp;
+                          <a  class="brspans"  style="color:#1D60FE;margin-left:0;display:inline-block" @click.stop="tracing(aa.id)">事件追溯</a>
+                          <a  class="brspans"  style="color:#1D60FE;margin-left:10px;display:inline-block" @click.stop="fastFeedback(aa.id)" v-if="aa.isHandBack == 0">快速反馈处理</a>&nbsp;&nbsp;&nbsp;
                           <span v-if="aa.type == 'gatewayOfflineAlert'">分析报告：<a  class="brspans"  style="color:#1D60FE;margin-left:0;display:inline-block" @click.stop="see()">查看</a></span>
                 </p>
                 
@@ -918,6 +925,16 @@
                <div slot="footer">
                </div>
           </Modal>
+
+          <Modal
+              v-model="modal2"
+              title="快速反馈处理"
+              width="550"
+              >
+              <p v-for="(list,index) in fastFeedbackdata" v-if="fastFeedbackdata.length > 0" :key="index">反馈人：{{list.dealer}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;反馈时间：{{list.consumeTime}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;反馈内容：{{list.content}}</p>
+               <div slot="footer">
+               </div>
+          </Modal>
      </div>
        
       <!-- 点击ip弹窗 -->
@@ -1060,7 +1077,21 @@
                     <span>{{list.content}}</span>
                   </div>
                  </div>
-                 
+                 <div class="sendbox"  >
+                   <img src="../../public/img/168.png"/>
+                    GPS定位
+                 </div>
+                 <div class="content" style="border:none;">
+                    <div style="min-width:50%;margin-top:10px;display:block">
+                      <p style="font-size:10px;text-align: left">注：该定位是档设备维修完毕后，维修人员使用APP上报处理结果时的实时定位</p>
+                      <p style="text-align: left;margin-top: 20px;margin-left: 13px;">点位位置：( <span style="color:#3C7FEE">经度{{gpslist.maintenancerLatitude}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#3C7FEE">纬度{{gpslist.maintenancerLongitude}}</span> )</p>
+                      <p style="text-align: left;margin-top: 20px">手机端位置：( <span style="color:#3C7FEE">经度{{gpslist.deviceLatitude}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#3C7FEE">纬度{{gpslist.deviceLongitude}}</span> )</p>
+                      <p style="text-align: center;margin-top: 20px;color:red;font-size:16px">该点位距离手机上报位置约{{gpslist.distance}}米</p>
+                    </div>
+                    <div style="min-width:50%">
+                      <ArcgisMapsworkdetail :propsgps='gpslist'v-if="gpslist.deviceLatitude != ''"/>
+                    </div>
+                 </div>
                  <div style="position:fixed;top:6%;right:12%">
                  <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="closetowork(formlists)">确认关闭工单</button>
                  <button   class="zhuanyixukes" v-if="formlists.processStatus == '待确认'" @click="backtowork(formlists)">退回</button>
@@ -1277,6 +1308,7 @@
 <script>
 import ArcgisMap from "@/components/ArcgisMap";
 import ArcgisMapsmall from "@/components/ArcgisMapsmall";
+import ArcgisMapsworkdetail from "@/components/ArcgisMapsworkdetail";
 import ipDevice from "@/components/ipDevice";
 import Vue from "vue";
 // let echarts = require('echarts/lib/echarts');
@@ -1285,10 +1317,12 @@ export default {
   components: {
     ArcgisMap,
     ArcgisMapsmall,
+    ArcgisMapsworkdetail,
     ipDevice
   },
   data() {
     return {
+      gpslist:{},
       oppages:1,
       oppagetotal:0,
       processlist:[],
@@ -1306,7 +1340,9 @@ export default {
       timeslist:{},
       bigrightshow2:false,
       tracingdata:[],
+      fastFeedbackdata:[],
       modal1:false,
+      modal2:false,
       timer:null,
       runtimer:null,
       mintime:60000,
@@ -1584,19 +1620,20 @@ export default {
         });
     },
     statusclick(index) {
+      this.oppages = 1
       this.statusdata = true;
       this.rightdialogshow = false
       this.value = "";
       if (index == 0) {
         this.$http.get(
           "alert/warning/getDeviceInfo?&param=",
-          { level: 2,requestModular:1 },
+          { level: 2,requestModular:1,current:1,pageSize:10 },
           res => {
-            this.timelinelist = res.data;
+            this.timelinelist = res.data
             this.levels = 2;
             this.move = false;
-            for (let i = 0; i < this.timelinelist.length; i++) {
-              this.$set(this.timelinelist[i], "nono", false);
+            for (let i = 0; i < this.timelinelist.list.length; i++) {
+              this.$set(this.timelinelist.list[i], "nono", false);
             }
           },
           err => {}
@@ -1604,13 +1641,13 @@ export default {
       } else if (index == 1) {
         this.$http.get(
           "alert/warning/getDeviceInfo?&param=",
-          { level: 1 ,requestModular:1 },
+          { level: 1 ,requestModular:1,current:1,pageSize:10 },
           res => {
-            this.timelinelist = res.data;
+            this.timelinelist = res.data
             this.levels = 1;
             this.move = false;
-            for (let i = 0; i < this.timelinelist.length; i++) {
-              this.$set(this.timelinelist[i], "nono", false);
+            for (let i = 0; i < this.timelinelist.list.length; i++) {
+              this.$set(this.timelinelist.list[i], "nono", false);
             }
           },
           err => {}
@@ -1618,13 +1655,13 @@ export default {
       } else if (index == 2) {
         this.$http.get(
           "alert/warning/getDeviceInfo?&param=",
-          { level: 0 ,requestModular:1 },
+          { level: 0 ,requestModular:1,current:1,pageSize:10 },
           res => {
             this.timelinelist = res.data;
             this.levels = 0;
             this.move = false;
-            for (let i = 0; i < this.timelinelist.length; i++) {
-              this.$set(this.timelinelist[i], "nono", false);
+            for (let i = 0; i < this.timelinelist.list.length; i++) {
+              this.$set(this.timelinelist.list[i], "nono", false);
             }
           },
           err => {}
@@ -1632,13 +1669,13 @@ export default {
       } else if (index == 3) {
         this.$http.get(
           "alert/warning/getDeviceInfo?&param=",
-          { level: 4 ,requestModular:1 },
+          { level: 4 ,requestModular:1,current:1,pageSize:10 },
           res => {
-            this.timelinelist = res.data;
+            this.timelinelist = res.data
             this.levels = 4;
             this.move = false;
-            for (let i = 0; i < this.timelinelist.length; i++) {
-              this.$set(this.timelinelist[i], "nono", false);
+            for (let i = 0; i < this.timelinelist.list.length; i++) {
+              this.$set(this.timelinelist.list[i], "nono", false);
             }
           },
           err => {}
@@ -1646,35 +1683,36 @@ export default {
       }
     },
     serach() {
+      this.oppages = 1
       this.$http.get(
         "/alert/warning/getDeviceInfo?",
-        { param: this.value, level: this.levels,requestModular:1  },
+        { param: this.value, level: this.levels,requestModular:1,current:1,pageSize:10},
         res => {
-          this.timelinelist = res.data;
+          this.timelinelist = res.data
           this.levels = this.levels;
-          for (let i = 0; i < this.timelinelist.length; i++) {
-            this.$set(this.timelinelist[i], "nono", false);
-          }
+          for (let i = 0; i < this.timelinelist.list.length; i++) {
+              this.$set(this.timelinelist.list[i], "nono", false);
+            }
         },
         err => {}
       );
     },
     checkicon(ip, imgcheck, status) {
-      this.timelinelist.forEach(el => {
+      this.timelinelist.list.forEach(el => {
         if (el.gatewayIp == ip) {
           (el.nono = true), (el.isAlert = 5);
         }
       });
     },
     checknono(ip) {
-      this.timelinelist.forEach(el => {
+      this.timelinelist.list.forEach(el => {
         if (el.gatewayIp == ip) {
           (el.nono = false), (el.isAlert = 4);
         }
       });
     },
     delwarn() {
-      this.timelinelist.forEach(el => {
+      this.timelinelist.list.forEach(el => {
         if (el.isAlert != 0) {
           (el.nono = true), (el.isAlert = 5);
         }
@@ -1687,8 +1725,8 @@ export default {
         { level: this.levels, param: this.value,requestModular:1  },
         res => {
           this.timelinelist = res.data;
-          for (let i = 0; i < this.timelinelist.length; i++) {
-            this.$set(this.timelinelist[i], "nono", false);
+          for (let i = 0; i < this.timelinelist.list.length; i++) {
+            this.$set(this.timelinelist.list[i], "nono", false);
           }
         },
         err => {}
@@ -1698,7 +1736,7 @@ export default {
     movewarn() {
       this.iplist = [];
       // console.log(this.timelinelist)
-      this.timelinelist.forEach(el => {
+      this.timelinelist.list.forEach(el => {
         if (el.isAlert == 4) {
           el.description.forEach(data => { this.iplist = this.iplist.concat(data.id);})
         }
@@ -1709,8 +1747,8 @@ export default {
             this.$Message.success('清除警告成功');
             this.$http.get( "alert/warning/getDeviceInfo?",{ level: this.levels, param: this.value,requestModular:1  },res => {
               this.timelinelist = res.data;
-              for (let i = 0; i < this.timelinelist.length; i++) {
-                this.$set(this.timelinelist[i], "nono", false);
+              for (let i = 0; i < this.timelinelist.list.length; i++) {
+                this.$set(this.timelinelist.list[i], "nono", false);
               }
             },
             err => {}
@@ -1808,7 +1846,7 @@ export default {
           },err=>{});
           //安全事件信息
           this.$http.get("alert/warning/getDeviceInfo",{gateId:data,level:3,requestModular:1},res=>{
-              this.descriptiondata = res.data[0].description
+              this.descriptiondata = res.data.list[0].description
           },err=>{});
 
           //运维事件信息
@@ -1909,7 +1947,7 @@ export default {
 
          //安全事件信息
           this.$http.get("alert/warning/getDeviceInfo",{gateId:data,level:3,requestModular:1},res=>{
-              this.descriptiondata = res.data[0].description
+              this.descriptiondata = res.data.list[0].description
           },err=>{});
 
           //运维事件信息
@@ -2757,6 +2795,8 @@ export default {
               this.formlists = res.data[0].form
               //流程信息
             this.processlist = res.data[0].process
+            //GPS信息
+            this.gpslist = res.data[0].GPS
           },err=>{});
    
     },
@@ -2933,6 +2973,13 @@ export default {
       this.modal1 = true
        this.$http.get("alert/warning/selectEventByAlertId",{alertId:id},res=>{
                this.tracingdata = res.data
+          },err=>{});
+    },
+    //快速反馈处理
+    fastFeedback(id){
+      this.modal2 = true
+       this.$http.get("alert/warning/getAlertAppHandleBackById",{alertId:id},res=>{
+               this.fastFeedbackdata = res.data
           },err=>{});
     },
     bigtable(){
@@ -3774,8 +3821,65 @@ export default {
       this.workdetaillist[index].entity=data
       // console.log(data,index)
     },
-    changeoppage(i){
-
+    changelevew4(i){
+       this.$http.get(
+          "alert/warning/getDeviceInfo?&param=",
+          { level: 4 ,requestModular:1,current:i,pageSize:10 },
+          res => {
+            this.timelinelist = res.data
+            this.levels = 4;
+            this.move = false;
+            for (let i = 0; i < this.timelinelist.list.length; i++) {
+              this.$set(this.timelinelist.list[i], "nono", false);
+            }
+          },
+          err => {}
+        );
+    },
+    changelevew0(i){
+      this.$http.get(
+          "alert/warning/getDeviceInfo?&param=",
+          { level: 0 ,requestModular:1,current:i,pageSize:10 },
+          res => {
+            this.timelinelist = res.data
+            this.levels = 0;
+            this.move = false;
+            for (let i = 0; i < this.timelinelist.list.length; i++) {
+              this.$set(this.timelinelist.list[i], "nono", false);
+            }
+          },
+          err => {}
+        );
+    },
+    changelevew1(i){
+       this.$http.get(
+          "alert/warning/getDeviceInfo?&param=",
+          { level: 1 ,requestModular:1,current:i,pageSize:10 },
+          res => {
+            this.timelinelist = res.data
+            this.levels = 1;
+            this.move = false;
+            for (let i = 0; i < this.timelinelist.list.length; i++) {
+              this.$set(this.timelinelist.list[i], "nono", false);
+            }
+          },
+          err => {}
+        );
+    },
+    changelevew2(i){
+       this.$http.get(
+          "alert/warning/getDeviceInfo?&param=",
+          { level: 2,requestModular:1,current:i,pageSize:10 },
+          res => {
+            this.timelinelist = res.data
+            this.levels = 2;
+            this.move = false;
+            for (let i = 0; i < this.timelinelist.list.length; i++) {
+              this.$set(this.timelinelist.list[i], "nono", false);
+            }
+          },
+          err => {}
+        );
     }
   }
 };
@@ -3844,7 +3948,7 @@ export default {
 }
 .timelinebox {
   padding: 20px;
-  height: calc(100% - 74px);
+  height: calc(100% - 110px);
   overflow: auto;
   padding-left: 30px;
 }

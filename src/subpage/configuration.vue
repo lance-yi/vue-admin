@@ -35,7 +35,7 @@
                               </TabPane>
                               <TabPane label="环境指标" name="环境指标">
                                   <Row>
-                                    <Col span="6" style="margin-right: 20px;">
+                                    <Col span="5" style="margin-right: 20px;">
                                         <div class="head-left" style="position:relative">组名称
                                             <img src="../../public/img/167.png" style="position:absolute;right:10px;top:12px;cursor:pointer" @click="deteleenvironment"/>
                                             <img src="../../public/img/166.png" style="position:absolute;right:35px;top:12px;cursor:pointer" @click="addenvironment"/>
@@ -51,23 +51,30 @@
                                             <p v-for="(list,index) in environmentlist" :key="index" style="padding: 10px 0 0 10px;cursor:pointer" @click="chekcdecives(list,index)" :class="deviceindexs == index?'check':''">{{list.name}}</p>
                                         </div> 
                                     </Col>
-                                    <Col span="17" v-if="environmentdatalist.groupCode">
-                                       <div style="margin-top:40px;position:relative">
-                                           <button   class="zhuanyixuke" style="position:absolute;right:0;top:-40px" @click="editingmode" v-if="bianji1">编辑</button>
-                                           <button   class="zhuanyixukes" style="position:absolute;right:0;top:-40px"  v-if="!bianji1">编辑</button>
-                                           <button   class="zhuanyixuke" style="position:absolute;right:70px;top:-40px" @click="backenvironment" v-if="!bianji1">返回</button>
+                                    <Col span="18" v-if="environmentdatalist.groupCode">
+                                       <div style="position:relative">
+                                           <button   class="zhuanyixuke" style="position:absolute;right:0;top:12px" @click="editingroup" v-if="bianji2">编辑</button>
+                                           <button   class="zhuanyixukes" style="position:absolute;right:0;top:12px"  v-if="!bianji2" @click="savegroup">保存</button>
+                                           <button   class="zhuanyixuke" style="position:absolute;right:70px;top:12px" @click="backgroup" v-if="!bianji2">返回</button>
+                                           <button   class="zhuanyixuke" style="position:absolute;right:0;top:65px" @click="editingmode" v-if="bianji1">编辑</button>
+                                           <button   class="zhuanyixukes" style="position:absolute;right:0;top:65px"  v-if="!bianji1">编辑</button>
+                                           <button   class="zhuanyixuke" style="position:absolute;right:70px;top:65px" @click="backenvironment" v-if="!bianji1">返回</button>
                                            <div class="mainbox" >
                                                 <div >
                                                     环境组编码
-                                                    <span v-if="bianji1">{{environmentdatalist.groupCode}}</span>
-                                                    <Input v-model="environmentdatalist.groupCode" disabled  style="width: 150px;border:none;margin:0;padding:0" v-if="!bianji1"/>
+                                                    <span v-if="bianji2">{{environmentdatalist.groupCode}}</span>
+                                                    <Input v-model="environmentdatalist.groupCode" disabled  style="width: 150px;border:none;margin:0;padding:0" v-if="!bianji2"/>
                                                 </div>
                                                 <div >
                                                     环境组名称
-                                                    <span v-if="bianji1">{{environmentdatalist.groupName}}</span>
-                                                    <Input v-model="environmentdatalist.groupName"   style="width: 150px;border:none;margin:0;padding:0" v-if="!bianji1"/>
+                                                    <span v-if="bianji2">{{environmentdatalist.groupName}}</span>
+                                                    <Input v-model="environmentdatalist.groupName"   style="width: 150px;border:none;margin:0;padding:0" v-if="!bianji2"/>
                                                 </div>
                                            </div>
+                                           <div class="detail-title">
+                                                <img src="../../public/img/66.png"/>
+                                                <p>信息栏</p>
+                                            </div>
                                            <div class="mainboxs" v-for="(list,index) in environmentdatalist.evnAttrList" :key="index">
                                                 <div v-if="list.code">
                                                     编码
@@ -88,6 +95,93 @@
                                            <button   class="zhuanyixuke" style="border:1px solid #5ECEDD;color:#5ECEDD" v-if="!bianji1" @click="handenAdd">添加</button>
                                        </div>
                                        <button   class="zhuanyixuke"  v-if="!bianji1" style="margin-top:40px;margin-left:30%" @click="allowenvironment">确认</button>
+                                       <div class="detail-title" style="position:relative">
+                                                <img src="../../public/img/66.png"/>
+                                                <p>信息栏</p>
+                                                <button   class="zhuanyixuke" style="position:absolute;right:0;top:0px" @click="addgroupbottom">添加</button>
+                                        </div>
+                                        <Row v-for="(list,indexs) in environmentdatalist.evnAttrExtendList" :key="indexs" class="bottombox">
+                                            <img src="../../public/img/xxx.png"  class="rightimg"   style="right:40px" @click="groupbottomRemove(list.id)"/>
+                                            <img src="../../public/img/bianji.png" class="rightimg" style="right:20px" @click="editgroupbottom(list)"/>
+                                            <img src="../../public/img/149.png"  class="rightimg" @click="open($event,list.isCreate)" />
+                                            <img src="../../public/img/big.png"  class="rightimg" style="display:none" @click="drawback($event)"/>
+                                            <Col span="7">
+                                                <div>
+                                                    <span>编码：</span>{{list.name}}
+                                                </div>
+                                            </Col>
+                                            <Col span="7" >
+                                               <div>
+                                                    <span>名称：</span>{{list.notes}}
+                                                </div>
+                                            </Col>
+                                            <Col span="7" >
+                                               <div>
+                                                    <span>类型：</span>{{list.type}}
+                                                </div>
+                                            </Col>
+                                            <Col span="7">
+                                                <div v-if="list.isShow == 0">
+                                                    <span>是否显示：</span>否
+                                                </div>
+                                                <div v-if="list.isShow == 1">
+                                                    <span>是否显示：</span>是
+                                                </div>
+                                            </Col>
+                                            <Col span="7">
+                                                <div v-if="list.isCreate == 0">
+                                                    <span>是否创建：</span>否
+                                                </div>
+                                                <div v-if="list.isCreate == 1">
+                                                    <span>是否创建：</span>是
+                                                </div>
+                                            </Col>
+                                            <Col span="7" v-if="list.isCreate == 1">
+                                                <div>
+                                                    <span>字段长度：</span>{{list.length}}
+                                                </div>
+                                            </Col>
+                                            <Col span="7" v-if="list.isCreate == 1">
+                                                    <span>小数点长度：</span>{{list.decimalLength}}
+                                            </Col>
+                                            <Col span="7" v-if="list.isCreate == 1">
+                                                <div v-if="list.isNull == 0">
+                                                    <span>是否为空：</span>否
+                                                </div>
+                                                <div v-if="list.isNull == 1">
+                                                    <span>是否为空：</span>是
+                                                </div>
+                                            </Col>
+                                            <Col span="7" v-if="list.isCreate == 1">
+                                                <div v-if="list.iskey == 0">
+                                                    <span>是否为主键：</span>否
+                                                </div>
+                                                <div v-if="list.iskey == 1">
+                                                    <span>是否为主键：</span>是
+                                                </div>
+                                            </Col>
+                                            <Col span="7" v-if="list.isCreate == 1">
+                                                <div v-if="list.isAutoIncrement == 0">
+                                                    <span>是否自增长：</span>否
+                                                </div>
+                                                <div v-if="list.isAutoIncrement == 1">
+                                                    <span>是否自增长：</span>是
+                                                </div>
+                                            </Col>
+                                            <Col span="7" v-if="list.isCreate == 1">
+                                                <div>
+                                                   <span>默认值：</span>{{list.defaultValue}}
+                                                </div>
+                                            </Col>
+                                            <Col span="7" v-if="list.isCreate == 1">
+                                                <div v-if="list.isUnique == 0">
+                                                    <span>是否是唯一：</span>否
+                                                </div>
+                                                <div v-if="list.isUnique == 1">
+                                                    <span>是否是唯一：</span>是
+                                                </div>
+                                            </Col>
+                                        </Row>
                                     </Col>
                                   </Row>
                               </TabPane>
@@ -340,6 +434,7 @@
     },
     data () {
       return {
+        bianji2:true,
         modal4:false,
         deviceindexs:0,
         deteleshows:false,
@@ -603,6 +698,9 @@
            this.bianji1 = false
            this.mainboxshow = false
        },
+       editingroup(){
+           this.bianji2 = false
+       },
        //新增设备
        adddevice(){
           this.modal1 = true
@@ -832,7 +930,29 @@
         this.$refs[name].validate((valid) => {
             if (valid) {
                 this.formproperty.deviceCode=this.chekcdecivedata.deviceCode
-                if(this.addrolenum == 0){
+                if(this.modal1title == '添加环境属性'){
+                   this.formproperty.id = this.environmentdatalist.id
+                   this.formproperty.groupName = this.environmentdatalist.groupName
+                   this.formproperty.groupCode = this.environmentdatalist.groupCode
+                   this.$http.post("res/resEvnAttrExtend/add",this.formproperty,res=>{
+                        this.$Message.info(res.message);
+                        this.$http.get("res/resEvnGroup/selectEvnAttr",{groupCode:this.checkendata.code},res=>{
+                        this.environmentdatalist = res.data
+                            },err=>{})
+                        },err=>{
+                        })
+                }else if(this.modal1title == '编辑环境属性'){
+                   this.formproperty.groupName = this.environmentdatalist.groupName
+                   this.formproperty.groupCode = this.environmentdatalist.groupCode
+                   this.$http.put("res/resEvnAttrExtend/edit",this.formproperty,res=>{
+                        this.$Message.info(res.message);
+                        this.$http.get("res/resEvnGroup/selectEvnAttr",{groupCode:this.checkendata.code},res=>{
+                        this.environmentdatalist = res.data
+                            },err=>{})
+                        },err=>{
+                        })
+                }else{
+                  if(this.addrolenum == 0){
                     this.$http.post("res/resDeviceAttr/add",this.formproperty,res=>{
                         this.$Message.info(res.message);
                         this.pagesdata = 1
@@ -840,18 +960,19 @@
                             this.data2 = res.data.rows
                             this.detailtotal = res.data.total
                             },err=>{});
-                    },err=>{
-                    })
-                }else if(this.addrolenum == 1){
-                   this.$http.put("res/resDeviceAttr/edit",this.formproperty,res=>{
-                        this.$Message.info(res.message);
-                        this.pagesdata = 1
-                        this.$http.get("res/resDeviceAttr/page",{deviceCode:this.chekcdecivedata.deviceCode,page:1,limit:10},res=>{
-                            this.data2 = res.data.rows
-                            this.detailtotal = res.data.total
-                            },err=>{});
-                    },err=>{
-                    })
+                        },err=>{
+                        })
+                    }else if(this.addrolenum == 1){
+                    this.$http.put("res/resDeviceAttr/edit",this.formproperty,res=>{
+                            this.$Message.info(res.message);
+                            this.pagesdata = 1
+                            this.$http.get("res/resDeviceAttr/page",{deviceCode:this.chekcdecivedata.deviceCode,page:1,limit:10},res=>{
+                                this.data2 = res.data.rows
+                                this.detailtotal = res.data.total
+                                },err=>{});
+                        },err=>{
+                        })
+                    }
                 }
             } else {
                 this.$Message.error('请填写完整');
@@ -1073,6 +1194,12 @@
                 this.environmentdatalist = res.data
                     },err=>{});
       },
+      backgroup(){
+        this.bianji2 = true
+         this.$http.get("res/resEvnGroup/selectEvnAttr",{groupCode:this.checkendata.code},res=>{
+                this.environmentdatalist = res.data
+                    },err=>{});
+      },
       //删除环境组下面
       handenRemove (index) {
                 if(this.environmentdatalist.evnAttrList.length > 0){
@@ -1085,6 +1212,23 @@
                     name:'',
                     codes:'',
                 });
+        },
+        savegroup(){
+            if(this.environmentdatalist.groupName == ''){
+              this.$Message.error('请填写完整');
+           }else{
+               this.$http.put("res/resEvnGroup/editEvnGroup", this.environmentdatalist,res=>{
+                        this.$Message.info(res.message);
+                        this.bianji2 = true
+                        this.$http.get("res/resEvnGroup/selectEvnGroup",{deviceCode:this.chekcdecivedata.deviceCode},res=>{
+                        this.environmentlist = res.data
+                        },err=>{});
+                        this.$http.get("res/resEvnGroup/selectEvnAttr",{groupCode:this.checkendata.code},res=>{
+                        this.environmentdatalist = res.data
+                            },err=>{});
+                    },err=>{
+                    })
+           }
         },
         allowenvironment(){
             var aa = 1
@@ -1108,6 +1252,66 @@
            }else{
                this.$Message.error('请填写完整');
            }
+        },
+        open(event,isCreate){
+            event.currentTarget.style = "display:none"
+            event.currentTarget.nextElementSibling.style = "display:block"
+            if(isCreate == 1){
+                event.currentTarget.parentElement.style.height = 117 +'px';
+            }else if(isCreate == 0){
+                event.currentTarget.parentElement.style.height = 50 +'px';
+            }
+        },
+        drawback(event){
+            event.currentTarget.previousElementSibling.style = "display:block"
+            event.currentTarget.style = "display:none"
+            event.currentTarget.parentElement.style.height = 23 +'px';
+        },
+        addgroupbottom(){
+            this.modal2 = true
+            this.modal1title = '添加环境属性'
+            this.formproperty.notes=''
+            this.formproperty.name=''
+            this.formproperty.type=''
+            this.formproperty.isNull=''
+            this.formproperty.isKey=''
+            this.formproperty.isAutoIncrement=''
+            this.formproperty.defaultValue=''
+            this.formproperty.isUnique=''
+            this.formproperty.isCreate=''
+            this.formproperty.isShow=''
+        },
+        editgroupbottom(list){
+            this.modal2 = true
+            this.modal1title = '编辑环境属性'
+            this.formproperty.notes=list.notes
+            this.formproperty.name=list.name
+            this.formproperty.type=list.type
+            this.formproperty.isNull=list.isNull
+            this.formproperty.isKey=list.isKey
+            this.formproperty.isAutoIncrement=list.isAutoIncrement
+            this.formproperty.defaultValue=list.defaultValue
+            this.formproperty.isUnique=list.isUnique
+            this.formproperty.isCreate=list.isCreate
+            this.formproperty.isShow=list.isShow
+            this.formproperty.id = list.id
+            if(list.isCreate == '0'){
+                this.shows = true
+            }else if(list.isCreate == '1'){
+                this.shows = false
+            }
+        },
+        groupbottomRemove(ids){
+            this.$Modal.confirm({
+                  title: '您确定要删除吗',
+                  onOk: () => {
+                     this.$http.delete("res/resEvnAttrExtend/delete",{id:ids},res=>{
+                        this.$Message.info(res.message);
+                        this.$http.get("res/resEvnGroup/selectEvnAttr",{groupCode:this.checkendata.code},res=>{
+                        this.environmentdatalist = res.data
+                            },err=>{})
+                    },err=>{});
+                  }})
         }
     }
     
@@ -1123,12 +1327,15 @@
 }
 .mainbox{
    display:flex;
-   margin-bottom: 20px;
+   margin-bottom: 10px;
    align-items: center;
+   border: 1px solid #E0E0E0;
+   padding: 10px;
+   height: 54px;
 }
 .mainbox div{
     margin-right: 40px;
-    border-bottom: 1px solid #D9D9D9;
+    /* border-bottom: 1px solid #D9D9D9; */
     padding-bottom: 5px;
 }
 .mainbox div span{
@@ -1153,5 +1360,35 @@
     width:150px;
     text-align: right;
     background: #EEEEEE;
+}
+.detail-title{
+  display: flex;
+  font-size: 15px;
+  border-bottom: 1px solid #E5E5E5;
+  height: 40px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.detail-title p{
+  margin-left: 10px;
+}
+.bottombox div span{
+    display: inline-block;
+    width: 80px;
+    text-align: right;
+}
+.bottombox div{
+    margin-bottom: 5px;
+}
+.bottombox{
+    margin-bottom: 10px;
+    position: relative;
+    height: 23px;
+    overflow: hidden;
+}
+.rightimg{
+    position: absolute;
+    right: 0;
+    top:0;
 }
 </style>

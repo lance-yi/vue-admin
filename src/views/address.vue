@@ -427,7 +427,7 @@ import city from "../../src/util/city.js";
         timer:null,
         mintime:60000,
         oldid:'',
-        removenum:0,
+        removenum:'0',
         rebuildType:true,
         timeList:[{
                 value: '两分钟',
@@ -671,7 +671,7 @@ import city from "../../src/util/city.js";
           this.$http.post("res/ponitMove/ponintRemove",{resId:this.detaildata.id,placePosition:this.placePosition,constructionUnit:this.constructionUnit},res=>{
                this.$Message.success(res.message);
                this.removecheck = false
-               this.removenum++
+               this.removenum = this.detaildata.id
                this.$http.get("res/ponitMove/selectCountPoint",{},res => {this.statuslist = res.data;},
                 err => {}
               );

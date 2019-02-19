@@ -6,10 +6,11 @@ export default {
     name: 'ArcgisMap',
     props: {propsmap:{type:String},
     maptime:{type:String},
-    num:{type:Number}
+    num:{type:String}
     },
     data() {
         return {
+            perCount:10,
             timer:null,
             mintime:60000,
             mapObj: {},
@@ -78,22 +79,25 @@ export default {
         timers(i){
             clearInterval(this.timer)
             this.timer =  setInterval(() => { 
-                this.refresh()
+                // this.refresh()
+                this.init()
                 }, this.mintime*i)
         },
         refresh(){
-            this.point.forEach (el=>{ 
-                var targetLayer=this.mapObj.map.getLayer(el.id);
+            var targetLayer=this.mapObj.map.getLayer(this.num);
                 this.mapObj.map.removeLayer(targetLayer);
-            })
-            this.$http.get("res/ponitMove/selectPonintForMap",{},res=>{
-                this.point = res.data
-                var that = this
-                this.point.forEach (el=>{ 
-                        that.createCircle(el)
-                })
-              },err=>{
-              })
+            // this.point.forEach (el=>{ 
+            //     var targetLayer=this.mapObj.map.getLayer(el.id);
+            //     this.mapObj.map.removeLayer(targetLayer);
+            // })
+            // this.$http.get("res/ponitMove/selectPonintForMap",{},res=>{
+            //     this.point = res.data
+            //     var that = this
+            //     this.point.forEach (el=>{ 
+            //             that.createCircle(el)
+            //     })
+            //   },err=>{
+            //   })
         },
         init() {
             // 加载js;
@@ -201,10 +205,9 @@ export default {
             this.$http.get("res/ponitMove/selectPonintForMap",{},res=>{
                 // console.log(res.data)
                 this.point = res.data
-                var that = this
-                this.point.forEach (el=>{ 
-                        that.createCircle(el)
-                })
+                if(this.point.length){
+                    this.fn()
+                }
                 // var polyline = new esri.geometry.Polyline([[114,30],[115,30]]);
                 // var symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASHDOTDOT, new dojo.Color([29,96,254]), 2);
                 // var graphic = new esri.Graphic(polyline, symbol);
@@ -212,8 +215,27 @@ export default {
                 //     map.graphics.add(graphic)},3000);
               },err=>{
               })
-        
-            
+        },
+        async fn(arrs){
+            const len = await this.add()
+            if(len){
+                this.fn()
+            }
+        }, 
+        add(){
+          return new Promise((resolve, reject) => {
+            for(let i = 0;i<this.perCount;i++){
+                this.createCircle(this.point[0])
+                this.point.shift() 
+            }
+            setTimeout(() =>{
+                resolve(this.point.length)
+               },0)
+           }
+        )
+        //   if(that.point.length>0){
+        //     window.requestAnimationFrame(that.add)
+        //   }
         },
         createCircle(el) {
             var that = this

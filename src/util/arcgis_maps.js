@@ -9,6 +9,7 @@ export default {
     },
     data() {
         return {
+            perCount:10,
             timer:null,
             mintime:60000,
             mapObj: {},
@@ -171,22 +172,38 @@ export default {
             this.$http.get("res/gis/getLalontude",{requestModular:2},res=>{
                 // console.log(res.data)
                 this.point = res.data
-                var that = this
-                this.point.forEach (el=>{ 
-                    if(el.isAlert == 1){
-                        that.createCircle(el)
-                    }else if(el.isAlert == 2){
-                        that.createCircless(el)
-                    }else if(el.isAlert == 0){
-                        that.createCircles(el)
-                    }
-                    // that.createCircle(el)
-                })
+                if(this.point.length){
+                    this.fn()
+                }
               },err=>{
               })
-
-              
-             
+        },
+        async fn(arrs){
+            const len = await this.add()
+            if(len){
+                this.fn()
+            }
+        }, 
+        add(){
+            return new Promise((resolve, reject) => {
+                for(let i = 0;i<this.perCount;i++){
+                    if(this.point[0].isAlert == 1){
+                        this.createCircle(this.point[0])
+                    }else 
+                    if(this.point[0].isAlert == 2){
+                        this.createCircless(this.point[0])
+                    }else if(this.point[0].isAlert == 0){
+                        this.createCircles(this.point[0])
+                }
+                this.point.shift() 
+               }
+               setTimeout(() =>{
+                resolve(this.point.length)
+               },0)
+            })
+        //   if(that.point.length>0){
+        //     window.requestAnimationFrame(that.add)
+        //   }
         },
         createCircle(el) {
             var that = this
