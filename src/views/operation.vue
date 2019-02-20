@@ -212,8 +212,8 @@
                 <i-button type="primary" class="sure" @click="serach">搜索</i-button>
               </div>
             </div>
-            <Page :total="timelinelist.total" v-if="timelinelist.list.length != 0&&this.levels == 2" :current.sync="righttotals"  @on-change="changelevew2"/>
-            <Page :total="timelinelist.total" v-if="timelinelist.list.length != 0&&this.levels == 1" :current.sync="righttotals"  @on-change="changelevew1"/>
+            <Page :total="timelinelist.total" show-total v-if="timelinelist.list.length != 0&&this.levels == 2" :current.sync="righttotals"  @on-change="changelevew2"/>
+            <Page :total="timelinelist.total" show-total v-if="timelinelist.list.length != 0&&this.levels == 1" :current.sync="righttotals"  @on-change="changelevew1"/>
             <p v-if="timelinelist.list.length == 0&&this.levels == 2" style="padding:10px 0px;font-size:15px;color:#FE0302">暂无运行严重故障设备</p>
             <p v-if="timelinelist.list.length == 0&&this.levels == 1" style="padding:10px 0px;font-size:15px;color:#F4A750">暂无运行一般故障设备</p>
             <div class="timelinebox" v-if="timelinelist.list.length != 0" style="padding-left: 30px;">
@@ -653,7 +653,7 @@
                         <p style="min-width:210px;margin-left: 5px">发生时间：<span>{{list.occurTime}}</span></p>
                       </div>
                       <div style="display:flex;font-size:14px;margin-top:10px">
-                        <div style="min-width:210px;text-align:left">
+                        <div style="min-width:220px;text-align:left">
                             <p>接入设备IP地址：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="onetypelist(rightlist.poleNo,list.lan)">{{list.ipAddr}}</span></p>
                           </div>
                           
@@ -663,7 +663,7 @@
                         <div v-if="list.alertType == 'deviationAlert'||list.alertType == 'timeOffsetAlert'||list.alertType == 'portFlowAlert'||list.alertType == 'wifiSniffingOfflineAlert'||list.alertType == 'electricOfflineAlert'||list.alertType == 'gatewayOfflineAlert'||list.alertType == 'cameraOfflineAlert'||list.alertType == 'electfenceOfflineAlert'">
                             <p>分析报告：<span style="color:#1D60FE;border-bottom:1px solid #1D60FE;cursor:pointer" @click="report(list)">查看</span></p>
                           </div>
-                        
+                        <a  class="brspans"  style="color:#1D60FE;margin-left:10px;display:inline-block;border-bottom:1px solid #1D60FE;" @click.stop="fastFeedback(list.id)" v-if="list.isHandBack == 0">快速反馈处理</a>
                       </div>
                       <div class="hadpro" style="margin-top:10px;margin-bottom:0">
                             <p>接入设备安装地址：<span style="color:#1D60FE;">{{list.installAddress}}</span></p>

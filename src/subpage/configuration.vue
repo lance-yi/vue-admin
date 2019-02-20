@@ -73,7 +73,7 @@
                                            </div>
                                            <div class="detail-title">
                                                 <img src="../../public/img/66.png"/>
-                                                <p>信息栏</p>
+                                                <p>环境编码详情</p>
                                             </div>
                                            <div class="mainboxs" v-for="(list,index) in environmentdatalist.evnAttrList" :key="index">
                                                 <div v-if="list.code">
@@ -96,15 +96,15 @@
                                        </div>
                                        <button   class="zhuanyixuke"  v-if="!bianji1" style="margin-top:40px;margin-left:30%" @click="allowenvironment">确认</button>
                                        <div class="detail-title" style="position:relative">
-                                                <img src="../../public/img/66.png"/>
-                                                <p>信息栏</p>
+                                                <img src="../../public/img/num2.png"/>
+                                                <p>环境编码详情</p>
                                                 <button   class="zhuanyixuke" style="position:absolute;right:0;top:0px" @click="addgroupbottom">添加</button>
                                         </div>
                                         <Row v-for="(list,indexs) in environmentdatalist.evnAttrExtendList" :key="indexs" class="bottombox">
                                             <img src="../../public/img/xxx.png"  class="rightimg"   style="right:40px" @click="groupbottomRemove(list.id)"/>
-                                            <img src="../../public/img/bianji.png" class="rightimg" style="right:20px" @click="editgroupbottom(list)"/>
-                                            <img src="../../public/img/149.png"  class="rightimg" @click="open($event,list.isCreate)" />
-                                            <img src="../../public/img/big.png"  class="rightimg" style="display:none" @click="drawback($event)"/>
+                                            <img src="../../public/img/bj1.png" class="rightimg" style="right:20px" @click="editgroupbottom(list)"/>
+                                            <img src="../../public/img/x.png"  class="rightimg" @click="open($event,list.isCreate)" />
+                                            <img src="../../public/img/s.png"  class="rightimg" style="display:none" @click="drawback($event)"/>
                                             <Col span="7">
                                                 <div>
                                                     <span>编码：</span>{{list.name}}
