@@ -4086,9 +4086,7 @@ export default {
 .detail-textbox div span{
   display: inline-block;
 }
-.detail-textbox div span:first-child{
-  /* margin-right: 10px; */
-}
+
 /* 控制栏 */
 .control{
   margin:40px 40px 60px 40px;

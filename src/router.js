@@ -20,7 +20,9 @@ import update from '@/views/update.vue'
 import pmic from '@/views/pmic.vue'
 import address from '@/views/address.vue'
 import system from '@/views/system.vue'
+import dutymanagement from '@/views/dutymanagement.vue'
 import iView from 'iview'
+
 
 Vue.use(iView)
 Vue.use(Router)
@@ -87,6 +89,11 @@ const router = new Router({
       path: '/update',
       name: 'update',
       component: update
+    },
+    {
+      path: '/dutymanagement',
+      name: 'dutymanagement',
+      component: dutymanagement
     },
     {
       path: '/system',

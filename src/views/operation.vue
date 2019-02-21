@@ -626,11 +626,12 @@
                 
                 
                 
-                <p v-if="!alertshow" style="font-size:15px">暂无运维事件</p>
-                <div class="detail-title" v-if="alertshow">
+                
+                <div class="detail-title" >
                   <img src="../../public/img/gx.png"/>
                   <p>运维事件</p>
                 </div>
+                <p v-if="!alertshow" style="font-size:15px">暂无运维事件</p>
                  <div class="top-box" v-if="alertshow">
                   <div>
                     <button   class="zhuanyixuke" @click="delwarns" v-if="!movealert">清除警告</button>

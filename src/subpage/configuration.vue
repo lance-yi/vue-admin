@@ -72,7 +72,7 @@
                                                 </div>
                                            </div>
                                            <div class="detail-title">
-                                                <img src="../../public/img/66.png"/>
+                                                <img src="../../public/img/hjdetail.png"/>
                                                 <p>环境编码详情</p>
                                             </div>
                                            <div class="mainboxs" v-for="(list,index) in environmentdatalist.evnAttrList" :key="index">
