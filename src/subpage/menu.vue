@@ -15,16 +15,16 @@
        
        <Modal
         v-model="modal1"
-        title="新增菜单"
+        :title="toptitle"
         @on-ok="ok('formValidate')">
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" >
             <p style="margin-left: 39px;margin-bottom: 10px;" v-if="parentdata != ''">父节点<span style="margin-left:10px">{{parentdata}}</span></p>
+            <FormItem label="父节点" prop="parentId" v-if="selectnum == 2">
+                 <Cascader :data="data1" v-model="formValidate.parentId" change-on-select @on-change="changeselect"></Cascader>
+            </FormItem>
             <FormItem label="标题" prop="title" >
                 <Input v-model="formValidate.title" />
             </FormItem>
-             <!-- <FormItem label="父节点" prop="parentId" >
-                <Input v-model="formValidate.parentId" />
-            </FormItem> -->
             <FormItem label="图标" prop="icon" >
                 <Input v-model="formValidate.icon" />
             </FormItem>
@@ -75,9 +75,9 @@ import TreeGrid from '@/components/treeGrid2.0'
                 title: [
                     { required: true, message: '标题不能为空', trigger: 'blur' }
                 ],
-                parentId: [
-                    { required: true, message: '父节点不能为空', trigger: 'blur' }
-                ],
+                // parentId: [
+                //     { required: true, message: '父节点不能为空', trigger: 'change' }
+                // ],
                 // icon: [
                 //     { required: true, message: '图标不能为空', trigger: 'blur' }
                 // ],
@@ -215,6 +215,8 @@ import TreeGrid from '@/components/treeGrid2.0'
           passid:'',
           selectlist:[],
           selectnum:0,
+          toptitle:'',
+
       }
     },
     created(){
@@ -223,23 +225,26 @@ import TreeGrid from '@/components/treeGrid2.0'
         this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
                   this.data = res.data      
              },err=>{});
+        this.$http.get("oauth/menu/user/authorityullDownTree",{parentId:-1,level:2},res=>{
+                this.data1 = res.data    
+             },err=>{});
     },
     methods: {
         rowClick(data, index, event) {
-                // console.log('当前行数据:' + data)
                 // console.log('点击行号:' + index)
                 // console.log('点击事件:' + event)
                 this.selectnum = 2
                 this.formValidate.title = data.text
                 this.parentdata=''
                 this.formValidate.description = data.description
-                this.formValidate.parentId= data.parentId
+                this.formValidate.parentId=[data.parentId]
                 this.formValidate.icon = data.icon
                 this.formValidate.sort = data.sort
                 this.formValidate.href = data.path
                 this.formValidate.id = data.id
                 this.formValidate.code = data.code
                 this.modal1 = true
+                this.toptitle = '编辑菜单'
             },
         selectionClick(arr) {
             console.log(arr)
@@ -250,6 +255,7 @@ import TreeGrid from '@/components/treeGrid2.0'
             console.log('排序规则:' + type)
         },
         addmenu(){
+            this.toptitle = '新增菜单'
             if(this.selectlist.length == 0){
                 this.selectnum = 1
                 this.parentdata = '-1'
@@ -331,6 +337,9 @@ import TreeGrid from '@/components/treeGrid2.0'
                  
              }
              
+        },
+        changeselect(value){
+            this.formValidate.parentId=value[value.length-1]
         }
     }
   }

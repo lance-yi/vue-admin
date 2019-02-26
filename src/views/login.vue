@@ -81,14 +81,18 @@ export default {
             data:{"username":this.formValidate.name,"password":this.formValidate.password}
           }).then(res=>{
             localStorage.setItem('token',res.data.token);
-            // this.$router.push({path: '/personmanage'})
+       
              
             this.$http.get("oauth/userfront/currentUser",{},response=>{
-              // console.log(response.data)
+  
               this.$store.commit("userSignin",response.data);
-              // this.$router.push({path: '/safemanage'})
-              this.$http.get("oauth/menu/user/system",{},response=>{
-                // console.log(response.data)
+             
+              // this.$http.get("oauth/menu/user/system",{},response=>{
+              //   // console.log(response.data)
+              //    localStorage.setItem('navlist',JSON.stringify(response.data))
+              //   this.$router.push({path:response.data[0].path})
+              //  });
+              this.$http.get("oauth/menu/user/authorityTree",{parentId:-1,level:2},response=>{
                  localStorage.setItem('navlist',JSON.stringify(response.data))
                 this.$router.push({path:response.data[0].path})
                });

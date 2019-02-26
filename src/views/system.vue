@@ -603,36 +603,15 @@ import TreeGrid from '@/components/treeGrid2.0'
     methods: {
       wordbook(name){
          this.bookname = name
-         if(name == '字典配置'){
-            this.$router.push({path:'/system/book'})
-         }else if(name == '人员配置'){
-             this.$router.push({path:'/system'})
-             this.pages = 1
-             this.$http.get("oauth/user/searchUser",{param:'',current: 1},res=>{
-                 this.persondata = res[0].user
-                 this.showpage = true
-            //  console.log(res[0].user)
-            },err=>{});
-            
-         }else if(name == '角色管理'){
-             this.$router.push({path:'/system/role'})
-            //  this.$http.get("oauth/group/all",{},res=>{
-            //   this.rolelist = res.data
-            // },err=>{});
-         }else if(name == '菜单管理'){
-             this.$router.push({path:'/system/menu'})
-            //  this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
-            //       this.data = res.data      
-            //  },err=>{});
-         }else if(name == '报表生成策略'){
-              this.$router.push({path:'/system/echartstime'})
-         }else if(name == '行政区划'){
-              this.$router.push({path:'/system/administrativearea'})
-         }else if(name == '告警配置'){
-              this.$router.push({path:'/system/alarmconfiguratioan'})
-         }else if(name == '设备配置'){
-              this.$router.push({path:'/system/configuration'})
-         }
+         this.navlist.forEach(el => {
+           if(el.title == name){
+               if(name == '人员配置'){
+                 this.$router.push({path:'/system'})
+               }else{
+                 this.$router.push({path:el.path})
+               }
+           }
+      });
       },
       checkbook(list){
         this.edittile = '编辑字典'
