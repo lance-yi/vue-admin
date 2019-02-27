@@ -101,7 +101,8 @@ export default {
   },
   computed:{
     ...mapState({
-      noSide: "noSide"
+      noSide: "noSide",
+      // lists: "navList"
     })
   },
   mounted() {

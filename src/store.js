@@ -8,7 +8,8 @@ export default new Vuex.Store({
   state: {
     noSide: false,
     loginState: false || Boolean(localStorage.getItem("token")), // 登录装填
-    userInfo: JSON.parse( localStorage.getItem("userInfo") ) || {}  // 用户基本信息
+    userInfo: JSON.parse( localStorage.getItem("userInfo") ) || {},  // 用户基本信息
+    navList:JSON.parse(localStorage.getItem('navlist'))
   },
   mutations: {
     // 登录状态
