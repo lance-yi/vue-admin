@@ -18,9 +18,12 @@
         :title="toptitle"
         @on-ok="ok('formValidate')">
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" >
-            <p style="margin-left: 39px;margin-bottom: 10px;" v-if="parentdata != ''">父节点<span style="margin-left:10px">{{parentdata}}</span></p>
-            <FormItem label="父节点" prop="parentId" v-if="selectnum == 2">
+            <!-- <p style="margin-left: 39px;margin-bottom: 10px;" v-if="parentdata != ''">父节点<span style="margin-left:10px">{{parentdata}}</span></p> -->
+            <FormItem label="父节点" prop="parentId" >
                  <Cascader :data="data1" v-model="formValidate.parentId" change-on-select @on-change="changeselect"></Cascader>
+            </FormItem>
+            <FormItem label="编码" prop="code" >
+                <Input v-model="formValidate.code" />
             </FormItem>
             <FormItem label="标题" prop="title" >
                 <Input v-model="formValidate.title" />
@@ -33,9 +36,6 @@
             </FormItem>
             <FormItem label="描述" prop="description" >
                 <Input v-model="formValidate.description" />
-            </FormItem>
-            <FormItem label="编码" prop="code" >
-                <Input v-model="formValidate.code" />
             </FormItem>
             <FormItem label="地址" prop="href" >
                 <Input v-model="formValidate.href" />
@@ -84,9 +84,9 @@ import TreeGrid from '@/components/treeGrid2.0'
                 // sort: [
                 //     { required: true, message: '排序不能为空', trigger: 'blur' }
                 // ],
-                description: [
-                    { required: true, message: '描述不能为空', trigger: 'blur' }
-                ],
+                // description: [
+                //     { required: true, message: '描述不能为空', trigger: 'blur' }
+                // ],
                 code: [
                     { required: true, message: '编码不能为空', trigger: 'blur' }
                 ],
@@ -225,7 +225,7 @@ import TreeGrid from '@/components/treeGrid2.0'
         this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
                   this.data = res.data      
              },err=>{});
-        this.$http.get("oauth/menu/user/authorityullDownTree",{parentId:-1,level:2},res=>{
+        this.$http.get("oauth/menu/user/authorityullDownTree",{parentId:-1},res=>{
                 this.data1 = res.data    
              },err=>{});
     },
@@ -233,11 +233,16 @@ import TreeGrid from '@/components/treeGrid2.0'
         rowClick(data, index, event) {
                 // console.log('点击行号:' + index)
                 // console.log('点击事件:' + event)
+                console.log(data)
                 this.selectnum = 2
                 this.formValidate.title = data.text
                 this.parentdata=''
                 this.formValidate.description = data.description
-                this.formValidate.parentId=[data.parentId]
+                if(data.parentId == -1){
+                  this.formValidate.parentId =''
+                }else{
+                      this.formValidate.parentId = data.parentPath
+                }
                 this.formValidate.icon = data.icon
                 this.formValidate.sort = data.sort
                 this.formValidate.href = data.path
@@ -261,6 +266,7 @@ import TreeGrid from '@/components/treeGrid2.0'
                 this.parentdata = '-1'
                 this.formValidate.title = ''
                 this.formValidate.parentId= '-1'
+                this.formValidate.attr2 = '-1'
                 this.formValidate.icon= ''
                 this.formValidate.sort= ''
                 this.formValidate.description= ''
@@ -272,7 +278,12 @@ import TreeGrid from '@/components/treeGrid2.0'
                 this.selectnum = 1
                 this.formValidate.title = ''
                 this.parentdata =this.selectlist[0].text
-                this.formValidate.parentId= this.selectlist[0].id
+                this.formValidate.parentId= this.selectlist[0].parentPath
+                var aa =""
+                this.selectlist[0].parentPath.forEach(el => {
+                aa= aa + el+'/'
+                });
+                this.formValidate.attr2= aa
                 this.formValidate.icon= ''
                 this.formValidate.sort= ''
                 this.formValidate.description= ''
@@ -292,14 +303,16 @@ import TreeGrid from '@/components/treeGrid2.0'
                             this.$http.post("oauth/menu/add",this.formValidate,res=>{
                                this.$Message.info(res.message);
                                 this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
-                                this.data = res.data      
+                                this.data = res.data 
+                                 localStorage.setItem('navlist',JSON.stringify(res.data))    
                                 },err=>{});
                             },err=>{});
                         }else if(this.selectnum == 2){
                             this.$http.put("oauth/menu/update",this.formValidate,res=>{
                                  this.$Message.info(res.message);
                                  this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
-                                this.data = res.data      
+                                this.data = res.data  
+                                  localStorage.setItem('navlist',JSON.stringify(res.data)) 
                                 },err=>{});
                             },err=>{});
                         }
@@ -325,7 +338,8 @@ import TreeGrid from '@/components/treeGrid2.0'
                      this.selectlist.forEach(data => {list.push(data.id) })
                      this.$http.delete("oauth/menu/deleteByIds",list,res=>{
                         this.$http.get("oauth/menu/user/authorityTree?",{parentId:-1},res=>{
-                                this.data = res.data      
+                                this.data = res.data
+                                 localStorage.setItem('navlist',JSON.stringify(res.data))    
                             },err=>{});
                         },err=>{});
                  }else{
@@ -339,7 +353,18 @@ import TreeGrid from '@/components/treeGrid2.0'
              
         },
         changeselect(value){
-            this.formValidate.parentId=value[value.length-1]
+            if(value.length == 0){
+              this.formValidate.parentId = '-1'
+              this.formValidate.attr2 = '-1'
+            }else{
+              var aa =""
+                value.forEach(el => {
+                aa= aa + el+'/'
+                });
+                this.formValidate.attr2= aa
+                this.formValidate.parentId = value[value.length - 1]
+            }
+            
         }
     }
   }

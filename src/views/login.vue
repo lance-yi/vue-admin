@@ -1,9 +1,9 @@
 <template>
   <div class="bigbox" >
-    <img src="../../public/img/er.png" style="position: absolute;left: 0;top: 284px;width:720px"/>
+    <!-- <img src="../../public/img/er.png" style="position: absolute;left: 0;top: 284px;width:720px"/>
     <img src="../../public/img/Andriod.png" style="position: absolute;left: 423px;top: 360px;width: 170px;height: 171px;"/>
     <img src="../../public/img/ios.png" style="position: absolute;left: 133px;top: 360px;width: 170px;height: 171px;"/>
-     <img src="../../public/img/rr.png" style="position: absolute;right: 10%;top: 300px;width: 500px;height: 300px;"/>
+     <img src="../../public/img/rr.png" style="position: absolute;right: 10%;top: 300px;width: 500px;height: 300px;"/> -->
       <div class="posibox">
           <div class="flexbox">
               <div class="textbox">
@@ -136,9 +136,11 @@ export default {
     }
     .posibox{
         position: absolute;
-        /* left: 0; */
         top: 165px;
-        right: 16%;
+        /* right: 16%; */
+        margin: 0 auto;
+        right: 0;
+        left: 0;
         bottom: 0;
         /* margin: auto; */
         width: 400px;

@@ -576,9 +576,10 @@ import TreeGrid from '@/components/treeGrid2.0'
             //  console.log(res[0].user)
             },err=>{});
     this.$http.get("oauth/menu/menuTreeByPath?path=/system",{},res=>{
-                this.navlist = res.data
-                this.$router.push({path:res.data[0].path})
-                this.bookname = res.data[0].title
+                this.navlist = res.data[0].children
+                console.log(res.data[0].children[0].path)
+                this.$router.push({path:res.data[0].children[0].path})
+                this.bookname = res.data[0].children[0].title
             },err=>{});
      this.$http.get("oauth/user/dic",{},res=>{
                 this.selectlist = res.data

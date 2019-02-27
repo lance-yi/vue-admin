@@ -1,6 +1,5 @@
 <template>
   <div class="nav-center">
-    <!-- <span class="switch" @click="changeSide(!noSide)">{{ noSide ? '显示导航' : '隐藏导航'}}</span> -->
     <div style="background:#F8F9FA;padding-top:10px">
        <div @click="changeSide(!noSide)" v-if="!noSide">
          <img src="../../public/img/ss1.png" />
@@ -11,28 +10,29 @@
     </div>
     <div class="menu" :class="{ noSide: noSide }">
       <ul class="item">
-        <router-link tag="li" :to="x.path" v-for="(x,index) in lists" class="clearfix main-item" :key="index" :class="x.path == '/'+$route.name ? 'on' : ''"   @click.native="gotopage(x.path)">
+        <li tag="li"  v-for="(x,index) in lists" class="clearfix main-item" :key="index" :class="navindex == index ? 'checknav' : ''"   @click="gotopage(x,index)" >
           <img :src="require('../../public/img/'+x.icon+'.png')" class="icon">
           <div class="inner">
-            <!-- <a :class="x.path == '/'+$route.name?'titles':'title'" @click.stop="x._show = !x._show" >
-              {{ x.title }}
-            </a> -->
-            <a class="title" @click.stop="x._show = !x._show" >
+            <a class="title" >
               {{ x.title }}
             </a>
-            <ul class="item" v-if="x._show && x.children.length">
-              <li v-for="(y,i) in x.children" :key="i">
-                <a class="title">
-                  <i>图标</i>
+            <img src="../../public/img/x.png" class="imgbottom" v-if="x.children.length > 0&&openindex != index"/>
+            <img src="../../public/img/s.png" class="imgbottom" v-if="openindex == index"/>
+            <ul class="item" v-if="openindex == index" >
+              <li v-for="(y,i) in x.children" :key="i" @click.stop="gotochildren(y,i)" :class="childrenindex == i ? 'checknav' : ''">
+                <a class="title" style="padding:0">
+                  <img :src="require('../../public/img/'+y.icon+'.png')" class="icon" style="margin-right:20px;margin-top: 10px;" v-if="y.icon">
                   {{ y.title }}
                 </a>
+                <!-- <img src="../../public/img/x.png" class="imgbottom" v-if="y.children.length > 0"/> -->
               </li>
             </ul>
           </div>
-        </router-link>
+        </li>
       </ul>
     </div>
   </div>
+  
 </template>
 
 <script>
@@ -45,7 +45,9 @@ export default {
   data(){
     return {
       lists:JSON.parse(localStorage.getItem('navlist')),
-
+      navindex:-1,
+      openindex:-1,
+      childrenindex:-1,
       // lists: [
       //   {
       //     url: '/safemanage',
@@ -105,21 +107,62 @@ export default {
   mounted() {
     this.lists.forEach (el=>{ if(el.path == '/bigscreenshow') { el.path = '#' }})
     // console.log(this.lists)
+    this.navindex = localStorage.getItem('num')
+    this.childrenindex = localStorage.getItem('nums')
   },
   methods: {
     changeSide(bl){
       this.$store.commit("changeSide",bl);
     },
-    gotopage(url){
-      if(url == this.$route.path){
-        this.$router.go(0)
+    gotopage(data,index){
+      if(data.children.length == 0){
+        this.navindex = index
+        this.childrenindex = -1
+        this.openindex = -1
+        if(data.path == this.$route.path){
+          this.$router.go(0)
+          localStorage.setItem('num', index)
+        }else if(data.path == '#'){
+          window.open(window.g.bigscreenUrl+"#/bigscreenshow")
+        }else{
+          this.$router.push(data.path)
+        }
+      }else{
+        if(this.openindex == index){
+          this.openindex = -1
+        }else{
+          this.openindex = index
+        }
       }
-      // console.log(url)
-      // console.log(this.$route.path)
-      if(url == '#'){
-        window.open(window.g.bigscreenUrl+"#/bigscreenshow")
+    },
+    gotochildren(data,index){
+      this.childrenindex = index
+      this.navindex = -1
+      if(data.children.length == 0){
+        // this.childrenindex = index
+        // this.openindex = -1
+        if(data.path == this.$route.path){
+          this.$router.go(0)
+        }else if(data.path == '#'){
+          window.open(window.g.bigscreenUrl+"#/bigscreenshow")
+        }else{
+          this.$router.push(data.href)
+        }
+      }else{
+          this.$router.push(data.href)
+          if(data.href == '/system'){
+            console.log(1111)
+          this.$router.go(0)
+          localStorage.setItem('nums', index)
+          }
       }
-      
+      // else{
+      //   if(this.openindex == index){
+      //     this.openindex = -1
+      //   }else{
+      //     this.openindex = index
+      //   }
+      // }
     },
     asyncList: function (num) {
       var that = this
@@ -206,17 +249,19 @@ export default {
     list-style: none;
     li {
       position: relative;
-      padding: 10px 16px;
+      // padding: 10px 16px;
+      line-height: 40px;
       cursor: pointer;
       border-left: 8px solid #F8F9FA;
-      &.router-link-active,&.on{
-        border-left: 8px solid #1D60FE;
-        background: #fff;
-      }
+      // &.router-link-active,&.on{
+      //   border-left: 8px solid #1D60FE;
+      //   background: #fff;
+      // }
       .icon{
         display: block;
         float: left;
-        margin-top: 5px;
+        margin-top: 20px;
+        padding-left: 16px;
       }
     }
     .title {
@@ -225,7 +270,7 @@ export default {
       text-align: left;
       cursor: pointer;
       font-size: 17px;
-      margin-top: 0;
+      margin-top: 8px;
     }
     .titles{
       display: block;
@@ -233,74 +278,18 @@ export default {
       text-align: left;
       cursor: pointer;
       font-size: 17px;
-      margin-top: 0;
+      margin-top: 8px;
       color: #1D60FE;
     }
   }
 }
-// .navbox{
-//   position: absolute;
-//   top: 0;
-//   width: 15%;
-//   height: 100%;
-//   font-size: 14px;
-//   text-align: left;
-//   min-width: 220px;
-// }
-// .headcom div{
-//   text-align: center;
-//   width: 15%;
-//   background:#F8F9FA ;
-//   height: 100%;
-//   display: flex;
-//   align-items: center;
-// }
-// .headcom .logobox{
-//   /*height: 100px;*/
-//   text-align: center;
-// }
-// .logo{
-//   background-size: 100% 100%;
-//   width: 40px;
-//   align-items: center;
-//   margin: 0 auto;
-// }
-// .textlog{
-//   height: 50px;
-//   margin-left: 4%;
-// }
-// .nav{
-//   width: 15%;
-//   background: #F8F9FA;
-//   height: 100%;
-//   position: fixed;
-//   top:10%;
-//   min-width: 220px;
-// }
-// .nav li{
-//   min-width: 220px;
-//   padding: 10px 0;
-//   display:-webkit-box;
-//   display: -moz-box;
-//   display: -ms-flexbox;
-//   display: -webkit-flex;
-//   display: flex;
-//   align-items: center;
-//   border-left: 5px solid #F8F9FA;
-// }
-// .nav .check{
-//   border-left: 5px solid #1D60FE;
-//   background: #fff;
-// }
-// .navicon{
-//   width: 20px;
-//   height: 20px;
-//   margin-left: 40px;
-// }
-// .nav li p{
-//   font-size: #000;
-//   font-size: 18px;
-//   margin-left: 30px;
-//   color: #7E8184;
-// }
+ .nav-center ul .checknav{
+     border-left: 8px solid #1D60FE;
+     background: #fff;
+   }
+   .imgbottom{
+     position: absolute;
+     right: 25px;
+     top: 25px;
+   }
 </style>

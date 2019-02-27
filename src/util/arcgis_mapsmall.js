@@ -100,10 +100,10 @@ export default {
             };
         },
         initMap(obj) {
-            // obj.basemaps.delorme = {baseMapLayers: [{url: "http://100.16.3.40:6080/arcgis/rest/services/wuhann/MapServer"}]}
+            obj.basemaps.delorme = {baseMapLayers: [{url: "http://100.16.3.40:6080/arcgis/rest/services/wuhann/MapServer"}]}
             this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
-            let map = new obj.Map('maps', {logo: false,basemap: "streets-navigation-vector",slider:false});// 创建地图实例
-            // let map = new obj.Map('maps', {logo: false,basemap: "delorme",},);
+            // let map = new obj.Map('maps', {logo: false,basemap: "streets-navigation-vector",slider:false});// 创建地图实例
+            let map = new obj.Map('maps', {logo: false,basemap: "delorme",},);
             if(this.propsmap){
                     let pt = new obj.Point(this.propsmap.gateway.longitude,this.propsmap.gateway.latitude); // 设置中心点
                     map.centerAndZoom(pt,13); // 设置中心点和缩放级别;

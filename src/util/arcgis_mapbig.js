@@ -164,7 +164,8 @@ export default {
             };
         },
         initMap(obj) {
-            obj.basemaps.delorme = {baseMapLayers: [{url: "https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer"}]}
+            // obj.basemaps.delorme = {baseMapLayers: [{url: "https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer"}]}
+            obj.basemaps.delorme = {baseMapLayers: [{url: "http://100.16.3.40:6080/arcgis/rest/services/wuhann/MapServer"}]}
             this.mapObj = obj;// 将对象保存到vue data 的 maoObj中,方便调用;
             // let map = new obj.Map('map', {logo: false,basemap: "dark-gray-vector",},);// 创建地图实例
             let map = new obj.Map('map', {logo: false,basemap: "delorme",},);
